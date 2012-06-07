@@ -1,0 +1,9 @@
+
+# dovecot LDA - see http://wiki.dovecot.org/LDA/Postfix
+# ownership of mail is given to dovecot "internal user"
+dovecot   unix  -       n       n       -       -       pipe
+  flags=DRhu user=dovecot:dovecot 
+  argv=/usr/libexec/dovecot/dovecot-lda 
+                   -f $\{sender\} 
+ 		   -d $\{recipient\}
+

@@ -1,0 +1,41 @@
+#!/usr/bin/perl -w
+
+#
+# NethServer Mail Server events configuration
+#
+# Copyright (C) 2012 Nethesis srl
+# See COPYING for licensing informations
+#
+
+use esmith::Build::CreateLinks qw(:all);
+use File::Path;
+
+#
+# UPDATE event
+#
+
+event_templates('nethserver-mail-server-update',
+		'/etc/postfix/main.cf',
+		'/etc/postfix/master.cf');
+
+event_actions('nethserver-mail-server-update',
+	      'nethserver-mail-server-conf' => '20',
+	      'firewall-adjust' => '30',
+	      'runlevel-adjust' => '40');
+
+event_services('nethserver-mail-server-update',
+	       'postfix' => 'restart');
+
+
+#
+# SAVE event
+#
+
+event_templates('nethserver-mail-server-save',
+		'/etc/postfix/main.cf',
+		'/etc/postfix/master.cf');
+
+event_services('nethserver-mail-server-save',
+	       'dovecot' => 'reload',
+	       'postfix' => 'reload');
+
