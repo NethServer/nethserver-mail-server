@@ -1,0 +1,20 @@
+#
+# user and password databases
+#
+passdb \{
+       driver = pam
+\}
+
+#
+# FIXME: 97 is the dovecot user
+#
+userdb \{
+       driver = static
+       args = uid=97 gid=97 home=/var/lib/vmaildirs/private/%u
+\}      
+
+#
+# Maildir relative home settings returned by userdb
+#
+mail_location = maildir:~/Maildir
+

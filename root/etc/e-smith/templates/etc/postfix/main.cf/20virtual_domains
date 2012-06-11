@@ -4,8 +4,6 @@
 
 # All domains DB keys are listed here:
 virtual_mailbox_domains = { 
-    use esmith::DomainsDB;
-    my $domainsDb = esmith::DomainsDB->open_ro();
     return join(", ", $domainsDb->keys());
 }
 
