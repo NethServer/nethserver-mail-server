@@ -19,9 +19,14 @@ my $configDb = esmith::ConfigDB->open() || die("Could not open ConfigDB");
 
 my @postmapUpdateList = split(',', $configDb->get_prop('mail', 'PostmapUpdateList'));
 
-if ( ! grep($_ eq '/etc/postfix/virtual', @postmapUpdateList) ) {
-    push @postmapUpdateList, '/etc/postfix/virtual';
-    $configDb->set_prop('mail', 'PostmapUpdateList', join(',', @postmapUpdateList));
+foreach my $table (qw(
+    /etc/postfix/virtual 
+    /etc/postfix/transport
+)) {
+    if ( ! grep($table eq $_, @postmapUpdateList) ) {
+	push @postmapUpdateList, $table;
+	$configDb->set_prop('mail', 'PostmapUpdateList', join(',', @postmapUpdateList));
+    }
 }
 
 
