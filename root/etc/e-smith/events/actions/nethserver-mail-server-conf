@@ -8,8 +8,23 @@
 #
 
 use NethServer::Service;
+use esmith::ConfigDB;
+
 
 NethServer::Service::manage_add('nethserver-mail-server',
 				'dovecot',
 				'postfix');
+
+my $configDb = esmith::ConfigDB->open() || die("Could not open ConfigDB");
+
+my @postmapUpdateList = split(',', $configDb->get_prop('mail', 'PostmapUpdateList'));
+
+if ( ! grep($_ eq '/etc/postfix/virtual', @postmapUpdateList) ) {
+    push @postmapUpdateList, '/etc/postfix/virtual';
+    $configDb->set_prop('mail', 'PostmapUpdateList', join(',', @postmapUpdateList));
+}
+
+
+
+
 
