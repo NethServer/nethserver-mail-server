@@ -1,0 +1,57 @@
+#
+# Namespace setup
+#
+
+# Private mailboxes
+namespace \{
+  type = private
+  separator = /
+  prefix = 
+  # location defaults to mail_location.
+  inbox = yes
+\}
+
+# Public mailboxes are { $dovecot{PublicMailboxesStatus} }
+{
+    if($dovecot{PublicMailboxesStatus} ne 'enabled') {
+        return '';
+    }
+
+    return <<NAMESPACE;
+namespace {
+  type = public
+  separator = /
+  prefix = Public/
+  location = maildir:/var/lib/vmaildirs/public
+  subscriptions = no
+}
+NAMESPACE
+}
+# Shared mailboxes are { $dovecot{SharedMailboxesStatus} }
+{
+    if($dovecot{SharedMailboxesStatus} ne 'enabled') {
+        return '';
+    }
+
+    return <<NAMESPACE;
+namespace {
+  type = shared
+  separator = /
+  prefix = shared/%%u
+  location = maildir:/var/lib/vmaildirs/shared/%%u/Maildir:INDEX=~/Maildir/shared/%%u
+  subscriptions = no
+  list = children
+}
+
+# Enable acl plugin for shared mailboxes
+mail_plugins = acl
+protocol imap {
+  mail_plugins = \$mail_plugins imap_acl
+}
+plugin {
+  acl = vfile
+  acl_shared_dict = file:/var/lib/dovecot/shared-mailboxes.db
+}
+NAMESPACE
+}
+
