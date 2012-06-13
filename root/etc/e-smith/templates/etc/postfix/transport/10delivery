@@ -1,5 +1,5 @@
 #
-# Domain-specific delivery table
+# Domain-specific delivery table (Local and Remote)
 #
 {
     use esmith::DomainsDB;
