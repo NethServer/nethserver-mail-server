@@ -22,7 +22,7 @@ service lmtp \{
     unix_listener lmtp \{
         user = vmail
         group = vmail
-        mode = 0660
+        mode = 00660
     \}
 
 \}

@@ -1,4 +1,21 @@
 #
-# Virtual alias table
+# dovecot-lmtp virtual addresses
 #
+{
+    use esmith::AccountsDB;
 
+    my $accountsDb = esmith::AccountsDB->open_ro();
+
+    $OUT = '';
+
+    foreach my $record ($accountsDb->pseudonyms()) {
+
+	my $userName = $record->key;
+	my $domain = $record->prop('Domain');
+	my $account = $record->prop('Account');
+
+	$OUT .= $userName . '@' . $domain . "\t\t" . $account . "\n";
+
+    }
+
+}

@@ -7,8 +7,7 @@ virtual_mailbox_domains = {
     return join(", ", $domainsDb->keys());
 }
 
-virtual_mailbox_maps = hash:/etc/postfix/vmailbox
+smtpd_recipient_restrictions = permit_mynetworks, reject_unauth_destination, reject_unverified_recipient
 virtual_alias_maps = hash:/etc/postfix/virtual
-dovecot_destination_recipient_limit = 1
-virtual_transport = dovecot
+
 
