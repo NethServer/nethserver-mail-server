@@ -7,7 +7,12 @@ virtual_mailbox_domains = {
     return join(", ", $domainsDb->keys());
 }
 
-smtpd_recipient_restrictions = permit_mynetworks, reject_unauth_destination, reject_unverified_recipient
+smtpd_recipient_restrictions = 
+  permit_mynetworks
+  permit_sasl_authenticated
+  reject_unauth_destination
+  reject_unverified_recipient
+
 virtual_alias_maps = hash:/etc/postfix/virtual
 
 
