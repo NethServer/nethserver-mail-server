@@ -1,5 +1,5 @@
 #
-# Mailbox owner
+# Mailbox system user owner
 #
 first_valid_uid = { 
     $uid = (getpwnam('vmail'))[2] or die('Missing vmail user'); 
@@ -7,20 +7,21 @@ first_valid_uid = {
 }
 last_valid_uid = { $uid; }
 
-#
-# Password database: PAM
-#
+# Password database: ldap
 passdb \{
-       driver = pam
+    driver = ldap
+    args = /etc/dovecot/ldap.conf
 \}
 
-#
 # Static user database - { $uid } corresponds to vmail user
-#
 userdb \{ 
        driver = static
-       args = uid={ $uid } gid={ $gid } home=/var/lib/vmail/private/%u
+       args = uid={ $uid } gid={ $gid } home=/var/lib/vmail/private/%n
 \}      
 
+# Location of mailboxes:
 mail_location = maildir:~/Maildir
+
+# Username formatting before it's looked up from databases
+auth_username_format = %n
 

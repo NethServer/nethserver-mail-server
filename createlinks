@@ -15,6 +15,7 @@ my @templates = qw(
     /etc/postfix/transport
     /etc/postfix/virtual
     /etc/dovecot/dovecot.conf
+    /etc/dovecot/ldap.conf
 );
 
 #

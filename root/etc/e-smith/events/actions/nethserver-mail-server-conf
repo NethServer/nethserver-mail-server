@@ -8,12 +8,20 @@
 #
 
 use NethServer::Service;
+use NethServer::Directory;
 use esmith::ConfigDB;
-
 
 NethServer::Service::manage_add('nethserver-mail-server',
 				'dovecot',
 				'postfix');
+
+my $uid = (getpwnam('dovecot'))[2] or die('Missing dovecot user'); 
+my $gid = (getgrnam('dovecot'))[2] or die('Missing dovecot group');
+
+my $ldapAccessDirective = qq(by dn.exact="gidNumber=$gid+uidNumber=$uid,cn=peercred,cn=external,cn=auth" read);
+
+NethServer::Directory::addAccessDirective($ldapAccessDirective, 'userPassword');
+NethServer::Directory::addAccessDirective($ldapAccessDirective, '*');
 
 my $configDb = esmith::ConfigDB->open() || die("Could not open ConfigDB");
 

@@ -10,11 +10,11 @@
 
     foreach my $record ($accountsDb->pseudonyms()) {
 
-	my $userName = $record->key;
+	my $pseudonym = $record->key;
 	my $domain = $record->prop('Domain');
 	my $account = $record->prop('Account');
 
-	$OUT .= $userName . '@' . $domain . "\t\t" . $account . "\n";
+	$OUT .= "$pseudonym\@$domain" . "\t\t" . "$account\@$domain\n";
 
     }
 

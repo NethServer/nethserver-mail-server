@@ -1,0 +1,17 @@
+#
+# LDAP Dovecot configuration
+#
+
+uris = ldapi:///
+
+sasl_bind = yes
+sasl_mech = external
+tls = no
+
+base = ou=People,dc=directory,dc=nh
+scope = onelevel
+
+pass_attrs = uid=user, userPassword=password
+pass_filter = (&(objectClass=posixAccount)(uid=%n))
+
+default_pass_scheme = CRYPT

@@ -27,3 +27,11 @@ service lmtp \{
 
 \}
 
+service auth \{
+    unix_listener auth-userdb \{
+       mode = 00660
+       # user = <default>
+       group = vmail
+    \}
+\}
+
