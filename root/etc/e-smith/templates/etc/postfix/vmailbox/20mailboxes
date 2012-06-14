@@ -1,0 +1,34 @@
+
+# Mailbox list:
+{
+    use esmith::AccountsDB;
+
+    my $accountsDb = esmith::AccountsDB->open_ro();
+
+    my %accountHash = ();
+
+    foreach my $record ($accountsDb->pseudonyms()) {
+
+	my $pseudonym = $record->key;
+	my $account = $record->prop('Account');
+	my $domain = $pseudonym;
+
+	# Trim the address part:
+	$domain =~ s/([^@]+@)//;
+
+	if(! $domain ) {
+	    warn "Found pseudonym key `$pseudonym` without \@domain suffix: skipped";
+	    next;
+	}
+
+	$accountHash{"$account\@$domain"} = 1;
+
+    }
+
+    if( %accountHash ) {
+	$OUT = join("\n", map { $_ . "\t\tok" } keys %accountHash) . "\n";
+    } else {
+	$OUT = "# ..no mailbox defined\n";
+    }
+}
+

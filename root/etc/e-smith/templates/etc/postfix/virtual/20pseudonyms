@@ -1,0 +1,34 @@
+
+# Virtual addresses list:
+{
+    use esmith::AccountsDB;
+
+    my $accountsDb = esmith::AccountsDB->open_ro();
+
+    my @addressList = ();
+
+    foreach my $record ($accountsDb->pseudonyms()) {
+	my $pseudonym = $record->key;
+	my $account = $record->prop('Account');
+	my $domain = $pseudonym;
+
+	# Trim the address part:
+	$domain =~ s/([^@]+@)//;
+
+	if(! $domain ) {
+	    warn "Found pseudonym key `$pseudonym` without \@domain suffix: skipped";
+	    next;
+	}
+
+	my $entry = $pseudonym . "\t\t" . "$account\@$domain";
+
+	push @addressList, $entry;
+    }
+
+    if(@addressList) {
+	$OUT = join("\n", @addressList) . "\n";
+    } else {
+	$OUT = "# no virtual address defined\n";
+    }
+}
+

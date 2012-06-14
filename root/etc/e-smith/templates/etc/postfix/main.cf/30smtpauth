@@ -18,3 +18,12 @@ smtpd_tls_key_file = /etc/pki/dovecot/private/dovecot.pem
 # remote SMTP clients, but does not require that clients use TLS
 # encryption:
 smtpd_tls_security_level = may
+
+# Local and SASL authenticated clients can send mail everywhere:
+smtpd_recipient_restrictions = 
+  permit_mynetworks,
+  permit_sasl_authenticated,
+  reject_unauth_destination
+
+
+

@@ -1,18 +1,18 @@
-#
-# Virtual domains
+{
+    # Fill the list of domains with Local or Remote Delivery type:
+    $domainList = ();
+    foreach my $domainRecord ($domainsDb->get_all_by_prop(type => 'domain')) {
+	my $deliveryType = $domainRecord->prop('TransportType');
+	if($deliveryType eq 'LocalDelivery'
+	    || $deliveryType eq 'RemoteDelivery') {
+	    push @domainList, $domainRecord->key;
+	}
+    }
+    '';
+}#
+# Virtual domains are { scalar @domainList ? 'enabled' : 'disabled' }
 # 
-
-# All domains DB keys are listed here:
-virtual_mailbox_domains = { 
-    return join(", ", $domainsDb->keys());
-}
-
-smtpd_recipient_restrictions = 
-  permit_mynetworks
-  permit_sasl_authenticated
-  reject_unauth_destination
-  reject_unverified_recipient
-
-virtual_alias_maps = hash:/etc/postfix/virtual
-
+virtual_mailbox_domains = { join(' ', @domainList); }
+virtual_mailbox_maps = { scalar @domainList ? 'hash:/etc/postfix/vmailbox' : '' }
+virtual_alias_maps = { scalar @domainList ? 'hash:/etc/postfix/virtual' : '' }
 

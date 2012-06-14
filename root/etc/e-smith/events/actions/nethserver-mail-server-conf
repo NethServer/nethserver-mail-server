@@ -30,6 +30,7 @@ my @postmapUpdateList = split(',', $configDb->get_prop('postfix', 'PostmapUpdate
 foreach my $table (qw(
     /etc/postfix/virtual 
     /etc/postfix/transport
+    /etc/postfix/vmailbox
 )) {
     if ( ! grep($table eq $_, @postmapUpdateList) ) {
 	push @postmapUpdateList, $table;
