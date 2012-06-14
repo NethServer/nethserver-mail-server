@@ -20,7 +20,7 @@ my @templates = qw(
 );
 
 #
-# UPDATE event
+# nethserver-mail-server-UPDATE event
 #
 
 event_templates('nethserver-mail-server-update', @templates);
@@ -38,7 +38,7 @@ event_services('nethserver-mail-server-update',
 
 
 #
-# SAVE event
+# nethserver-mail-server-SAVE event
 #
 
 event_templates('nethserver-mail-server-save', @templates);
@@ -56,3 +56,19 @@ File::Path::make_path('root/var/lib/vmail/private',
 		      'root/var/lib/vmail/shared',  
 		      { mode => 00700 }
     );
+
+
+#
+# pseudonym-* events expand and reload postfix table templates
+#
+
+my @pseudonymTemplates = qw(
+    /etc/postfix/virtual
+    /etc/postfix/vmailbox
+);
+
+foreach (qw(create modify delete)) {
+    event_templates('pseudonym-' . $_, @pseudonymTemplates);
+    event_actions('pseudonym-'   . $_, 'nethserver-mail-postmap-update' => '30');
+    event_services('pseudonym-'  . $_, 'postfix' => 'reload');
+}
