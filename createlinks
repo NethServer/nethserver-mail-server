@@ -51,8 +51,8 @@ event_services('nethserver-mail-server-save',
 	       'postfix' => 'reload');
 
 
-File::Path::make_path(['root/var/lib/vmail/private', 
-		       'root/var/lib/vmail/public', 
-		       'root/var/lib/vmail/shared'], 		      
+File::Path::make_path('root/var/lib/vmail/private', 
+		      'root/var/lib/vmail/public', 
+		      'root/var/lib/vmail/shared',  
 		      { mode => 00700 }
     );
