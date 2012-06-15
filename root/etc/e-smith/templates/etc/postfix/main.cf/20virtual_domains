@@ -1,13 +1,6 @@
 {
-    # Fill the list of domains with Local or Remote Delivery type:
-    $domainList = ();
-    foreach my $domainRecord ($domainsDb->get_all_by_prop(type => 'domain')) {
-	my $deliveryType = $domainRecord->prop('TransportType');
-	if($deliveryType eq 'LocalDelivery'
-	    || $deliveryType eq 'RemoteDelivery') {
-	    push @domainList, $domainRecord->key;
-	}
-    }
+    use NethServer::MailServer;
+    @domainList = NethServer::MailServer->new()->getDeliveryDomains();
     '';
 }#
 # Virtual domains are { scalar @domainList ? 'enabled' : 'disabled' }

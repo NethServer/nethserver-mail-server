@@ -1,0 +1,24 @@
+#!/usr/bin/perl
+
+#
+# NethServer -- nethserver-mail-pseudonym-sync
+#
+# Synchronize system pseudonyms with user account state
+#
+# Copyright (C) 2012 Nethesis srl
+#
+
+use strict;
+
+use NethServer::MailServer;
+
+my $event = shift;
+my $user = shift;
+
+if(NethServer::MailServer->new()->createUserPseudonyms($user)) {
+    exit 0;
+}
+
+exit 1;
+
+
