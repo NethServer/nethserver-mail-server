@@ -8,6 +8,7 @@ package NethServer::MailServer;
 
 use esmith::AccountsDB;
 use esmith::DomainsDB;
+use Encode;
 use Text::Unidecode;
 
 =head1 NethServer::MailServer package
@@ -118,8 +119,8 @@ sub createUserDefaultPseudonyms($)
 	return 0; # failure
     }
 
-    my $firstName = lc(unidecode($userRecord->prop('FirstName')));
-    my $lastName = lc(unidecode($userRecord->prop('LastName')));
+    my $firstName = lc(unidecode(decode("UTF-8", $userRecord->prop('FirstName'))));
+    my $lastName = lc(unidecode(decode("UTF-8", $userRecord->prop('LastName'))));
 
     # Trim any whitespace character
     $firstName =~ s/\s+//;
