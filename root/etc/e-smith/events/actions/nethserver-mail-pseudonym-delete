@@ -15,7 +15,7 @@ use NethServer::MailServer;
 my $event = shift;
 my $user = shift;
 
-if(NethServer::MailServer->new()->createUserDefaultPseudonyms($user)) {
+if(NethServer::MailServer->new()->deleteUserPseudonyms($user)) {
     exit 0;
 }
 

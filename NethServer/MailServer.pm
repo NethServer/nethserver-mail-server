@@ -105,7 +105,7 @@ sub getAliases()
 Create user pseudonyms according to our rules
 
 =cut
-sub createUserPseudonyms($) 
+sub createUserDefaultPseudonyms($) 
 {
     my $self = shift;
     my $username = shift;
@@ -143,6 +143,39 @@ sub createUserPseudonyms($)
     return 1;
 }
 
+=head2 ->getUserPseudonyms($)
+
+Return a list of pseudonym keys pointing to the given $username argument
+
+=cut
+sub getUserPseudonyms($) 
+{
+    my $self = shift;
+    my $username = shift;
+    my @pseudonymList = ();
+    push @pseudonymList, $_->key foreach $self->_getUserPseudonymRecords($username);
+    return @pseudonymList;
+}
+
+=head2 ->deleteUserPseudonyms($)
+
+Delete all pseudonyms referring to the given $username
+
+=cut
+sub deleteUserPseudonyms($)
+{
+    my $self = shift;
+    my $username = shift;
+    $_->delete() foreach $self->_getUserPseudonymRecords($username);
+    return 1;
+}
+
+sub _getUserPseudonymRecords($) 
+{
+    my $self = shift;
+    my $username = shift;
+    return grep { $_->prop("Account") eq $username } $self->{AccountsDb}->pseudonyms();
+}
 
 
 sub getDeliveryDomains() 
