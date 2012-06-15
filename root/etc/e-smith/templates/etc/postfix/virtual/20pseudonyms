@@ -1,32 +1,15 @@
 
 # Virtual addresses list:
 {
-    use esmith::AccountsDB;
+    use NethServer::MailServer;
+    my $ms = NethServer::MailServer->new();
+    my %aliases = $ms->getAliases();
 
-    my $accountsDb = esmith::AccountsDB->open_ro();
-
-    my @addressList = ();
-
-    foreach my $record ($accountsDb->pseudonyms()) {
-	my $pseudonym = $record->key;
-	my $account = $record->prop('Account');
-	my $domain = $pseudonym;
-
-	# Trim the address part:
-	$domain =~ s/([^@]+@)//;
-
-	if(! $domain ) {
-	    warn "Found pseudonym key `$pseudonym` without \@domain suffix: skipped";
-	    next;
+    if(%aliases) {
+	$OUT = '';
+	while( my ($alias, $mbox) = each %aliases  ) {
+	    $OUT .= $alias . "\t\t" . $mbox . "\n";
 	}
-
-	my $entry = $pseudonym . "\t\t" . "$account\@$domain";
-
-	push @addressList, $entry;
-    }
-
-    if(@addressList) {
-	$OUT = join("\n", @addressList) . "\n";
     } else {
 	$OUT = "# no virtual address defined\n";
     }
