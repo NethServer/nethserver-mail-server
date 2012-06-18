@@ -17,6 +17,7 @@ my @templates = qw(
     /etc/postfix/vmailbox
     /etc/dovecot/dovecot.conf
     /etc/dovecot/ldap.conf
+    /etc/sysconfig/dovecot
 );
 
 #

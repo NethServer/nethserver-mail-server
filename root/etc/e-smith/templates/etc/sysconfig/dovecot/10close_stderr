@@ -1,0 +1,8 @@
+
+#
+# Refs #1232 - adjust-services zombie process on dovecot restarts
+#
+# Close stderr on dovecot startup
+#
+OPTIONS="2>-"
+
