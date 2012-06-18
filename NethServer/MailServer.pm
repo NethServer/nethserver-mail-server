@@ -68,6 +68,12 @@ sub getAliases()
 
     foreach my $record ($self->{AccountsDb}->pseudonyms()) {
 	my $pseudonym = $record->key;
+
+	if($pseudonym !~ m/^[^@]+@.+$/) {
+	    warn ("Missing domain part in pseudonym `$pseudonym`: skipped\n");
+	    next;
+	}
+
 	my $account = $record->prop('Account');
 	my $domain = $pseudonym;
 
