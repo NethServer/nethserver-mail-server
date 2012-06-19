@@ -67,5 +67,14 @@ class Modify extends \Nethgui\Controller\Table\Modify
         );
         $view->setTemplate($templates[$this->getIdentifier()]);
     }
-
+    
+    public function onParametersSaved($changedParameters)
+    {
+        if ($this->getIdentifier() === 'update') {
+            $event = 'modify';
+        } else {
+            $event = $this->getIdentifier();
+        }
+        $this->getPlatform()->signalEvent(sprintf('pseudonym-%s@post-process', $event), array($this->parameters['pseudonym']));
+    }
 }
