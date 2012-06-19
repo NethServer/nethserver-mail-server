@@ -39,6 +39,7 @@ class Pseudonym extends \Nethgui\Controller\TableController
         $columns = array(
             'Key',
             'Account',
+            'Access',
             'Actions'
         );
 

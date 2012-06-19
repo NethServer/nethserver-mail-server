@@ -39,6 +39,7 @@ class Modify extends \Nethgui\Controller\Table\Modify
             array('pseudonym', Validate::ANYTHING, Table::KEY),
             array('Description', Validate::ANYTHING, Table::FIELD),
             array('Account', Validate::USERNAME, Table::FIELD),
+            array('Access', $this->createValidator()->memberOf('public', 'private'), Table::FIELD),
         );
 
         $this->setSchema($parameterSchema);

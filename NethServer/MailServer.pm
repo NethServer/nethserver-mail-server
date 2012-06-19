@@ -137,7 +137,8 @@ sub createUserDefaultPseudonyms($)
 	my $props = {
 	    'type' => 'pseudonym',
 	    'Account' => $username,
-	    'ControlledBy' => 'system'
+	    'ControlledBy' => 'system',
+	    'Access' => 'public'
 	};
 
 	my $newRecord = $self->{AccountsDb}->new_record($address1, $props);
