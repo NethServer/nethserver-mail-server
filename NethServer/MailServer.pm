@@ -147,7 +147,7 @@ sub createUserDefaultPseudonyms($)
 
     my $userRecord = $self->{AccountsDb}->get($username);
 
-    if( ! $userRecord || $userRecord->get('type') ne 'user') {
+    if( ! $userRecord || $userRecord->prop('type') ne 'user') {
 	$self->{debug} && warn(qq(Given username "$username" is not a user record key));
 	return 0; # failure
     }
@@ -183,7 +183,7 @@ sub createGroupDefaultPseudonyms($)
 
     my $groupRecord = $self->{AccountsDb}->get($groupname);
 
-    if ( ! $groupRecord || $groupRecord->get('type') ne 'group') {
+    if ( ! $groupRecord || $groupRecord->prop('type') ne 'group') {
 	$self->{debug} && warn(qq(Given group name "$groupname" is not a group record key));
 	return 0; # failure
     }
@@ -194,7 +194,7 @@ sub createGroupDefaultPseudonyms($)
     }
 
     my $prefix = lc($groupname);
-    $prefix =~ s/[^a-z.-]/_/;
+    $prefix =~ s/[^a-z0-9.-]/_/;
     $prefix =~ s/_+/_/;
 
     $self->_createPseudonymRecords($groupname, $prefix);
