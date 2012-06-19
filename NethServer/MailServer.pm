@@ -47,21 +47,21 @@ sub getMailboxes()
 
     my %mailboxes = ();
 
-    my %aliases = $self->getAliases();
+    my %aliases = $self->getMailboxAliases();
 
-    while ( my ($alias, $mailbox) = each %aliases ) {
-	$mailboxes{$mailbox} = 1;
+    while ( my ($alias, $mbxList) = each %aliases ) {
+	$mailboxes{$_} = 1 foreach (@{$mbxList});
     }
 
     return keys %mailboxes;
 }
 
-=head2 ->getAliases()
+=head2 ->getMailboxAliases()
 
-Return an hash describing the alias => mailbox association
+Return an hash describing the alias => mailboxes association
 
 =cut
-sub getAliases()
+sub getMailboxAliases()
 {
     my $self = shift;
     my %aliasMap = ();
@@ -77,20 +77,6 @@ sub getAliases()
 	my $account = $record->prop('Account');
 	my $domain = $pseudonym;
 
-	my $accountRecord = $self->{AccountsDb}->get($account);
-
-	# Skip the pseudonym if the reffered account is not 
-	# enabled.
-	if(! defined($accountRecord) ) {
-	    $self->{debug} && warn "Account `$account` not found";
-	    next;
-	} elsif($accountRecord->prop('type') eq 'user'
-	    &&  $accountRecord->prop('MailStatus') ne 'enabled') {
-	    next;
-	} elsif($accountRecord->prop('type') eq 'group') {
-	    next;
-	}
-
 	# Trim the address part:
 	$domain =~ s/([^@]+@)//;
 
@@ -99,7 +85,27 @@ sub getAliases()
 	    next;
 	}
 
-	$aliasMap{$pseudonym} = "$account\@$domain";
+	my $accountRecord = $self->{AccountsDb}->get($account);
+
+	# Skip the pseudonym if the reffered account is not 
+	# enabled.
+	if(! defined($accountRecord) ) {
+	    $self->{debug} && warn "Account `$account` not found";
+	    next;
+	} elsif($accountRecord->prop('type') eq 'user'
+	    &&  $accountRecord->prop('MailStatus') eq 'enabled') {
+	    $aliasMap{$pseudonym} = ["$account\@$domain"];
+	} elsif($accountRecord->prop('type') eq 'group'
+	    &&  $accountRecord->prop('MailStatus') eq 'enabled') {
+
+	    my @MailEnabledMemberList = grep { 
+		$self->{AccountsDb}->get_prop($_, 'MailStatus') eq 'enabled' 
+	    } split(',', $accountRecord->prop('Members'));
+
+	    $aliasMap{$pseudonym} = [map { $_ . '@' . $domain } @MailEnabledMemberList];
+	} 
+
+
 
     }
 
@@ -107,7 +113,29 @@ sub getAliases()
 }
 
 
-=head2 ->createUserPseudonyms($$)
+=head2 ->createAccountDefaultPseudonyms($)
+
+Create account pseudonyms according to our rules
+
+=cut
+sub createAccountDefaultPseudonyms($)
+{
+    my $self = shift;
+    my $account = shift;
+    
+    my $accountType = $self->{AccountsDb}->get_prop($account, 'type');
+    
+    if($accountType eq 'user') {
+	return $self->createUserDefaultPseudonyms($account);
+    } elsif($accountType eq 'group') {
+	return $self->createGroupDefaultPseudonyms($account);
+    } else {
+	$self->{debug} && warn("Invalid account type for key `$account`\n");
+	return 1;
+    }       
+}
+
+=head2 ->createUserDefaultPseudonyms($)
 
 Create user pseudonyms according to our rules
 
@@ -117,12 +145,16 @@ sub createUserDefaultPseudonyms($)
     my $self = shift;
     my $username = shift;
 
-    my @domainList = $self->getDeliveryDomains();
-
     my $userRecord = $self->{AccountsDb}->get($username);
 
-    if ( ! $userRecord ) {
+    if( ! $userRecord || $userRecord->get('type') ne 'user') {
+	$self->{debug} && warn(qq(Given username "$username" is not a user record key));
 	return 0; # failure
+    }
+
+    if($userRecord->prop('MailStatus') ne 'enabled') {
+	$self->{debug} && warn("User mail account `$username` is not enabled, skipped.\n");
+	return 1;
     }
 
     my $firstName = lc(unidecode(decode("UTF-8", $userRecord->prop('FirstName'))));
@@ -132,57 +164,106 @@ sub createUserDefaultPseudonyms($)
     $firstName =~ s/\s+//;
     $lastName =~ s/\s+//;
 
-    foreach my $domain (@domainList) {
-	my $address1 = $firstName . '.' . $lastName . '@' . $domain;
-	my $props = {
-	    'type' => 'pseudonym',
-	    'Account' => $username,
-	    'ControlledBy' => 'system',
-	    'Access' => 'public'
-	};
+    my $prefix1 = $firstName . '.' . $lastName;
 
-	my $newRecord = $self->{AccountsDb}->new_record($address1, $props);
-
-	if( ! $newRecord) {
-	    $self->{debug} && warn ("Pseudonym ${address1} already exists");
-	}
-    }
+    $self->_createPseudonymRecords($username, $prefix1);
 
     return 1;
 }
 
-=head2 ->getUserPseudonyms($)
+=head2 ->createGroupDefaultPseudonyms($)
+
+Create a group pseudonym groupname@domain
+
+=cut
+sub createGroupDefaultPseudonyms($)
+{
+    my $self = shift;
+    my $groupname = shift;
+
+    my $groupRecord = $self->{AccountsDb}->get($groupname);
+
+    if ( ! $groupRecord || $groupRecord->get('type') ne 'group') {
+	$self->{debug} && warn(qq(Given group name "$groupname" is not a group record key));
+	return 0; # failure
+    }
+
+    if($groupRecord->prop('MailStatus') ne 'enabled') {
+	$self->{debug} && warn("Group mail account `$groupname` is not enabled, skipped.\n");
+	return 1;
+    }
+
+    my $prefix = lc($groupname);
+    $prefix =~ s/[^a-z.-]/_/;
+    $prefix =~ s/_+/_/;
+
+    $self->_createPseudonymRecords($groupname, $prefix);
+
+    return 1;
+
+}
+
+
+sub _createPseudonymRecords()
+{
+    my $self = shift;
+    my $username = shift;
+    my @prefixList = @_;
+
+    my @domainList = $self->getDeliveryDomains();
+    
+    foreach (@prefixList) {
+	foreach my $domain (@domainList) {
+	    my $address = $_ . '@' . $domain;
+	    my $props = {
+		'type' => 'pseudonym',
+		'Account' => $username,
+		'ControlledBy' => 'system',
+		'Access' => 'public'
+	    };
+	    
+	    my $newRecord = $self->{AccountsDb}->new_record($address, $props);
+	    
+	    if( ! $newRecord) {
+		$self->{debug} && warn ("Pseudonym ${address} already exists");
+	    }
+	}
+    }
+
+}
+
+
+
+=head2 ->getAccountPseudonyms($)
 
 Return a list of pseudonym keys pointing to the given $username argument
 
 =cut
-sub getUserPseudonyms($) 
+sub getAccountPseudonyms($) 
 {
     my $self = shift;
-    my $username = shift;
-    my @pseudonymList = ();
-    push @pseudonymList, $_->key foreach $self->_getUserPseudonymRecords($username);
-    return @pseudonymList;
+    my $account = shift;
+    return map { $_->key } $self->_getAccountPseudonymRecords($account);
 }
 
-=head2 ->deleteUserPseudonyms($)
+=head2 ->deleteAccountPseudonyms($)
 
 Delete all pseudonyms referring to the given $username
 
 =cut
-sub deleteUserPseudonyms($)
+sub deleteAccountPseudonyms($)
 {
     my $self = shift;
-    my $username = shift;
-    $_->delete() foreach $self->_getUserPseudonymRecords($username);
+    my $account = shift;
+    $_->delete() foreach $self->_getAccountPseudonymRecords($account);
     return 1;
 }
 
-sub _getUserPseudonymRecords($) 
+sub _getAccountPseudonymRecords($)
 {
     my $self = shift;
-    my $username = shift;
-    return grep { $_->prop("Account") eq $username } $self->{AccountsDb}->pseudonyms();
+    my $account = shift;
+    return grep { $_->prop("Account") eq $account } $self->{AccountsDb}->pseudonyms();
 }
 
 

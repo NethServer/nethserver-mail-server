@@ -3,12 +3,12 @@
 {
     use NethServer::MailServer;
     my $ms = NethServer::MailServer->new();
-    my %aliases = $ms->getAliases();
+    my %aliases = $ms->getMailboxAliases();
 
     if(%aliases) {
 	$OUT = '';
-	while( my ($alias, $mbox) = each %aliases  ) {
-	    $OUT .= $alias . "\t\t" . $mbox . "\n";
+	while( my ($alias, $mailboxes) = each %aliases  ) {
+	    $OUT .= $alias . "\t\t" . join(",\n ", @{$mailboxes}) . "\n";
 	}
     } else {
 	$OUT = "# no virtual address defined\n";

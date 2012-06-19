@@ -34,7 +34,7 @@ class Mail extends \Nethgui\Controller\Table\RowPluginAction
 
     protected function initializeAttributes(\Nethgui\Module\ModuleAttributesInterface $base)
     {
-        return \Nethgui\Module\SimpleModuleAttributesProvider::extendModuleAttributes($base, 'Service', 30);
+        return \Nethgui\Module\SimpleModuleAttributesProvider::extendModuleAttributes($base, 'PlugService', 30);
     }
 
     public function initialize()

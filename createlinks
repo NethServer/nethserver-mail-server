@@ -93,3 +93,23 @@ event_actions('user-create',
 
 event_actions('user-delete',
 	      'nethserver-mail-pseudonym-delete' => '03');
+
+
+#
+# group-* events expand and reload postfix table templates
+#
+
+my @groupTemplates = @pseudonymTemplates;
+
+foreach (qw(create modify delete)) {
+    event_templates('group-' . $_, @groupTemplates);
+    event_actions('group-'   . $_, 
+		  'nethserver-mail-postmap-update' => '30');
+    event_services('group-'  . $_, 'postfix' => 'reload');
+}
+
+event_actions('group-create',
+	      'nethserver-mail-pseudonym-create' => '03');
+
+event_actions('group-delete',
+	      'nethserver-mail-pseudonym-delete' => '03');
