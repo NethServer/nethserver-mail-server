@@ -3,7 +3,70 @@
 #
 # nethserver-mail-group-acl
 #
-# Keep IMAP ACL updated for group accounts
+# Keep IMAP ACL updated for group accounts. The optional $accountArg
+# limit the operation on the given group account only.
 #
 
 use strict;
+use IMAP::Admin;
+use esmith::AccountsDB;
+use NethServer::Directory;
+
+my $accountsDb = esmith::AccountsDB->open_ro();
+
+my $event = shift || die("Missing event argument");
+my $accountArg = shift;
+
+my @accounts = ();
+my $errors = 0;
+
+if($accountArg) {
+    @accounts = @{[$accountsDb->get($accountArg)]};
+} else {
+    @accounts = $accountsDb->groups();
+}
+
+
+
+foreach my $accountRecord (@accounts) {
+
+    my $account = $accountRecord->key;
+    my $retval;
+
+    if($accountRecord->prop('type') ne 'group') {
+	die("Account `$account` is not a group");
+    }
+
+    my $imap = IMAP::Admin->new(
+	'Server' => '/var/run/dovecot/imap-ipc',
+	'Login' => $account . '*vmail',
+	'Password' => NethServer::Directory::getUserPassword('vmail')
+	);
+    
+    if(!$imap) {
+	die("Could not create connection to IMAP server");
+    }
+        
+    #
+    # Set/Unset group ($) ACL to share the INBOX folder    
+    #
+    my $deliveryType = $accountRecord->prop('MailDeliveryType');
+    if($deliveryType eq 'shared') {
+	$retval = $imap->set_acl('INBOX', '$' . $account, 'lrs');
+    } elsif($deliveryType eq 'copy') {
+	$retval = $imap->delete_acl('INBOX', '$' . $account);
+    } else {
+	warn("Skipping unknown delivery type: $deliveryType\n");
+	$retval = 1;
+    }
+
+    if( ! $retval) {
+	warn("IMAP error: " . $imap->{Error} . "\n");
+	$errors ++;
+    }
+
+    $imap->close();
+}
+
+
+exit ($errors == 0 ? 0 : 1);

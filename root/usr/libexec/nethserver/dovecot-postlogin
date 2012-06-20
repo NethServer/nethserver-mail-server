@@ -1,0 +1,10 @@
+#!/bin/bash
+export MASTER_USER=$USER
+
+ACL_GROUPS=`groups $USER |  sed 's/^.*: //; y/ /,/'`
+export ACL_GROUPS
+export USERDB_KEYS="$USERDB_KEYS acl_groups"
+
+exec "$@"
+
+

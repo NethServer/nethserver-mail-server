@@ -22,12 +22,12 @@ namespace {
   type = shared
   separator = /
   prefix = Shared/%%n/
-  location = maildir:/var/lib/vmail/private/%%n/Maildir:INDEX=~/Maildir/shared/%%n
+  location = maildir:/var/lib/vmail/user/%%n/Maildir:INDEX=~/Maildir/shared/%%n
   subscriptions = no
   list = children
 }
 
-# Enable acl plugin for shared and/or public mailboxes
+# Enable acl plugin for shared mailboxes
 mail_plugins = \$mail_plugins acl
 protocol imap {
   mail_plugins = \$mail_plugins imap_acl
@@ -44,5 +44,34 @@ service dict {
     user = vmail
   }
 }
+
+# See http://wiki2.dovecot.org/Authentication/MasterUsers
+auth_master_user_separator = *
+passdb {
+  driver = passwd-file
+  args = /etc/dovecot/master-users
+  master = yes
+  pass = yes
+}
+service imap {
+  executable = imap imap-postlogin
+}
+service imap-postlogin {
+  executable = script-login /usr/libexec/nethserver/dovecot-postlogin
+  user = \$default_internal_user
+  unix_listener imap-postlogin {
+  }
+}
+service imap-login {
+     unix_listener imap-ipc {
+         group = root
+         user = \$default_internal_user
+	 mode = 0600
+     }
+}
+
+
+mail_debug = yes
+
 NAMESPACE
 }

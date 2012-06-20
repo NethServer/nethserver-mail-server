@@ -1,0 +1,4 @@
+vmail:\{PLAIN\}{
+   use NethServer::Directory;
+   return NethServer::Directory::getUserPassword('vmail');
+}

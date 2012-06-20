@@ -98,11 +98,15 @@ sub getMailboxAliases()
 	} elsif($accountRecord->prop('type') eq 'group'
 	    &&  $accountRecord->prop('MailStatus') eq 'enabled') {
 
-	    my @MailEnabledMemberList = grep { 
-		$self->{AccountsDb}->get_prop($_, 'MailStatus') eq 'enabled' 
-	    } split(',', $accountRecord->prop('Members'));
-
-	    $aliasMap{$pseudonym} = [map { $_ . '@' . $domain } @MailEnabledMemberList];
+	    if($accountRecord->prop('MailDeliveryType') eq 'copy') {
+		my @MailEnabledMemberList = grep { 
+		    $self->{AccountsDb}->get_prop($_, 'MailStatus') eq 'enabled' 
+		} split(',', $accountRecord->prop('Members'));
+		
+		$aliasMap{$pseudonym} = [map { $_ . '@' . $domain } @MailEnabledMemberList];
+	    } elsif($accountRecord->prop('MailDeliveryType')eq 'shared') {
+		$aliasMap{$pseudonym} = ["$account\@$domain"];
+	    }
 	} 
 
 
