@@ -52,11 +52,7 @@ event_services('nethserver-mail-server-save',
 	       'postfix' => 'reload');
 
 
-File::Path::make_path('root/var/lib/vmail/private', 
-		      'root/var/lib/vmail/public', 
-		      'root/var/lib/vmail/shared',  
-		      { mode => 00700 }
-    );
+File::Path::make_path('root/var/lib/vmail/user', { mode => 00700 } );
 
 
 #
@@ -102,7 +98,9 @@ my @groupTemplates = @pseudonymTemplates;
 
 foreach (qw(create modify delete)) {
     event_templates('group-' . $_, @groupTemplates);
-    event_actions('group-'   . $_, 'nethserver-mail-postmap-update' => '30');
+    event_actions('group-'   . $_, 
+		  'nethserver-mail-postmap-update' => '30',
+		  'nethserver-mail-group-acl' => '99');
     event_services('group-'  . $_, 'postfix' => 'reload');
 }
 

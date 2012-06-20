@@ -1,0 +1,9 @@
+#!/usr/bin/perl
+
+#
+# nethserver-mail-group-acl
+#
+# Keep IMAP ACL updated for group accounts
+#
+
+use strict;

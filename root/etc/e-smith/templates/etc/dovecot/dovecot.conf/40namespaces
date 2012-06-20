@@ -11,22 +11,6 @@ namespace \{
   inbox = yes
 \}
 
-# Public mailboxes are { $dovecot{PublicMailboxesStatus} }
-{
-    if($dovecot{PublicMailboxesStatus} ne 'enabled') {
-        return '';
-    }
-
-    return <<NAMESPACE;
-namespace {
-  type = public
-  separator = /
-  prefix = Public/
-  location = maildir:/var/lib/vmaildirs/public
-  subscriptions = no
-}
-NAMESPACE
-}
 # Shared mailboxes are { $dovecot{SharedMailboxesStatus} }
 {
     if($dovecot{SharedMailboxesStatus} ne 'enabled') {
@@ -37,21 +21,28 @@ NAMESPACE
 namespace {
   type = shared
   separator = /
-  prefix = shared/%%u
-  location = maildir:/var/lib/vmaildirs/shared/%%u/Maildir:INDEX=~/Maildir/shared/%%u
+  prefix = Shared/%%n/
+  location = maildir:/var/lib/vmail/private/%%n/Maildir:INDEX=~/Maildir/shared/%%n
   subscriptions = no
   list = children
 }
 
-# Enable acl plugin for shared mailboxes
-mail_plugins = acl
+# Enable acl plugin for shared and/or public mailboxes
+mail_plugins = \$mail_plugins acl
 protocol imap {
   mail_plugins = \$mail_plugins imap_acl
 }
+
 plugin {
   acl = vfile
-  acl_shared_dict = file:/var/lib/dovecot/shared-mailboxes.db
+  acl_shared_dict = file:/var/lib/vmail/shared-mailboxes.db
+}
+
+service dict {
+  unix_listener dict {
+    mode = 0600
+    user = vmail
+  }
 }
 NAMESPACE
 }
-
