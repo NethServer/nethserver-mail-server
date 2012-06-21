@@ -1,24 +1,23 @@
 #
 # LMTP server for message delivery
 #
-{
-    @addressList = ();
 
-    if($dovecot{LmtpInetListenerStatus} eq 'enabled') {
-        @addressList = ('::1', '127.0.0.1', $InternalInterface{IPAddress});
-    }
-
-    '';
-}
 service lmtp \{
 
     user = vmail
+{ 
+    if($dovecot{LmtpInetListenerStatus} eq 'enabled') {
+	# my $addresses = join(', ', '::1', '127.0.0.1', $InternalInterface{IPAddress});
+	my $addresses = '';
+	$lmtpInetListener = <<INET;
 
-    inet_listener lmtp \{
-        address = { join(' ', @addressList);  }
+    inet_listener lmtp {
+        address =  $addresses
         port = 24
-    \}
-
+    }
+INET
+    }
+}
     unix_listener lmtp \{
         user = vmail
         group = vmail
