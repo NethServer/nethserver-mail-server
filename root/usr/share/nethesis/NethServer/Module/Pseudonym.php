@@ -52,5 +52,31 @@ class Pseudonym extends \Nethgui\Controller\TableController
             ->addRowAction(new Pseudonym\Modify('delete'))
         ;
         parent::initialize();
-    }    
+    }
+
+    public function prepareViewForColumnKey(\Nethgui\Controller\Table\Read $action, \Nethgui\View\ViewInterface $view, $key, $values, &$rowMetadata)
+    {
+        if (in_array($values['Account'], $this->getDisabledAccounts())) {
+            $rowMetadata['rowCssClass'] = trim($rowMetadata['rowCssClass'] . ' user-locked');
+        }
+        return strval($key);
+    }
+
+    private function getDisabledAccounts()
+    {
+        static $disabledAccounts;
+        if ( ! isset($disabledAccounts)) {
+            $accounts = $this->getPlatform()->getDatabase('accounts')->getAll();
+            $disabledAccounts = array();
+            foreach ($accounts as $key => $prop) {
+                if ($prop['type'] === 'user' || $prop['type'] === 'group') {
+                    if (isset($prop['MailStatus']) && $prop['MailStatus'] !== 'enabled') {
+                        $disabledAccounts[] = $key;
+                    }
+                }
+            }
+        }
+        return $disabledAccounts;
+    }
+
 }
