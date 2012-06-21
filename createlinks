@@ -111,10 +111,10 @@ foreach (qw(create modify delete)) {
 
 event_actions('group-create',
 	      'nethserver-mail-pseudonym-create' => '03',
-	      'nethserver-mail-group-acl-conf' => '95');
+	      'nethserver-mail-group-acl-adjust' => '95');
 
 event_actions('group-modify',
-	      'nethserver-mail-group-acl-conf' => '95');
+	      'nethserver-mail-group-acl-adjust' => '95');
 
 event_actions('group-delete',
 	      'nethserver-mail-pseudonym-delete' => '03',

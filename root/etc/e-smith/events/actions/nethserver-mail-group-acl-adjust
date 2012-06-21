@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 #
-# nethserver-mail-group-acl
+# nethserver-mail-group-acl-adjust
 #
 # Keep IMAP ACL updated for group accounts. The optional $accountArg
 # limit the operation on the given group account only.
