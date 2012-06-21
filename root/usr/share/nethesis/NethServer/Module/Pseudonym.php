@@ -70,7 +70,7 @@ class Pseudonym extends \Nethgui\Controller\TableController
             $disabledAccounts = array();
             foreach ($accounts as $key => $prop) {
                 if ($prop['type'] === 'user' || $prop['type'] === 'group') {
-                    if (isset($prop['MailStatus']) && $prop['MailStatus'] !== 'enabled') {
+                    if ( ! isset($prop['MailStatus']) || $prop['MailStatus'] !== 'enabled') {
                         $disabledAccounts[] = $key;
                     }
                 }
