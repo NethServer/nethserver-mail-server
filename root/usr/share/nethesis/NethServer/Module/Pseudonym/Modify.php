@@ -44,17 +44,12 @@ class Modify extends \Nethgui\Controller\Table\Modify
 
         $this->setSchema($parameterSchema);
 
-        $this->declareParameter('AccountDatasource', FALSE);
-
         parent::initialize();
     }
 
     public function bind(\Nethgui\Controller\RequestInterface $request)
     {
         parent::bind($request);
-        $this->parameters['AccountDatasource'] = array(
-            array($this->parameters['Account'], $this->parameters['Account'])
-        );
     }
 
     public function prepareView(\Nethgui\View\ViewInterface $view)
@@ -66,8 +61,12 @@ class Modify extends \Nethgui\Controller\Table\Modify
             'delete' => 'Nethgui\Template\Table\Delete',
         );
         $view->setTemplate($templates[$this->getIdentifier()]);
+
+        if ( ! $this->getRequest()->isMutation() && $this->getRequest()->isValidated()) {
+            $view['AccountDatasource'] = $this->readAccountDatasource($view['Account'], $view);
+        }
     }
-    
+
     public function onParametersSaved($changedParameters)
     {
         if ($this->getIdentifier() === 'update') {
@@ -77,4 +76,44 @@ class Modify extends \Nethgui\Controller\Table\Modify
         }
         $this->getPlatform()->signalEvent(sprintf('pseudonym-%s@post-process', $event), array($this->parameters['pseudonym']));
     }
+
+    private function readAccountDatasource($current, \Nethgui\View\ViewInterface $view)
+    {
+        $users = $this->getPlatform()->getDatabase('accounts')->getAll('user');
+        $groups = $this->getPlatform()->getDatabase('accounts')->getAll('group');
+
+        $hash = array();
+
+        $keyFound = FALSE;
+
+        $usersLabel = $view->translate('Users_label');
+        $groupsLabel = $view->translate('Groups_label');
+
+        foreach ($users as $key => $prop) {
+            if(! isset($prop['MailStatus']) || $prop['MailStatus'] !== 'enabled') {
+                continue;
+            }
+            $hash[$usersLabel][$key] = $prop['FirstName'] . ' ' . $prop['LastName'] . ' (' . $key . ')';
+            if ($current === $key) {
+                $keyFound = TRUE;
+            }
+        }
+
+        foreach ($groups as $key => $prop) {
+            if(! isset($prop['MailStatus']) || $prop['MailStatus'] !== 'enabled') {
+                continue;
+            }            
+            $hash[$groupsLabel][$key] = $prop['Description'] . ' (' . $key . ')';
+            if ($current === $key) {
+                $keyFound = TRUE;
+            }
+        }
+
+        if ( ! $keyFound) {
+            $hash[$view->translate('Current_label')][$current] = $current;
+        }
+
+        return \Nethgui\Renderer\AbstractRenderer::hashToDatasource($hash, TRUE);
+    }
+
 }

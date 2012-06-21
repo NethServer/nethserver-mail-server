@@ -12,7 +12,7 @@ echo $view->header('pseudonym')->setAttribute('template', $view->translate($temp
 echo $view->textInput('pseudonym', $keyFlags);
 echo $view->textInput('Description');
 echo $view->selector('Account', $view::SELECTOR_DROPDOWN)->setAttribute('choices', 'AccountDatasource');
-echo $view->checkbox('Access', 'private')->setAttribute('uncheckedValue', 'public');
+echo $view->checkbox('Access', 'private', $view::STATE_DISABLED)->setAttribute('uncheckedValue', 'public');
 
 echo $view->buttonList($view::BUTTON_SUBMIT | $view::BUTTON_CANCEL | $view::BUTTON_HELP);
 
