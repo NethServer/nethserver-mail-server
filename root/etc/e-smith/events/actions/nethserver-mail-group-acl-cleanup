@@ -1,0 +1,36 @@
+#!/usr/bin/perl
+
+#
+# nethserver-mail-group-acl-cleanup
+#
+# Remove any group acl set on group INBOX
+#
+
+use strict;
+use esmith::AccountsDB;
+use NethServer::MailServer;
+
+my $accountsDb = esmith::AccountsDB->open_ro();
+
+my $event = shift || die("Missing event argument");
+my $account = shift;
+
+my $accountRecord = $accountsDb->get($account);
+
+if($accountRecord->prop('type') ne 'group') {
+    die("Account `$account` is not a group");
+}
+
+my $imap = NethServer::MailServer->connectAclManager($account . '*vmail');
+	    
+if( ! $imap) {
+    die("Could not create connection to IMAP server");
+}
+        
+#
+# Unset group ($) ACL on the INBOX folder    
+#
+$imap->deleteAcl('INBOX', '$' . $account);
+$imap->logout();
+
+

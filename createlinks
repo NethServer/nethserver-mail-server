@@ -92,7 +92,8 @@ event_actions('user-create',
 	      'nethserver-mail-pseudonym-create' => '03');
 
 event_actions('user-delete',
-	      'nethserver-mail-pseudonym-delete' => '03');
+	      'nethserver-mail-pseudonym-delete' => '03',
+	      'nethserver-mail-account-cleanup' => '30');
 
 
 #
@@ -104,13 +105,18 @@ my @groupTemplates = @pseudonymTemplates;
 foreach (qw(create modify delete)) {
     event_templates('group-' . $_, @groupTemplates);
     event_actions('group-'   . $_, 
-		  'nethserver-mail-postmap-update' => '30',
-		  'nethserver-mail-group-acl' => '99');
+		  'nethserver-mail-postmap-update' => '30');
     event_services('group-'  . $_, 'postfix' => 'reload');
 }
 
 event_actions('group-create',
-	      'nethserver-mail-pseudonym-create' => '03');
+	      'nethserver-mail-pseudonym-create' => '03',
+	      'nethserver-mail-group-acl-conf' => '95');
+
+event_actions('group-modify',
+	      'nethserver-mail-group-acl-conf' => '95');
 
 event_actions('group-delete',
-	      'nethserver-mail-pseudonym-delete' => '03');
+	      'nethserver-mail-pseudonym-delete' => '03',
+	      'nethserver-mail-group-acl-cleanup' => '03',
+	      'nethserver-mail-account-cleanup' => '30');

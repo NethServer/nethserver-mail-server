@@ -8,9 +8,9 @@
 #
 
 use strict;
-use IMAP::Admin;
 use esmith::AccountsDB;
-use NethServer::Directory;
+use NethServer::MailServer;
+
 
 my $accountsDb = esmith::AccountsDB->open_ro();
 
@@ -37,13 +37,9 @@ foreach my $accountRecord (@accounts) {
 	die("Account `$account` is not a group");
     }
 
-    my $imap = IMAP::Admin->new(
-	'Server' => '/var/run/dovecot/imap-ipc',
-	'Login' => $account . '*vmail',
-	'Password' => NethServer::Directory::getUserPassword('vmail')
-	);
-    
-    if(!$imap) {
+    my $imap = NethServer::MailServer->connectAclManager($account . '*vmail');
+	    
+    if( ! $imap) {
 	die("Could not create connection to IMAP server");
     }
         
@@ -52,9 +48,9 @@ foreach my $accountRecord (@accounts) {
     #
     my $deliveryType = $accountRecord->prop('MailDeliveryType');
     if($deliveryType eq 'shared') {
-	$retval = $imap->set_acl('INBOX', '$' . $account, 'lrs');
+	$retval = $imap->setAcl('INBOX', '$' . $account, 'lrs');
     } elsif($deliveryType eq 'copy') {
-	$retval = $imap->delete_acl('INBOX', '$' . $account);
+	$retval = $imap->deleteAcl('INBOX', '$' . $account);
     } else {
 	warn("Skipping unknown delivery type: $deliveryType\n");
 	$retval = 1;
@@ -65,7 +61,7 @@ foreach my $accountRecord (@accounts) {
 	$errors ++;
     }
 
-    $imap->close();
+    $imap->logout();
 }
 
 

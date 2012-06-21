@@ -10,6 +10,7 @@ use esmith::AccountsDB;
 use esmith::DomainsDB;
 use Encode;
 use Text::Unidecode;
+use NethServer::MailServer::AclManager;
 
 =head1 NethServer::MailServer package
 
@@ -270,7 +271,11 @@ sub _getAccountPseudonymRecords($)
     return grep { $_->prop("Account") eq $account } $self->{AccountsDb}->pseudonyms();
 }
 
+=head2 ->getDeliveryDomains()
 
+Get the list of domains configured for local or remote delivery
+
+=cut
 sub getDeliveryDomains() 
 {
     my $self = shift;
@@ -284,6 +289,19 @@ sub getDeliveryDomains()
 	}
     }
     return @domainList;
+}
+
+=head2 connectAclManager
+
+Create a connection to the IMAP server, to configure ACLs
+
+=cut
+sub connectAclManager
+{
+    my $class = shift;
+    my $account = shift;
+
+    return NethServer::MailServer::AclManager->new(login => $account);
 }
 
 1;

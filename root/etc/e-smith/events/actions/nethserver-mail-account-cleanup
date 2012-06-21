@@ -1,0 +1,20 @@
+#!/usr/bin/perl
+
+#
+# nethserver-mail-account-cleanup
+#
+# Remove the account mail home directory
+#
+
+use strict;
+
+my $event = shift || die("Missing event argument!");
+my $account = shift || die("Missing account name argument!");
+
+my $mailHomeDir = '/var/lib/vmail/user/' . $account;
+
+if [ -d $mailHomeDir ] {
+    exit system('/bin/rm', '-rf', $mailHomeDir);
+} else {
+    warn ("Home directory for $account account does not exist; skipped");
+}
