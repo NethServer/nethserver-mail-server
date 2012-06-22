@@ -1,15 +1,23 @@
 <?php
 
 if ($view->getModule()->getIdentifier() == 'update') {
-    $keyFlags = $view::STATE_READONLY;
-    $template = 'Edit pseudonym `${0}`';
+    $headerText = 'Edit pseudonym `${0}`';
+    $keyWidgets = '';
 } else {
-    $keyFlags = 0;
-    $template = 'Create a new pseudonym';
+    $headerText = 'Create a new pseudonym';
+
+    $keyWidgets = $view->panel()->setAttribute('class', 'labeled-control label-above');
+
+    $keyWidgets
+        ->insert($view->literal('<label>' . $T('pseudonym_label'). '</label>'))
+        ->insert($view->textInput('localAddress', $view::LABEL_NONE))
+        ->insert($view->literal(' @ '))
+        ->insert($view->selector('domainAddress', $view::SELECTOR_DROPDOWN | $view::LABEL_NONE))
+    ;
 }
 
-echo $view->header('pseudonym')->setAttribute('template', $view->translate($template));
-echo $view->textInput('pseudonym', $keyFlags);
+echo $view->header('pseudonym')->setAttribute('template', $view->translate($headerText));
+echo $keyWidgets;
 echo $view->textInput('Description');
 echo $view->selector('Account', $view::SELECTOR_DROPDOWN)->setAttribute('choices', 'AccountDatasource');
 echo $view->checkbox('Access', 'private', $view::STATE_DISABLED)->setAttribute('uncheckedValue', 'public');

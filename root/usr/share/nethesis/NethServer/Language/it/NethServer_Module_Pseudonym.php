@@ -13,6 +13,7 @@ $L['Access_label'] = 'Accesso';
 
 $L['Description_label'] = 'Descrizione';
 $L['pseudonym_label'] = 'Indirizzo email';
+$L['localAddress_label'] = 'Indirizzo email';
 
 $L['Edit pseudonym `${0}`'] = 'Modifica l\'indirizzo `${0}`';
 $L['Create a new pseudonym'] = "Crea un nuovo indirizzo email";

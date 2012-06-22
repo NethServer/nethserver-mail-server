@@ -34,9 +34,8 @@ class Modify extends \Nethgui\Controller\Table\Modify
 
     public function initialize()
     {
-
         $parameterSchema = array(
-            array('pseudonym', Validate::ANYTHING, Table::KEY),
+            array('pseudonym', Validate::EMAIL, Table::KEY),
             array('Description', Validate::ANYTHING, Table::FIELD),
             array('Account', Validate::USERNAME, Table::FIELD),
             array('Access', $this->createValidator()->memberOf('public', 'private'), Table::FIELD),
@@ -47,9 +46,20 @@ class Modify extends \Nethgui\Controller\Table\Modify
         parent::initialize();
     }
 
-    public function bind(\Nethgui\Controller\RequestInterface $request)
+    protected function calculateKeyFromRequest(\Nethgui\Controller\RequestInterface $request)
     {
-        parent::bind($request);
+        return trim($request->getParameter('localAddress')) . '@' . $request->getParameter('domainAddress');
+    }
+
+    public function validate(\Nethgui\Controller\ValidationReportInterface $report)
+    {
+        parent::validate($report);
+        // we must explicitly validate the pseudonym parameter because is not posted with create request
+        if ($this->getRequest()->isMutation() && $this->getIdentifier() === 'create') {
+            if ($this->getValidator('pseudonym')->evaluate($this->parameters['pseudonym']) !== TRUE) {
+                $report->addValidationError($this, 'localAddress', $this->getValidator('pseudonym'));
+            }
+        }
     }
 
     public function prepareView(\Nethgui\View\ViewInterface $view)
@@ -64,6 +74,10 @@ class Modify extends \Nethgui\Controller\Table\Modify
 
         if ( ! $this->getRequest()->isMutation() && $this->getRequest()->isValidated()) {
             $view['AccountDatasource'] = $this->readAccountDatasource($view['Account'], $view);
+
+            if ($this->getIdentifier() === 'create') {
+                $view['domainAddressDatasource'] = $this->readDomainAddressDatasource();
+            }
         }
     }
 
@@ -75,6 +89,17 @@ class Modify extends \Nethgui\Controller\Table\Modify
             $event = $this->getIdentifier();
         }
         $this->getPlatform()->signalEvent(sprintf('pseudonym-%s@post-process', $event), array($this->parameters['pseudonym']));
+    }
+
+    private function readDomainAddressDatasource()
+    {
+        $domains = array();
+
+        foreach ($this->getPlatform()->getDatabase('domains')->getAll('domain') as $key => $prop) {
+            $domains[] = array($key, $key);
+        }
+
+        return $domains;
     }
 
     private function readAccountDatasource($current, \Nethgui\View\ViewInterface $view)
@@ -90,7 +115,7 @@ class Modify extends \Nethgui\Controller\Table\Modify
         $groupsLabel = $view->translate('Groups_label');
 
         foreach ($users as $key => $prop) {
-            if(! isset($prop['MailStatus']) || $prop['MailStatus'] !== 'enabled') {
+            if ( ! isset($prop['MailStatus']) || $prop['MailStatus'] !== 'enabled') {
                 continue;
             }
             $hash[$usersLabel][$key] = $prop['FirstName'] . ' ' . $prop['LastName'] . ' (' . $key . ')';
@@ -100,9 +125,9 @@ class Modify extends \Nethgui\Controller\Table\Modify
         }
 
         foreach ($groups as $key => $prop) {
-            if(! isset($prop['MailStatus']) || $prop['MailStatus'] !== 'enabled') {
+            if ( ! isset($prop['MailStatus']) || $prop['MailStatus'] !== 'enabled') {
                 continue;
-            }            
+            }
             $hash[$groupsLabel][$key] = $prop['Description'] . ' (' . $key . ')';
             if ($current === $key) {
                 $keyFound = TRUE;

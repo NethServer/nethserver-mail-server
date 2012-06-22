@@ -14,4 +14,5 @@ $L['Access_label'] = 'Access';
 
 $L['Description_label'] = 'Description';
 $L['pseudonym_label'] = 'Email address';
+$L['localAddress_label'] = 'Email address';
 
