@@ -39,16 +39,36 @@ class Mail extends \Nethgui\Controller\Table\RowPluginAction
 
     public function initialize()
     {
+        $quotaValidator1 = $this->createValidator()->greatThan(0)->lessThan(51);
+        $quotaValidator2 = $this->createValidator()->equalTo('unlimited');
+                    
         $this->setSchemaAddition(array(
             array('MailStatus', Validate::SERVICESTATUS, Table::FIELD),
-            array('MailQuotaType', $this->createValidator()->memberOf('custom', 'default', 'unlimited'), Table::FIELD),
-            array('MailQuotaCustom', $this->createValidator()->greatThan(5242880)->lessThan(5368709120), Table::FIELD),
+            array('MailQuotaType', $this->createValidator()->memberOf('custom', 'default'), Table::FIELD),
+            array('MailQuotaCustom', $this->createValidator()->orValidator($quotaValidator1, $quotaValidator2), Table::FIELD),
             array('MailForwardStatus', Validate::SERVICESTATUS, Table::FIELD),
             array('MailForwardAddress', Validate::ANYTHING, Table::FIELD), // FIXME implement EMAIL ADDRESS validator
             array('MailForwardKeepMessageCopy', Validate::YES_NO, Table::FIELD)
         ));
         $this->setDefaultValue('MailStatus', 'enabled');
         parent::initialize();
+    }
+
+    public function prepareView(\Nethgui\View\ViewInterface $view)
+    {
+        parent::prepareView($view);
+        if ( ! $this->getRequest()->isMutation()) {
+            $h = array();
+            for($i = 1; $i <= 50; $i += ($i === 1) ? 4 : 5) {
+                $h[$i] = $i . ' GB';
+            }
+            
+            $h['unlimited'] = $view->translate('Unlimited_quota');
+            
+            $view['MailQuotaCustomDatasource'] = \Nethgui\Renderer\AbstractRenderer::hashToDatasource($h);
+        } else {
+            $view['MailQuotaCustomDatasource'] = array();
+        }
     }
 
 }

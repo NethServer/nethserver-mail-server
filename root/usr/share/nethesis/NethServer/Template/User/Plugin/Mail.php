@@ -1,9 +1,13 @@
 <?php
 
-$quotaPanel = $view->fieldset()->setAttribute('template', $T('Quota'))
-    ->insert($view->radioButton('MailQuotaType', 'default'))
-    ->insert($view->fieldsetSwitch('MailQuotaType', 'custom', $view::FIELDSETSWITCH_EXPANDABLE)->insert($view->textInput('MailQuotaCustom')))
-    ->insert($view->radioButton('MailQuotaType', 'unlimited'))
+$quotaPanel = $view->fieldsetSwitch('MailQuotaType', 'custom', $view::FIELDSETSWITCH_EXPANDABLE
+        | $view::FIELDSETSWITCH_CHECKBOX)->setAttribute('uncheckedValue', 'default')
+    ->insert($view->slider('MailQuotaCustom', $view::LABEL_RIGHT | $view::SLIDER_ENUMERATIVE)
+    ->setAttribute('label', '${0}')
+    ->setAttribute('min', 1)
+    ->setAttribute('max', 51)
+    ->setAttribute('step', 5)
+    )
 ;
 
 $forwardPanel = $view->fieldsetSwitch('MailForwardStatus', 'enabled', $view::FIELDSETSWITCH_CHECKBOX | $view::FIELDSETSWITCH_EXPANDABLE)
