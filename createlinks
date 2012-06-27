@@ -89,7 +89,11 @@ foreach (qw(create modify delete)) {
 }
 
 event_actions('user-create',
-	      'nethserver-mail-pseudonym-create' => '03');
+	      'nethserver-mail-pseudonym-create' => '03',
+              'nethserver-mail-user-update' => '30');
+
+event_actions('user-modify',
+              'nethserver-mail-user-update' => '30');
 
 event_actions('user-delete',
 	      'nethserver-mail-pseudonym-delete' => '03',

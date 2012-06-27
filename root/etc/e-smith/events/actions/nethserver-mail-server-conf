@@ -11,20 +11,43 @@ use NethServer::Service;
 use NethServer::Directory;
 use esmith::ConfigDB;
 
+# Get dovecot user and group id
+my $uid = (getpwnam('dovecot'))[2] or die('Missing dovecot user'); 
+my $gid = (getgrnam('dovecot'))[2] or die('Missing dovecot group');
+
+#
+# Remove the LDAP misc schema, because it conflicts with qmail schema
+#
+@schemas = glob('/etc/openldap/slapd.d/cn\=config/cn\=schema/cn=\{*\}misc.ldif');
+if(@schemas) {
+    NethServer::Service::stop('slapd');
+    unlink @schemas;
+    NethServer::Service::start('slapd');
+    sleep 5;
+}
+
+#
+# Connect and load the qmail schema:
+#
+my $ldap = NethServer::Directory::connect();
+$ldap->loadLdifSchema('qmail', '/etc/openldap/schema/qmail.ldif') || die("Could not load the qmail LDIF schema for dovecot");
+
 NethServer::Service::manage_add('nethserver-mail-server',
 				'dovecot',
 				'postfix');
 
-my $uid = (getpwnam('dovecot'))[2] or die('Missing dovecot user'); 
-my $gid = (getgrnam('dovecot'))[2] or die('Missing dovecot group');
-
+#
+# Adjust LDAP ACLs to allow dovecot read on any field through ldapi:// socket.
+#
 my $ldapAccessDirective = qq(by dn.exact="gidNumber=$gid+uidNumber=$uid,cn=peercred,cn=external,cn=auth" read);
 
 NethServer::Directory::addAccessDirective($ldapAccessDirective, 'userPassword');
 NethServer::Directory::addAccessDirective($ldapAccessDirective, '*');
 
+#
+# Register some postfix tables to be updated with nethserver-mail-postmap-update action
+#
 my $configDb = esmith::ConfigDB->open() || die("Could not open ConfigDB");
-
 my @postmapUpdateList = split(',', $configDb->get_prop('postfix', 'PostmapUpdateList'));
 
 foreach my $table (qw(

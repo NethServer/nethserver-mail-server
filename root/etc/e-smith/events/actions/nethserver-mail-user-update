@@ -1,0 +1,76 @@
+#!/usr/bin/perl
+
+#
+# nethserver-mail-user-update
+#
+# Set / Unset a custom mail quota for specific user(s)
+#
+
+use esmith::AccountsDB;
+use NethServer::Directory;
+use strict;
+
+my $event = shift || die("Missing event name argument");
+my $account = shift;
+
+my $accountsDb = esmith::AccountsDB->open_ro();
+
+my @accountList = ();
+
+my $errors = 0;
+
+if( ! $account ) {
+    @accountList = $accountsDb->users();
+} else {
+    @accountList = ($accountsDb->get($account));
+}
+
+my $ldap = NethServer::Directory::connect() || die("LDAP connection error");
+
+
+foreach my $accountRecord (@accountList) {
+
+    if($accountRecord->prop('type') ne 'user') {
+	warn "Skipping non-user account " . $accountRecord->key . "\n";
+	next;
+    }
+
+    my $ldapEntry = $ldap->search(
+	base => 'ou=People, ' . NethServer::Directory::getInternalSuffix(),
+	scope => 'one',
+	filter => sprintf('(&(objectClass=PosixAccount)(uid=%s))', $accountRecord->key),
+	)->pop_entry();
+
+    if( ! defined $ldapEntry ) {
+	warn("User " . $accountRecord->key . " is not found!\n");
+	next;
+    }
+
+    if( ! grep(/^qmailUser$/, $ldapEntry->get_value('objectClass')))  {
+	$ldapEntry->add(objectClass => 'qmailUser', mail => '');
+	$ldapEntry->update($ldap);
+    }
+
+    if( ! defined $accountRecord->prop('MailStatus')
+       || $accountRecord->prop('MailStatus') ne 'enabled') {
+	$ldapEntry->replace(accountStatus => 'disabled');
+    } else {
+	$ldapEntry->replace(accountStatus => 'active');
+    }
+
+    if( ! defined $accountRecord->prop('MailQuotaType') 
+	|| $accountRecord->prop('MailQuotaType') ne 'custom') {
+	if($ldapEntry->exists('mailQuotaSize')) {
+	    $ldapEntry->delete('mailQuotaSize');
+	}
+    } elsif ($accountRecord->prop('MailQuotaCustom') eq 'unlimited') {
+	$ldapEntry->replace(mailQuotaSize => 0xFFFFFFFF);
+    } else {
+	$ldapEntry->replace(mailQuotaSize => $accountRecord->prop('MailQuotaCustom') * 100);
+    }
+
+    $ldapEntry->update($ldap);
+}
+
+
+exit($errors == 0 ? 0 : 1);
