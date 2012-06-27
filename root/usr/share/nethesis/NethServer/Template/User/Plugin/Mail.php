@@ -4,9 +4,6 @@ $quotaPanel = $view->fieldsetSwitch('MailQuotaType', 'custom', $view::FIELDSETSW
         | $view::FIELDSETSWITCH_CHECKBOX)->setAttribute('uncheckedValue', 'default')
     ->insert($view->slider('MailQuotaCustom', $view::LABEL_RIGHT | $view::SLIDER_ENUMERATIVE)
     ->setAttribute('label', '${0}')
-    ->setAttribute('min', 1)
-    ->setAttribute('max', 51)
-    ->setAttribute('step', 5)
     )
 ;
 

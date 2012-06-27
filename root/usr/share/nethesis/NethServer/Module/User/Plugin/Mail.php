@@ -60,7 +60,7 @@ class Mail extends \Nethgui\Controller\Table\RowPluginAction
         if ( ! $this->getRequest()->isMutation()) {
             $h = array();
             for($i = 1; $i <= 50; $i += ($i === 1) ? 4 : 5) {
-                $h[$i] = $i . ' GB';
+                $h[$i . 'G'] = $i . ' GB';
             }
             
             $h['unlimited'] = $view->translate('Unlimited_quota');
