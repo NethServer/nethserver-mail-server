@@ -53,15 +53,18 @@ passdb {
   master = yes
   pass = yes
 }
-service imap {
-  executable = imap imap-postlogin
-}
-service imap-postlogin {
-  executable = script-login /usr/libexec/nethserver/dovecot-postlogin
-  user = \$default_internal_user
-  unix_listener imap-postlogin {
-  }
-}
+
+# CLEANUP
+#service imap {
+#  executable = imap imap-postlogin
+#}
+#service imap-postlogin {
+#  executable = script-login /usr/libexec/nethserver/dovecot-postlogin
+#  user = \$default_internal_user
+#  unix_listener imap-postlogin {
+#  }
+#}
+
 service imap-login {
      unix_listener imap-ipc {
          group = root

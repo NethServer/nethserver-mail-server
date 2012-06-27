@@ -2,10 +2,13 @@
 # Mailbox system user owner
 #
 first_valid_uid = { 
-    $uid = (getpwnam('vmail'))[2] or die('Missing vmail user'); 
     $gid = (getgrnam('vmail'))[2] or die('Missing vmail group');
+    $uid = (getpwnam('vmail'))[2] or die('Missing vmail user'); 
 }
 last_valid_uid = { $uid; }
+
+mail_uid = vmail
+mail_gid = vmail
 
 # Password database: ldap
 passdb \{
@@ -13,10 +16,15 @@ passdb \{
     args = /etc/dovecot/ldap.conf
 \}
 
-# Static user database - { $uid } corresponds to vmail user
+# Use the password lookup query to prefetch userdb fields (for IMAP)
+userdb \{
+       driver = prefetch
+\}
+
+# User database (for LMTP)
 userdb \{ 
-       driver = static
-       args = uid={ $uid } gid={ $gid } home=/var/lib/vmail/user/%n system_groups_user=%n
+       driver = ldap
+       args = /etc/dovecot/ldap.conf       
 \}      
 
 # Location of mailboxes:
