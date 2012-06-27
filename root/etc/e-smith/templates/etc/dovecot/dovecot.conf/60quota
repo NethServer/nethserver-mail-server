@@ -15,7 +15,7 @@ protocol imap {
 
 plugin {
   quota = maildir:User quota
-  quota_rule  = *:bytes=$dovecot{QuotaDefaultBytes}
+  quota_rule  = *:bytes=$dovecot{QuotaDefaultBytes}M
 }
 EOF
 }

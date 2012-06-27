@@ -39,7 +39,7 @@ class Mail extends \Nethgui\Controller\Table\RowPluginAction
 
     public function initialize()
     {
-        $quotaValidator1 = $this->createValidator()->greatThan(0)->lessThan(51);
+        $quotaValidator1 = $this->createValidator()->greatThan(0)->lessThan(501);
         $quotaValidator2 = $this->createValidator()->equalTo('unlimited');
                     
         $this->setSchemaAddition(array(
@@ -60,7 +60,7 @@ class Mail extends \Nethgui\Controller\Table\RowPluginAction
         if ( ! $this->getRequest()->isMutation()) {
             $h = array();
             for($i = 1; $i <= 50; $i += ($i === 1) ? 4 : 5) {
-                $h[$i . 'G'] = $i . ' GB';
+                $h[$i * 10] = $i . ' GB';
             }
             
             $h['unlimited'] = $view->translate('Unlimited_quota');
