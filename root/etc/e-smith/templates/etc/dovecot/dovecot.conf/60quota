@@ -6,6 +6,8 @@
         return '';
     }
 
+    my $quotaDefaultSize = $dovecot{QuotaDefaultSize} * 100;
+
     return <<EOF;
 mail_plugins = \$mail_plugins quota
 
@@ -15,7 +17,7 @@ protocol imap {
 
 plugin {
   quota = maildir:User quota
-  quota_rule  = *:bytes=$dovecot{QuotaDefaultBytes}M
+  quota_rule  = *:bytes=${quotaDefaultSize}M
 }
 EOF
 }
