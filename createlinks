@@ -120,7 +120,7 @@ event_actions('group-create',
 	      'nethserver-mail-group-acl-adjust' => '95');
 
 event_actions('group-modify',
-	      'nethserver-mail-account-update' => '30'
+	      'nethserver-mail-account-update' => '30',
 	      'nethserver-mail-group-acl-adjust' => '95');
 
 event_actions('group-delete',
