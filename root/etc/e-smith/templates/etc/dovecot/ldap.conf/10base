@@ -22,3 +22,4 @@ user_attrs = mailQuotaSize=quota_rule=*:bytes=%$M, =home=/var/lib/vmail/user/%n,
 
 iterate_attrs = uid=user
 iterate_filter = (&(objectClass=posixAccount)(accountStatus=active))
+
