@@ -1,9 +1,9 @@
 #!/usr/bin/perl
 
 #
-# nethserver-mail-user-update
+# nethserver-mail-account-update
 #
-# Set / Unset a custom mail quota for specific user(s)
+# Set / Unset a custom mail quota for specific user(s) and group(s)
 #
 
 use esmith::AccountsDB;
@@ -20,7 +20,7 @@ my @accountList = ();
 my $errors = 0;
 
 if( ! $account ) {
-    @accountList = $accountsDb->users();
+    @accountList = ($accountsDb->users(), $accountsDb->groups());
 } else {
     @accountList = ($accountsDb->get($account));
 }
@@ -30,8 +30,9 @@ my $ldap = NethServer::Directory::connect() || die("LDAP connection error");
 
 foreach my $accountRecord (@accountList) {
 
-    if($accountRecord->prop('type') ne 'user') {
-	warn "Skipping non-user account " . $accountRecord->key . "\n";
+    if($accountRecord->prop('type') ne 'user'
+	&& $accountRecord->prop('type') ne 'group') {
+	warn "Skipping invalid account type:" . $accountRecord->key . "\n";
 	next;
     }
 
@@ -42,7 +43,7 @@ foreach my $accountRecord (@accountList) {
 	)->pop_entry();
 
     if( ! defined $ldapEntry ) {
-	warn("User " . $accountRecord->key . " is not found!\n");
+	warn("Account `" . $accountRecord->key . "` has not been found!\n");
 	next;
     }
 
@@ -51,11 +52,18 @@ foreach my $accountRecord (@accountList) {
 	$ldapEntry->update($ldap);
     }
 
-    if( ! defined $accountRecord->prop('MailStatus')
-       || $accountRecord->prop('MailStatus') ne 'enabled') {
-	$ldapEntry->replace(accountStatus => 'disabled');
-    } else {
+    my $isEnabledMailStatus = defined $accountRecord->prop('MailStatus')
+	&& $accountRecord->prop('MailStatus') eq 'enabled';
+    
+    my $isSharedGroup = $accountRecord->prop('type') eq 'group'
+	&& $accountRecord->prop('MailDeliveryType') eq 'shared';
+
+    # See accountStatus attributeType in qmail schema:
+    if ( $isEnabledMailStatus &&
+	( $accountRecord->prop('type') eq 'user' || $isSharedGroup )) {
 	$ldapEntry->replace(accountStatus => 'active');
+    } else {
+	$ldapEntry->replace(accountStatus => 'disabled');
     }
 
     if( ! defined $accountRecord->prop('MailQuotaType') 

@@ -34,6 +34,7 @@ event_actions('nethserver-mail-server-update',
 	      'initialize-default-databases' => '00',
 	      'nethserver-mail-server-conf' => '20',
 	      'nethserver-mail-postmap-update' => '30',
+	      'nethserver-mail-account-update' => '30',
 	      'firewall-adjust' => '30',
 	      'runlevel-adjust' => '40');
 
@@ -90,10 +91,10 @@ foreach (qw(create modify delete)) {
 
 event_actions('user-create',
 	      'nethserver-mail-pseudonym-create' => '03',
-              'nethserver-mail-user-update' => '30');
+              'nethserver-mail-account-update' => '30');
 
 event_actions('user-modify',
-              'nethserver-mail-user-update' => '30');
+              'nethserver-mail-account-update' => '30');
 
 event_actions('user-delete',
 	      'nethserver-mail-pseudonym-delete' => '03',
@@ -115,9 +116,11 @@ foreach (qw(create modify delete)) {
 
 event_actions('group-create',
 	      'nethserver-mail-pseudonym-create' => '03',
+	      'nethserver-mail-account-update' => '30',
 	      'nethserver-mail-group-acl-adjust' => '95');
 
 event_actions('group-modify',
+	      'nethserver-mail-account-update' => '30'
 	      'nethserver-mail-group-acl-adjust' => '95');
 
 event_actions('group-delete',
