@@ -26,6 +26,7 @@ sub new
 	password => NethServer::Directory::getUserPassword('vmail'),
 	commandId => 0,
 	debug => 0,
+	error => '',
     };
 
     while(@_) {
@@ -108,11 +109,12 @@ sub _expect
     # skip untagged lines
     do {
 	$line = readline $self->{socket};
+	$self->{error} .= $line;
 	$self->{debug} && print STDERR "DEBUG " . $line . "\n";
     } while ($line =~ /^\* /);
 
-
     if($line =~ m/^${cid} ${expect}/i) {
+	$self->{error} = '';
 	return 1;
     }
 
@@ -128,5 +130,11 @@ sub _send
     return 1;
 }
 
+
+sub getErrorMessage()
+{
+    my $self = shift;
+    return $self->{error};
+}
 
 1;
