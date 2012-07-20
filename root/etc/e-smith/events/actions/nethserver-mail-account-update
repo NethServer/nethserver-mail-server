@@ -55,12 +55,8 @@ foreach my $accountRecord (@accountList) {
     my $isEnabledMailStatus = defined $accountRecord->prop('MailStatus')
 	&& $accountRecord->prop('MailStatus') eq 'enabled';
     
-    my $isSharedGroup = $accountRecord->prop('type') eq 'group'
-	&& $accountRecord->prop('MailDeliveryType') eq 'shared';
-
     # See accountStatus attributeType in qmail schema:
-    if ( $isEnabledMailStatus &&
-	( $accountRecord->prop('type') eq 'user' || $isSharedGroup )) {
+    if ( $isEnabledMailStatus ) {
 	$ldapEntry->replace(accountStatus => 'active');
     } else {
 	$ldapEntry->replace(accountStatus => 'disabled');
