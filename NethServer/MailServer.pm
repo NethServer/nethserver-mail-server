@@ -304,4 +304,15 @@ sub connectAclManager
     return NethServer::MailServer::AclManager->new(login => $account);
 }
 
+=head2 getDovecotSharedPath
+
+Return the path of the shared mailfolder for the given group name
+
+=cut
+sub getDovecotSharedPath($)
+{
+    my $group = shift;
+    return '/var/lib/vmail/user/' . $group . '/Maildir/dovecot-shared';
+}
+
 1;
