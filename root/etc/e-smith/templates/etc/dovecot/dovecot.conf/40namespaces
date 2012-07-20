@@ -54,16 +54,15 @@ passdb {
   pass = yes
 }
 
-# CLEANUP
-#service imap {
-#  executable = imap imap-postlogin
-#}
-#service imap-postlogin {
-#  executable = script-login /usr/libexec/nethserver/dovecot-postlogin
-#  user = \$default_internal_user
-#  unix_listener imap-postlogin {
-#  }
-#}
+service imap {
+  executable = imap imap-postlogin
+}
+service imap-postlogin {
+  executable = script-login /usr/libexec/nethserver/dovecot-postlogin
+  user = \$default_internal_user
+  unix_listener imap-postlogin {
+  }
+}
 
 service imap-login {
      unix_listener imap-ipc {
@@ -73,8 +72,8 @@ service imap-login {
      }
 }
 
-
-mail_debug = yes
+# auth_debug = yes
+# mail_debug = yes
 
 NAMESPACE
 }
