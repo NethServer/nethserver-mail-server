@@ -9,7 +9,7 @@ $L['Current_label'] = 'Account selezionato';
 
 $L['Key_label'] = 'Email';
 $L['Account_label'] = 'Account';
-$L['Access_label'] = 'Accesso';
+$L['Access_label'] = 'Accessibile solo da reti locali';
 
 $L['Description_label'] = 'Descrizione';
 $L['pseudonym_label'] = 'Indirizzo email';
