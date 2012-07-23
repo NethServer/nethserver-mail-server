@@ -47,7 +47,7 @@ class Mail extends \Nethgui\Controller\Table\RowPluginAction
             array('MailQuotaType', $this->createValidator()->memberOf('custom', 'default'), Table::FIELD),
             array('MailQuotaCustom', $this->createValidator()->orValidator($quotaValidator1, $quotaValidator2), Table::FIELD),
             array('MailForwardStatus', Validate::SERVICESTATUS, Table::FIELD),
-            array('MailForwardAddress', Validate::ANYTHING, Table::FIELD), // FIXME implement EMAIL ADDRESS validator
+            array('MailForwardAddress', Validate::EMAIL, Table::FIELD), 
             array('MailForwardKeepMessageCopy', Validate::YES_NO, Table::FIELD)
         ));
         $this->setDefaultValue('MailStatus', 'enabled');

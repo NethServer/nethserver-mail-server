@@ -95,7 +95,17 @@ sub getMailboxAliases()
 	    next;
 	} elsif($accountRecord->prop('type') eq 'user'
 	    &&  $accountRecord->prop('MailStatus') eq 'enabled') {
-	    $aliasMap{$pseudonym} = ["$account\@$domain"];
+
+	    if($accountRecord->prop('MailForwardStatus') eq 'enabled') {
+		if($accountRecord->prop('MailForwardKeepMessageCopy') eq 'yes') {
+		    $aliasMap{$pseudonym} = ["$account\@$domain", $accountRecord->prop('MailForwardAddress')];
+		} else {
+		    $aliasMap{$pseudonym} = [$accountRecord->prop('MailForwardAddress')];
+		}	       
+	    } else {
+		$aliasMap{$pseudonym} = ["$account\@$domain"];
+	    }
+
 	} elsif($accountRecord->prop('type') eq 'group'
 	    &&  $accountRecord->prop('MailStatus') eq 'enabled') {
 
