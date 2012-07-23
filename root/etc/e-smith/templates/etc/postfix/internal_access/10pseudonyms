@@ -1,0 +1,20 @@
+
+#
+# 10pseudonyms -- internal addresses defined by pseudonyms database
+#
+
+{
+    use NethServer::MailServer;
+    my $ms = NethServer::MailServer->new();
+    my @addresses = $ms->getInternalAddresses();
+
+    if(@addresses) {
+	$OUT = '';
+	foreach my $address (@addresses) {
+	    $OUT .= $address . "\t\t\t" . 'reject' . "\n";
+	}
+    } else {
+	$OUT = "# no internal address defined\n";
+    }
+}
+

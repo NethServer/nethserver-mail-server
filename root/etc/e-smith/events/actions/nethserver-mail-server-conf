@@ -54,6 +54,7 @@ foreach my $table (qw(
     /etc/postfix/virtual 
     /etc/postfix/transport
     /etc/postfix/vmailbox
+    /etc/postfix/internal_access
 )) {
     if ( ! grep($table eq $_, @postmapUpdateList) ) {
 	push @postmapUpdateList, $table;

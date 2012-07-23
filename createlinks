@@ -15,6 +15,7 @@ my @templates = qw(
     /etc/postfix/transport
     /etc/postfix/virtual
     /etc/postfix/vmailbox
+    /etc/postfix/internal_access
     /etc/dovecot/dovecot.conf
 );
 
@@ -68,6 +69,7 @@ File::Path::make_path('root/var/lib/dovecot/acls', { mode => 00755 } );
 my @pseudonymTemplates = qw(
     /etc/postfix/virtual
     /etc/postfix/vmailbox
+    /etc/postfix/internal_access
 );
 
 foreach (qw(create modify delete)) {

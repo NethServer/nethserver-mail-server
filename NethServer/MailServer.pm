@@ -325,4 +325,26 @@ sub getDovecotSharedPath($)
     return '/var/lib/vmail/user/' . $group . '/Maildir/dovecot-shared';
 }
 
+
+=head2 getInteralAddresses()
+
+Return the list of internal (aka private) email addresses. Recipients
+in this list are visible only to local clients (mynetworks).
+
+=cut
+sub getInternalAddresses()
+{
+    my $self = shift;
+    my @internalAddresses = ();
+
+    foreach my $addressRecord ($self->{AccountsDb}->pseudonyms()) {
+	if(defined $addressRecord->prop('Access') 
+	   && $addressRecord->prop('Access') eq 'private') {
+	    push @internalAddresses, $addressRecord->key;
+	}
+    }
+
+    return @internalAddresses;   
+}
+
 1;
