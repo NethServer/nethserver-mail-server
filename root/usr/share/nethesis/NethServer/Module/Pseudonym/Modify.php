@@ -73,8 +73,7 @@ class Modify extends \Nethgui\Controller\Table\Modify
         $view->setTemplate($templates[$this->getIdentifier()]);
 
         if ( ! $this->getRequest()->isMutation() && $this->getRequest()->isValidated()) {
-            $view['AccountDatasource'] = $this->readAccountDatasource($view['Account'], $view);
-
+            $view['AccountDatasource'] = new \NethServer\Module\Pseudonym\AccountDatasource($this, $view->getTranslator(), $view['Account']);
             if ($this->getIdentifier() === 'create') {
                 $view['domainAddressDatasource'] = $this->readDomainAddressDatasource();
             }
@@ -100,45 +99,6 @@ class Modify extends \Nethgui\Controller\Table\Modify
         }
 
         return $domains;
-    }
-
-    private function readAccountDatasource($current, \Nethgui\View\ViewInterface $view)
-    {
-        $users = $this->getPlatform()->getDatabase('accounts')->getAll('user');
-        $groups = $this->getPlatform()->getDatabase('accounts')->getAll('group');
-
-        $hash = array();
-
-        $keyFound = FALSE;
-
-        $usersLabel = $view->translate('Users_label');
-        $groupsLabel = $view->translate('Groups_label');
-
-        foreach ($users as $key => $prop) {
-            if ( ! isset($prop['MailStatus']) || $prop['MailStatus'] !== 'enabled') {
-                continue;
-            }
-            $hash[$usersLabel][$key] = $prop['FirstName'] . ' ' . $prop['LastName'] . ' (' . $key . ')';
-            if ($current === $key) {
-                $keyFound = TRUE;
-            }
-        }
-
-        foreach ($groups as $key => $prop) {
-            if ( ! isset($prop['MailStatus']) || $prop['MailStatus'] !== 'enabled') {
-                continue;
-            }
-            $hash[$groupsLabel][$key] = $prop['Description'] . ' (' . $key . ')';
-            if ($current === $key) {
-                $keyFound = TRUE;
-            }
-        }
-
-        if ( ! $keyFound) {
-            $hash[$view->translate('Current_label')][$current] = $current;
-        }
-
-        return \Nethgui\Renderer\AbstractRenderer::hashToDatasource($hash, TRUE);
     }
 
 }
