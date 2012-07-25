@@ -42,7 +42,9 @@ class Mail extends \Nethgui\Controller\Table\RowPluginAction
         $quotaValidator1 = $this->createValidator()->greatThan(0)->lessThan(501);
         $quotaValidator2 = $this->createValidator()->equalTo('unlimited');
                     
-        $this->setSchemaAddition(array(
+        $this->declareParameter('QuotaStatus', FALSE, array('configuration', 'dovecot', 'QuotaStatus'));
+        
+        $this->setSchemaAddition(array(            
             array('MailStatus', Validate::SERVICESTATUS, Table::FIELD),
             array('MailQuotaType', $this->createValidator()->memberOf('custom', 'default'), Table::FIELD),
             array('MailQuotaCustom', $this->createValidator()->orValidator($quotaValidator1, $quotaValidator2), Table::FIELD),

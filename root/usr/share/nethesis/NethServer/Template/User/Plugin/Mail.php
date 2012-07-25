@@ -1,11 +1,15 @@
 <?php
 
-$quotaPanel = $view->fieldsetSwitch('MailQuotaType', 'custom', $view::FIELDSETSWITCH_EXPANDABLE
-        | $view::FIELDSETSWITCH_CHECKBOX)->setAttribute('uncheckedValue', 'default')
-    ->insert($view->slider('MailQuotaCustom', $view::LABEL_RIGHT | $view::SLIDER_ENUMERATIVE)
-    ->setAttribute('label', '${0}')
-    )
-;
+if ($view['QuotaStatus'] === 'enabled') {
+    $quotaPanel = $view->fieldsetSwitch('MailQuotaType', 'custom', $view::FIELDSETSWITCH_EXPANDABLE
+            | $view::FIELDSETSWITCH_CHECKBOX)->setAttribute('uncheckedValue', 'default')
+        ->insert($view->slider('MailQuotaCustom', $view::LABEL_RIGHT | $view::SLIDER_ENUMERATIVE)
+        ->setAttribute('label', '${0}')
+        )
+    ;
+} else {
+    $quotaPanel = $view->checkbox('MailQuotaType', 'default', $view::STATE_DISABLED);
+}
 
 $forwardPanel = $view->fieldsetSwitch('MailForwardStatus', 'enabled', $view::FIELDSETSWITCH_CHECKBOX | $view::FIELDSETSWITCH_EXPANDABLE)
     ->setAttribute('uncheckedValue', 'disabled')
