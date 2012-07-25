@@ -83,7 +83,7 @@ class AccountDatasource implements \IteratorAggregate
             }
         }
 
-        if ( ! $keyFound) {
+        if ( $keyFound === FALSE && ! is_null($this->current)) {
             $hash[$this->translator->translate($this->module, 'Current_label')][$this->current] = $this->current;
         }
 
