@@ -34,23 +34,36 @@ class Mailbox extends \Nethgui\Controller\AbstractController
 
     public function initialize()
     {
+        // Create an adapter that maps TlsSecurity parameter 
+        // on ImapTlsSecurity and PopTlsSecurity:
+        $tlsSecurityAdapter = $this->getPlatform()->getMapAdapter(
+            function($imapTlsSecurity, $popTlsSecurity) {
+                return $imapTlsSecurity;
+            }, function($tlsSecurity) {
+                return array($tlsSecurity, $tlsSecurity);
+            }, array(array('configuration', 'dovecot', 'ImapTlsSecurity'), array('configuration', 'dovecot', 'PopTlsSecurity'))
+        );
+
+        $this->declareParameter('ImapStatus', Validate::SERVICESTATUS, array('configuration', 'dovecot', 'ImapStatus'));
+        $this->declareParameter('PopStatus', Validate::SERVICESTATUS, array('configuration', 'dovecot', 'PopStatus'));
+        $this->declareParameter('TlsSecurity', '/^(required|optional)$/', $tlsSecurityAdapter);
         $this->declareParameter('QuotaStatus', Validate::SERVICESTATUS, array('configuration', 'dovecot', 'QuotaStatus'));
         $this->declareParameter('QuotaDefaultSize', Validate::POSITIVE_INTEGER, array('configuration', 'dovecot', 'QuotaDefaultSize'));
-       parent::initialize();
+        parent::initialize();
     }
 
     public function prepareView(\Nethgui\View\ViewInterface $view)
-    {       
+    {
         parent::prepareView($view);
         if ( ! $this->getRequest()->isMutation()) {
             $h = array();
-            for($i = 1; $i <= 50; $i += ($i === 1) ? 4 : 5) {
+            for ($i = 1; $i <= 50; $i += ($i === 1) ? 4 : 5) {
                 $h[$i * 10] = $i . ' GB';
-            }                        
+            }
             $view['QuotaDefaultSizeDatasource'] = \Nethgui\Renderer\AbstractRenderer::hashToDatasource($h);
         } else {
             $view['QuotaDefaultSizeDatasource'] = array();
-        }        
+        }
     }
 
 }
