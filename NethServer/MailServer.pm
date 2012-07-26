@@ -94,10 +94,6 @@ sub getMailboxAliases()
 	if(! defined($accountRecord) ) {
 	    $self->{debug} && warn "Account `$account` not found";
 	    next;
-	} elsif(defined($domainRecord) 
-		&& $domainRecord->prop('TransportType') eq 'Reject') {
-	    $self->{debug} && warn "The domain `$domain` is unknown or rejected";
-	    next;
 	} elsif($accountRecord->prop('type') eq 'user'
 	    &&  $accountRecord->prop('MailStatus') eq 'enabled') {
 
@@ -124,8 +120,6 @@ sub getMailboxAliases()
 		$aliasMap{$pseudonym} = ["$account\@$domain"];
 	    }
 	} 
-
-
 
     }
 
