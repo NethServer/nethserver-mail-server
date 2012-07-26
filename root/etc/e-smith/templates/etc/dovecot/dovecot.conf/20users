@@ -1,5 +1,5 @@
 #
-# Mailbox system user owner
+# 20users -- configure user authentication and storage
 #
 first_valid_uid = { 
     $gid = (getgrnam('vmail'))[2] or die('Missing vmail group');

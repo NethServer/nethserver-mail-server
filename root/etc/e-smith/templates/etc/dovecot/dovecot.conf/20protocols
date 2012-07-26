@@ -1,0 +1,23 @@
+#
+# 20protocols -- configure access to mailboxes
+#
+protocols = {
+    my @protocols = ();
+    if($dovecot{ImapStatus} eq 'enabled') {
+        @protocols = (@protocols, 'imap');
+    }
+    if($dovecot{PopStatus} eq 'enabled') {
+        @protocols = (@protocols, 'pop3');
+    }
+    if( ! @protocols) {
+        @protocols = ('none');
+    }
+    $OUT = join(' ', @protocols);
+}
+disable_plaintext_auth = {
+    if($dovecot{TlsSecurity} eq 'required') {
+        $OUT = 'yes';
+    } else {
+        $OUT = 'no';
+    }   
+}
