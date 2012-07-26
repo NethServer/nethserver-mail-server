@@ -56,4 +56,9 @@ class Mailbox extends \Nethgui\Controller\AbstractController
         }
     }
 
+    protected function onParametersSaved($changedParameters)
+    {
+        $this->getPlatform()->signalEvent('nethserver-mail-server-save@post-process');
+    }
+
 }
