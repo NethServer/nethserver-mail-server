@@ -15,8 +15,9 @@ echo $view->fieldset()->setAttribute('template', $T('Mailbox access protocols'))
     )    
 ;
 
-echo $view->fieldsetSwitch('QuotaStatus', 'enabled', $view::FIELDSETSWITCH_CHECKBOX)
-    ->setAttribute('uncheckedValue', 'disabled')
+echo $view->radioButton('QuotaStatus', 'disabled');
+echo $view->fieldsetSwitch('QuotaStatus', 'enabled', $view::FIELDSETSWITCH_EXPANDABLE)
+
     ->insert(
         $view->slider('QuotaDefaultSize', $view::SLIDER_ENUMERATIVE | $view::LABEL_ABOVE)
         ->setAttribute('label', $T('Quota default size ${0}'))

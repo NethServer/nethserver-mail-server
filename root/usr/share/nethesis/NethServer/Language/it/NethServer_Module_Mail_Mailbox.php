@@ -2,8 +2,9 @@
 
 $L['Mailbox_Title'] = 'Caselle di posta';
 
-$L['QuotaStatus_label'] = 'Quota disco';
-$L['Quota default size ${0}'] = 'Quota email predefinita: ${0}';
+$L['QuotaStatus_disabled_label'] = 'Spazio disco illimitato';
+$L['QuotaStatus_enabled_label'] = 'Applica quota';
+$L['Quota default size ${0}'] = 'Valore predefinito: ${0}';
 $L['Mailbox access protocols'] = 'Protocolli di accesso';
 
 $L['TlsSecurity_label'] = 'Consenti connessioni non cifrate';
