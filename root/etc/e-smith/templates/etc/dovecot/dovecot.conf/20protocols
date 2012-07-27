@@ -2,7 +2,7 @@
 # 20protocols -- configure access to mailboxes
 #
 protocols = {
-    my @protocols = ();
+    my @protocols = ('lmtp');
     if($dovecot{ImapStatus} eq 'enabled') {
         @protocols = (@protocols, 'imap');
     }
