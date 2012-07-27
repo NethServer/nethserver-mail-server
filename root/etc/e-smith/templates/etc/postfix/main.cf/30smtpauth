@@ -19,10 +19,14 @@ smtpd_tls_key_file = /etc/pki/dovecot/private/dovecot.pem
 # encryption:
 smtpd_tls_security_level = may
 
-# Local and SASL authenticated clients can send mail everywhere:
-smtpd_recipient_restrictions = 
-  permit_mynetworks,
-  permit_sasl_authenticated,
-  reject_unauth_destination,
-  check_recipient_access hash:/etc/postfix/internal_access
-
+{
+    # Override @smtpd_recipient_restrictions
+    # Local and SASL authenticated clients can send mail everywhere:
+    @smtpd_recipient_restrictions = (
+       'permit_mynetworks',
+       'permit_sasl_authenticated',
+       'reject_unauth_destination',
+       'check_recipient_access hash:/etc/postfix/internal_access'
+    );
+    '';
+}
