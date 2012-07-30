@@ -2,11 +2,11 @@
 # Limits
 #
 
+default_process_limit = { $dovecot{MaxProcesses} }
+
 protocol imap \{
   mail_max_userip_connections = { $dovecot{MaxUserConnectionsPerIp} }
 \}
 
-service imap \{
-  process_limit = { $dovecot{MaxImapProcesses} }
-\}
+
 
