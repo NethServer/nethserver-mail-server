@@ -55,12 +55,14 @@ foreach my $table (qw(
     /etc/postfix/transport
     /etc/postfix/vmailbox
     /etc/postfix/internal_access
+    /etc/postfix/recipient_bcc
 )) {
     if ( ! grep($table eq $_, @postmapUpdateList) ) {
 	push @postmapUpdateList, $table;
-	$configDb->set_prop('postfix', 'PostmapUpdateList', join(',', @postmapUpdateList));
     }
 }
+
+$configDb->set_prop('postfix', 'PostmapUpdateList', join(',', @postmapUpdateList));
 
 
 

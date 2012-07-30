@@ -16,6 +16,7 @@ my @templates = qw(
     /etc/postfix/virtual
     /etc/postfix/vmailbox
     /etc/postfix/internal_access
+    /etc/postfix/recipient_bcc
     /etc/dovecot/dovecot.conf
 );
 
@@ -129,3 +130,10 @@ event_actions('group-delete',
 	      'nethserver-mail-pseudonym-delete' => '03',
 	      'nethserver-mail-group-acl-cleanup' => '03',
 	      'nethserver-mail-account-cleanup' => '30');
+
+
+#
+# domain-* events: expand recipient_bcc map
+#
+event_templates('domain-' . $_, '/etc/postfix/recipient_bcc') foreach (qw('create delete modify'));
+
