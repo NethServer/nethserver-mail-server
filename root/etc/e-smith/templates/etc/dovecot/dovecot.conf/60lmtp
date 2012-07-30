@@ -2,6 +2,10 @@
 # LMTP server for message delivery
 #
 
+protocol lmtp \{
+    mail_plugins = $mail_plugins sieve
+\}
+
 service lmtp \{
 
     user = vmail
