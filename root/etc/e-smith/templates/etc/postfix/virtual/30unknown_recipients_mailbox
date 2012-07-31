@@ -1,0 +1,32 @@
+#
+# 30unknown_recipients_mailbox -- catch-all mailboxes for unknown recipients
+#
+{
+    use NethServer::MailServer;
+    use esmith::DomainsDB;
+    my $domainsDb = esmith::DomainsDB->open() || die('Could not open DomainsDB');
+    
+    $OUT = '';
+    
+    foreach $domainRecord ($domainsDb->get_all_by_prop(type => 'domain')) {
+	if(defined $domainRecord->prop('UnknownRecipientsActionType') 
+	   && $domainRecord->prop('UnknownRecipientsActionType') eq 'deliver'
+	   && defined $domainRecord->prop('UnknownRecipientsActionDeliverMailbox')) {
+	    $OUT .= sprintf("@%-47s %s@%s\n", 
+			    $domainRecord->key, 
+			    $domainRecord->prop('UnknownRecipientsActionDeliverMailbox'), 
+			    NethServer::MailServer::getVirtualMailboxDomain()
+		);
+
+	} elsif (defined $domainRecord->prop('UnknownRecipientsActionType') 
+		 && $domainRecord->prop('UnknownRecipientsActionType') eq 'bounce') {
+	    $OUT .= '';
+	}
+    }
+    
+    if(! $OUT) {
+	$OUT = "# -- Messages to unknown recipients are bounced --";
+    }
+    
+}
+

@@ -136,7 +136,10 @@ event_actions('group-delete',
 # domain-* events: expand recipient_bcc map
 #
 foreach (qw(create delete modify)) {
-    event_templates('domain-' . $_, '/etc/postfix/recipient_bcc') ;
+    event_templates('domain-' . $_, 
+		    '/etc/postfix/recipient_bcc', 
+		    '/etc/postfix/virtual',
+		    '/etc/postfix/vmailbox');
     event_actions('domain-'   . $_, 'nethserver-mail-postmap-update' => '30');
 }
 

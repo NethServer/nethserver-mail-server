@@ -57,6 +57,18 @@ sub getMailboxes()
     return keys %mailboxes;
 }
 
+
+=head2 ->getVirtualMailboxDomain() 
+
+Return the internal virtual mailbox domain
+
+=cut 
+sub getVirtualMailboxDomain()
+{
+    return 'vmail.nh';
+}
+
+
 =head2 ->getMailboxAliases()
 
 Return an hash describing the alias => mailboxes association
@@ -77,6 +89,7 @@ sub getMailboxAliases()
 
 	my $account = $record->prop('Account');
 	my $domain = $pseudonym;
+	my $vdomain = getVirtualMailboxDomain();
 
 	# Trim the address part:
 	$domain =~ s/([^@]+@)//;
@@ -99,12 +112,12 @@ sub getMailboxAliases()
 
 	    if($accountRecord->prop('MailForwardStatus') eq 'enabled') {
 		if($accountRecord->prop('MailForwardKeepMessageCopy') eq 'yes') {
-		    $aliasMap{$pseudonym} = ["$account\@$domain", $accountRecord->prop('MailForwardAddress')];
+		    $aliasMap{$pseudonym} = ["$account\@$vdomain", $accountRecord->prop('MailForwardAddress')];
 		} else {
 		    $aliasMap{$pseudonym} = [$accountRecord->prop('MailForwardAddress')];
 		}	       
 	    } else {
-		$aliasMap{$pseudonym} = ["$account\@$domain"];
+		$aliasMap{$pseudonym} = ["$account\@$vdomain"];
 	    }
 
 	} elsif($accountRecord->prop('type') eq 'group'
@@ -115,9 +128,9 @@ sub getMailboxAliases()
 		    $self->{AccountsDb}->get_prop($_, 'MailStatus') eq 'enabled' 
 		} split(',', $accountRecord->prop('Members'));
 		
-		$aliasMap{$pseudonym} = [map { $_ . '@' . $domain } @MailEnabledMemberList];
+		$aliasMap{$pseudonym} = [map { $_ . '@' . $vdomain } @MailEnabledMemberList];
 	    } elsif($accountRecord->prop('MailDeliveryType')eq 'shared') {
-		$aliasMap{$pseudonym} = ["$account\@$domain"];
+		$aliasMap{$pseudonym} = ["$account\@$vdomain"];
 	    }
 	} 
 

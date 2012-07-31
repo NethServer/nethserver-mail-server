@@ -6,8 +6,10 @@
     my $ms = NethServer::MailServer->new();
     my @mailboxes = $ms->getMailboxes();
 
+    $OUT = '';
+
     if( @mailboxes ) {
-	$OUT = join("\n", map { $_ . "\t\tok" } @mailboxes) . "\n";
+	$OUT .= sprintf("%-48s ok\n", $_) foreach (@mailboxes);
     } else {
 	$OUT = "# ..no mailbox defined\n";
     }

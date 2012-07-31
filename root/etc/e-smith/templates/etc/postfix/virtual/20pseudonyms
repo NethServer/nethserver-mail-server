@@ -1,5 +1,7 @@
 
-# Virtual addresses list:
+#
+# 20psudonyms -- Virtual addresses list:
+#
 {
     use NethServer::MailServer;
     my $ms = NethServer::MailServer->new();
@@ -8,7 +10,7 @@
     if(%aliases) {
 	$OUT = '';
 	while( my ($alias, $mailboxes) = each %aliases  ) {
-	    $OUT .= $alias . "\t\t" . join(",\n ", @{$mailboxes}) . "\n";
+	    $OUT .= sprintf("%-48s %s\n",$alias, join(",\n ", @{$mailboxes}));
 	}
     } else {
 	$OUT = "# no virtual address defined\n";
