@@ -29,7 +29,6 @@ event_templates('nethserver-mail-server-update',
 		'/etc/dovecot/ldap.conf',
 		'/etc/sysconfig/dovecot',
 		'/etc/dovecot/master-users',
-		'/var/lib/dovecot/acls/INBOX',
     );
 
 event_actions('nethserver-mail-server-update',
@@ -60,7 +59,6 @@ event_services('nethserver-mail-server-save',
 
 
 File::Path::make_path('root/var/lib/vmail/user', { mode => 00700 } );
-File::Path::make_path('root/var/lib/dovecot/acls', { mode => 00755 } );
 
 
 #
