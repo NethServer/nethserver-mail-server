@@ -6,6 +6,13 @@ protocol lmtp \{
     mail_plugins = $mail_plugins sieve
 \}
 
+
+# Global sieve script, executed BEFORE user's private scripts:
+plugin \{
+    sieve_before = /etc/dovecot/sieve-scripts/before.sieve
+    sieve_after = /etc/dovecot/sieve-scripts/after.sieve
+\}
+
 service lmtp \{
 
     user = vmail

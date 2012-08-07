@@ -60,7 +60,6 @@ event_services('nethserver-mail-server-save',
 
 File::Path::make_path('root/var/lib/vmail/user', { mode => 00700 } );
 
-
 #
 # pseudonym-* events expand and reload postfix table templates
 #

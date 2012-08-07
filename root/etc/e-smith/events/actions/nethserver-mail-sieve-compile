@@ -1,0 +1,7 @@
+#!/bin/bash
+
+/usr/bin/sievec -c /etc/dovecot/sievec/dovecot.conf /etc/dovecot/sieve-scripts/
+
+
+
+
