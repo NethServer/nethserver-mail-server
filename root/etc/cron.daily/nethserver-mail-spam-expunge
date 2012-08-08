@@ -1,0 +1,29 @@
+#!/bin/bash
+
+# The default retention time period length:
+DefaultRetentionTime=`db configuration getprop dovecot SpamRetentionTime`
+
+for USER in `doveadm user '*'`; do
+
+    # Cleanup prop values:
+    unset MailSpamRetentionStatus MailSpamRetentionTime MailStatus
+
+    # Extract customized values from accounts database:
+    eval `db accounts printprop ${USER} MailSpamRetentionStatus MailSpamRetentionTime MailStatus`
+
+    if [ "${MailStatus}" != "enabled" ]; then
+	continue;
+    fi
+
+    if [ "${MailSpamRetentionStatus:-disabled}" = "enabled" ]; then
+	TIME=${MailSpamRetentionTime}	
+    else
+	TIME=${DefaultRetentionTime}
+    fi
+
+    if [ "${TIME}" != 'infinite' ]; then
+	doveadm expunge -u ${USER} \( MAILBOX junkmail OR MAILBOX INBOX \) HEADER X-Spam-Flag YES SAVEDBEFORE ${TIME}
+    fi
+    
+done
+
