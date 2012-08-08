@@ -39,21 +39,32 @@ class Mailbox extends \Nethgui\Controller\AbstractController
         $this->declareParameter('TlsSecurity', '/^(required|optional)$/', array('configuration', 'dovecot', 'TlsSecurity'));
         $this->declareParameter('QuotaStatus', Validate::SERVICESTATUS, array('configuration', 'dovecot', 'QuotaStatus'));
         $this->declareParameter('QuotaDefaultSize', Validate::POSITIVE_INTEGER, array('configuration', 'dovecot', 'QuotaDefaultSize'));
+        $this->declareParameter('SpamRetentionTime', '/^(\d+[smhdw]|infinite)$/', array('configuration', 'dovecot', 'SpamRetentionTime'));
+        $this->declareParameter('SpamFolder', $this->createValidator()->memberOf('', 'junkmail'), array('configuration', 'dovecot', 'SpamFolder'));
         parent::initialize();
     }
 
     public function prepareView(\Nethgui\View\ViewInterface $view)
     {
         parent::prepareView($view);
-        if ( ! $this->getRequest()->isMutation()) {
-            $h = array();
-            for ($i = 1; $i <= 50; $i += ($i === 1) ? 4 : 5) {
-                $h[$i * 10] = $i . ' GB';
-            }
-            $view['QuotaDefaultSizeDatasource'] = \Nethgui\Renderer\AbstractRenderer::hashToDatasource($h);
-        } else {
-            $view['QuotaDefaultSizeDatasource'] = array();
+        $h = array();
+        for ($i = 1; $i <= 50; $i += ($i === 1) ? 4 : 5) {
+            $h[$i * 10] = $i . ' GB';
         }
+        $view['QuotaDefaultSizeDatasource'] = \Nethgui\Renderer\AbstractRenderer::hashToDatasource($h);
+
+        $view['SpamRetentionTimeDatasource'] = \Nethgui\Renderer\AbstractRenderer::hashToDatasource(array(
+                '1d' => $view->translate('${0} day', array(1)),
+                '2d' => $view->translate('${0} days', array(2)),
+                '4d' => $view->translate('${0} days', array(4)),
+                '7d' => $view->translate('${0} days', array(7)),
+                '15d' => $view->translate('${0} days', array(15)),
+                '30d' => $view->translate('${0} days', array(30)),
+                '60d' => $view->translate('${0} days', array(60)),
+                '90d' => $view->translate('${0} days', array(90)),
+                '180d' => $view->translate('${0} days', array(180)),
+                'infinite' => $view->translate('ever'),
+            ));
     }
 
     protected function onParametersSaved($changedParameters)

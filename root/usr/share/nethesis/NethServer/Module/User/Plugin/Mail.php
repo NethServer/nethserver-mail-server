@@ -41,36 +41,47 @@ class Mail extends \Nethgui\Controller\Table\RowPluginAction
     {
         $quotaValidator1 = $this->createValidator()->greatThan(0)->lessThan(501);
         $quotaValidator2 = $this->createValidator()->equalTo('unlimited');
-                    
+
         $this->declareParameter('QuotaStatus', FALSE, array('configuration', 'dovecot', 'QuotaStatus'));
-        
-        $this->setSchemaAddition(array(            
+
+        $this->setSchemaAddition(array(
             array('MailStatus', Validate::SERVICESTATUS, Table::FIELD),
             array('MailQuotaType', $this->createValidator()->memberOf('custom', 'default'), Table::FIELD),
             array('MailQuotaCustom', $this->createValidator()->orValidator($quotaValidator1, $quotaValidator2), Table::FIELD),
             array('MailForwardStatus', Validate::SERVICESTATUS, Table::FIELD),
-            array('MailForwardAddress', Validate::EMAIL, Table::FIELD), 
-            array('MailForwardKeepMessageCopy', Validate::YES_NO, Table::FIELD)
+            array('MailForwardAddress', Validate::EMAIL, Table::FIELD),
+            array('MailForwardKeepMessageCopy', Validate::YES_NO, Table::FIELD),
+            array('MailSpamRetentionStatus', Validate::SERVICESTATUS, Table::FIELD),
+            array('MailSpamRetentionTime', '/^(\d+[smhdw]|infinite)$/', Table::FIELD),
         ));
         $this->setDefaultValue('MailStatus', 'enabled');
+        $this->setDefaultValue('MailSpamRetentionTime', '15d');
         parent::initialize();
     }
 
     public function prepareView(\Nethgui\View\ViewInterface $view)
     {
         parent::prepareView($view);
-        if ( ! $this->getRequest()->isMutation()) {
-            $h = array();
-            for($i = 1; $i <= 50; $i += ($i === 1) ? 4 : 5) {
-                $h[$i * 10] = $i . ' GB';
-            }
-            
-            $h['unlimited'] = $view->translate('Unlimited_quota');
-            
-            $view['MailQuotaCustomDatasource'] = \Nethgui\Renderer\AbstractRenderer::hashToDatasource($h);
-        } else {
-            $view['MailQuotaCustomDatasource'] = array();
+
+        $h = array();
+        for ($i = 1; $i <= 50; $i += ($i === 1) ? 4 : 5) {
+            $h[$i * 10] = $i . ' GB';
         }
+        $h['unlimited'] = $view->translate('Unlimited_quota');
+        $view['MailQuotaCustomDatasource'] = \Nethgui\Renderer\AbstractRenderer::hashToDatasource($h);
+
+        $view['MailSpamRetentionTimeDatasource'] = \Nethgui\Renderer\AbstractRenderer::hashToDatasource(array(
+                '1d' => $view->translate('${0} day', array(1)),
+                '2d' => $view->translate('${0} days', array(2)),
+                '4d' => $view->translate('${0} days', array(4)),
+                '7d' => $view->translate('${0} days', array(7)),
+                '15d' => $view->translate('${0} days', array(15)),
+                '30d' => $view->translate('${0} days', array(30)),
+                '60d' => $view->translate('${0} days', array(60)),
+                '90d' => $view->translate('${0} days', array(90)),
+                '180d' => $view->translate('${0} days', array(180)),
+                'infinite' => $view->translate('ever'),
+            ));
     }
 
 }

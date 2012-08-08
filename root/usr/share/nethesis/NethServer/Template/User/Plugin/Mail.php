@@ -17,10 +17,19 @@ $forwardPanel = $view->fieldsetSwitch('MailForwardStatus', 'enabled', $view::FIE
     ->insert($view->checkbox('MailForwardKeepMessageCopy', 'yes')->setAttribute('uncheckedValue', 'no'))
 ;
 
+$spamRetentionPanel = $view->fieldsetSwitch('MailSpamRetentionStatus', 'enabled', $view::FIELDSETSWITCH_CHECKBOX | $view::FIELDSETSWITCH_EXPANDABLE)
+    ->setAttribute('uncheckedValue', 'disabled')
+    ->insert(
+    $view->slider('MailSpamRetentionTime', $view::LABEL_ABOVE | $view::SLIDER_ENUMERATIVE)
+    ->setAttribute('label', $T('Hold for ${0}'))
+    )
+;
+
 echo $view->fieldsetSwitch('MailStatus', 'enabled', $view::FIELDSETSWITCH_CHECKBOX | $view::FIELDSETSWITCH_EXPANDABLE)
     ->setAttribute('uncheckedValue', 'disabled')
-    ->insert($quotaPanel)
     ->insert($forwardPanel)
+    ->insert($quotaPanel)
+    ->insert($spamRetentionPanel)
 ;
 
 

@@ -24,5 +24,14 @@ echo $view->fieldset()->setAttribute('template', $T('Disk space'))
         ))
 ;
 
+echo $view->fieldset()->setAttribute('template', $T('Spam messages handling'))
+    ->insert($view->checkBox('SpamFolder', 'junkmail')->setAttribute('uncheckedValue', ''))
+    ->insert(
+        $view->slider('SpamRetentionTime', $view::LABEL_ABOVE | $view::SLIDER_ENUMERATIVE)
+        ->setAttribute('label', $T('Hold for ${0}'))
+    )
+;
+
+
 echo $view->buttonList($view::BUTTON_SUBMIT | $view::BUTTON_HELP);
 
