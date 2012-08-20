@@ -1,0 +1,12 @@
+{
+    # Local and SASL authenticated clients can send mail everywhere:
+    @smtpd_recipient_restrictions = (
+       'permit_mynetworks',
+       'permit_sasl_authenticated',
+       'check_recipient_access hash:/etc/postfix/internal_access',
+       @smtpd_recipient_restrictions
+    );
+    '';  # Fragment delivers empty string as
+	 # smtpd_recipient_restrictions parameter is expanded by
+	 # nethserver-mail-common package
+}
