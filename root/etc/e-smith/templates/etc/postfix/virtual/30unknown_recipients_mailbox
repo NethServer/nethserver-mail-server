@@ -9,6 +9,10 @@
     $OUT = '';
     
     foreach $domainRecord ($domainsDb->get_all_by_prop(type => 'domain')) {
+	if($domainRecord->prop('TransportType') ne 'LocalDelivery') {
+	    next;
+	}
+
 	if(defined $domainRecord->prop('UnknownRecipientsActionType') 
 	   && $domainRecord->prop('UnknownRecipientsActionType') eq 'deliver'
 	   && defined $domainRecord->prop('UnknownRecipientsActionDeliverMailbox')) {
@@ -25,7 +29,7 @@
     }
     
     if(! $OUT) {
-	$OUT = "# -- Messages to unknown recipients are bounced --";
+	$OUT = "# " . $domainRecord->key . " -- Messages to unknown recipients are bounced --\n";
     }
     
 }

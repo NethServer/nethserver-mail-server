@@ -1,0 +1,23 @@
+
+#
+# 10system_accounts
+#
+{
+    use esmith::DomainsDB;
+    my $domainsDb = esmith::DomainsDB->open() || die('Could not open DomainsDB');
+
+
+    $hostname = `hostname -f` || 'localhost';
+    chomp($hostname);
+    
+    $OUT = '';
+    
+    foreach $domainRecord ($domainsDb->get_all_by_prop(type => 'domain')) {
+	if($domainRecord->prop('TransportType') ne 'LocalDelivery') {
+	    next;
+	}
+
+	$OUT .= sprintf("postmaster@%-37s postmaster\@%s\n", $domainRecord->key, $hostname);
+    }
+}
+
