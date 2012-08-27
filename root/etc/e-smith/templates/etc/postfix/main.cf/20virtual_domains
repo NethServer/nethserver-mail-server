@@ -1,15 +1,17 @@
 #
 # Virtual domains are { 
     use NethServer::MailServer;
-    @domainList = ( 
+    @localDomains = ( 
                    NethServer::MailServer->new()->getDeliveryDomains(),
                    NethServer::MailServer::getVirtualMailboxDomain()
                   );
-    scalar @domainList ? 'enabled' : 'disabled'; 
+
+    @virtual_mailbox_domains = @localDomains, @virtual_mailbox_domains;
+
+    scalar @localDomains ? 'enabled' : 'disabled'; 
 }
 # 
-virtual_alias_maps = { scalar @domainList ? 'hash:/etc/postfix/virtual' : '' }
-virtual_mailbox_domains = { join(' ', @domainList) }
-virtual_mailbox_maps = { scalar @domainList ? 'hash:/etc/postfix/vmailbox' : '' }
+virtual_alias_maps = { scalar @localDomains ? 'hash:/etc/postfix/virtual' : '' }
+virtual_mailbox_maps = { scalar @localDomains ? 'hash:/etc/postfix/vmailbox' : '' }
 virtual_transport = lmtp:unix:/var/run/dovecot/lmtp
 
