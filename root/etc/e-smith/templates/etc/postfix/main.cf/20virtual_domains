@@ -1,12 +1,12 @@
 #
-# Virtual domains are { 
+# 20virtual_domains -- Virtual domains are { 
     use NethServer::MailServer;
     @localDomains = ( 
                    NethServer::MailServer->new()->getDeliveryDomains(),
                    NethServer::MailServer::getVirtualMailboxDomain()
                   );
 
-    @virtual_mailbox_domains = @localDomains, @virtual_mailbox_domains;
+    @virtual_mailbox_domains = (@localDomains, @virtual_mailbox_domains);
 
     scalar @localDomains ? 'enabled' : 'disabled'; 
 }
