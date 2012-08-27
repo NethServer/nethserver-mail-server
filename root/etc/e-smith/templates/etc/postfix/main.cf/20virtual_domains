@@ -12,6 +12,5 @@
 }
 # 
 virtual_alias_maps = { scalar @localDomains ? 'hash:/etc/postfix/virtual' : '' }
-virtual_mailbox_maps = { scalar @localDomains ? 'hash:/etc/postfix/vmailbox' : '' }
 virtual_transport = lmtp:unix:/var/run/dovecot/lmtp
 
