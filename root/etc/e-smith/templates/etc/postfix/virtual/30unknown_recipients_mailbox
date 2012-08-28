@@ -29,7 +29,7 @@
     }
     
     if(! $OUT) {
-	$OUT = "# " . $domainRecord->key . " -- Messages to unknown recipients are bounced --\n";
+	$OUT = "# -- Messages to unknown recipients are bounced --\n";
     }
     
 }
