@@ -52,6 +52,7 @@ event_services('nethserver-mail-server-update',
 event_templates('nethserver-mail-server-save', @templates);
 
 event_actions('nethserver-mail-server-save',
+	      'nethserver-mail-sieve-compile' => '20',
 	      'nethserver-mail-postmap-update' => '30');
 
 event_services('nethserver-mail-server-save',
