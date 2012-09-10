@@ -1,0 +1,11 @@
+{
+    #
+    # 20virtual_domains -- add virtual domains to the list of local domains
+    #
+
+    use NethServer::MailServer;
+   
+    @domainList = (@domainList, NethServer::MailServer->new()->getDeliveryDomains());
+
+    '';
+}
