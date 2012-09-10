@@ -1,8 +1,11 @@
 {
-    # Local and SASL authenticated clients can send mail everywhere:
-    @smtpd_recipient_restrictions = map { $_ eq 'permit_mynetworks' ? 
-					  ('permit_mynetworks', 
-					  'permit_sasl_authenticated',
+    #
+    # 30internal_recipients -- Deny access to internal-only recipients
+    # from public listener
+    #
+
+    @smtpd_recipient_restrictions = map { $_ eq 'reject_non_fqdn_recipient' ? 
+					  ('reject_non_fqdn_recipient', 
 					  'check_recipient_access hash:/etc/postfix/internal_access') 
 					  : $_ } @smtpd_recipient_restrictions ;
     '';  # Fragment delivers empty string as
