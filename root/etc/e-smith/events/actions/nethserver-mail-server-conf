@@ -51,11 +51,11 @@ my $configDb = esmith::ConfigDB->open() || die("Could not open ConfigDB");
 my @postmapUpdateList = split(',', $configDb->get_prop('postfix', 'PostmapUpdateList'));
 
 foreach my $table (qw(
-    /etc/postfix/virtual 
-    /etc/postfix/transport
-    /etc/postfix/vmailbox
-    /etc/postfix/internal_access
-    /etc/postfix/recipient_bcc
+    virtual 
+    transport
+    vmailbox
+    internal_access
+    recipient_bcc
 )) {
     if ( ! grep($table eq $_, @postmapUpdateList) ) {
 	push @postmapUpdateList, $table;
