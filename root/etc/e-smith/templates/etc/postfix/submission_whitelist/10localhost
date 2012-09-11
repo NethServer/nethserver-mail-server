@@ -1,0 +1,8 @@
+#
+# 10localhost -- localhost is allowed to bypass SMTPAUTH on submission 
+# and smtps TCP ports
+#
+
+127.0.0.1                            OK
+
+

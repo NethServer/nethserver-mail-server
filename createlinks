@@ -17,6 +17,7 @@ my @templates = qw(
     /etc/postfix/vmailbox
     /etc/postfix/internal_access
     /etc/postfix/recipient_bcc
+    /etc/postfix/submission_whitelist
     /etc/dovecot/dovecot.conf
     /etc/dovecot/sieve-scripts/before.sieve
 );

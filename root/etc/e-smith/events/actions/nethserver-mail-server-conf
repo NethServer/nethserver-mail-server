@@ -56,6 +56,7 @@ foreach my $table (qw(
     vmailbox
     internal_access
     recipient_bcc
+    submission_whitelist
 )) {
     if ( ! grep($table eq $_, @postmapUpdateList) ) {
 	push @postmapUpdateList, $table;
