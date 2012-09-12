@@ -10,7 +10,9 @@
 use esmith::Build::CreateLinks qw(:all);
 use File::Path;
 
-my @templates = qw(
+
+# expanded templates on SAVE event
+my @saveTemplates = qw(
     /etc/postfix/main.cf
     /etc/postfix/transport
     /etc/postfix/virtual
@@ -27,10 +29,11 @@ my @templates = qw(
 #
 
 event_templates('nethserver-mail-server-update', 
-		@templates, 
+		@saveTemplates, 
 		'/etc/dovecot/ldap.conf',
 		'/etc/sysconfig/dovecot',
 		'/etc/dovecot/master-users',
+		'/etc/postfix/master.cf',
     );
 
 event_actions('nethserver-mail-server-update',
@@ -50,7 +53,7 @@ event_services('nethserver-mail-server-update',
 # nethserver-mail-server-SAVE event
 #
 
-event_templates('nethserver-mail-server-save', @templates);
+event_templates('nethserver-mail-server-save', @saveTemplates);
 
 event_actions('nethserver-mail-server-save',
 	      'nethserver-mail-sieve-compile' => '20',
