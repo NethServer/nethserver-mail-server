@@ -8,6 +8,7 @@
 
 use esmith::AccountsDB;
 use NethServer::Directory;
+use NethServer::MailServer;
 use strict;
 
 my $event = shift || die("Missing event name argument");
@@ -25,8 +26,7 @@ if( ! $account ) {
     @accountList = ($accountsDb->get($account));
 }
 
-my $ldap = NethServer::Directory::connect() || die("LDAP connection error");
-
+my $ldap = NethServer::Directory->new() || die("LDAP connection error");
 
 foreach my $accountRecord (@accountList) {
 
@@ -36,22 +36,28 @@ foreach my $accountRecord (@accountList) {
 	next;
     }
 
-    my $ldapEntry = $ldap->search(
-	base => 'ou=People, ' . NethServer::Directory::getInternalSuffix(),
-	scope => 'one',
-	filter => sprintf('(&(objectClass=PosixAccount)(uid=%s))', $accountRecord->key),
-	)->pop_entry();
+    my $ldapEntry = $ldap->getUser($accountRecord->key);
 
     if( ! defined $ldapEntry ) {
 	warn("Account `" . $accountRecord->key . "` has not been found!\n");
 	next;
     }
 
+    my $mailServer = NethServer::MailServer->new();
+
+    my @accountPseudonyms = $mailServer->getAccountPseudonyms($accountRecord->key);
+
     if( ! grep(/^qmailUser$/, $ldapEntry->get_value('objectClass')))  {
 	$ldapEntry->add(objectClass => 'qmailUser', mail => '');
 	$ldapEntry->update($ldap);
     }
 
+    if(@accountPseudonyms) {
+	$ldapEntry->replace(mail => \@accountPseudonyms);
+    } else {
+	$ldapEntry->replace(mail => '');
+    }
+    
     my $isEnabledMailStatus = defined $accountRecord->prop('MailStatus')
 	&& $accountRecord->prop('MailStatus') eq 'enabled';
     
