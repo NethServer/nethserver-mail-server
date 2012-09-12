@@ -1,0 +1,15 @@
+{
+    #
+    # 00template_vars_submission
+    #
+
+    @submission_smtpd_options = qw(
+      smtpd_client_restrictions=$submission_client_policy
+      smtpd_helo_restrictions=
+      smtpd_sender_restrictions=
+      smtpd_recipient_restrictions=$submission_recipient_policy
+      strict_rfc821_envelopes=no
+    );
+
+    '';
+}
