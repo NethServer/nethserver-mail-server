@@ -13,7 +13,7 @@ my $account = shift || die("Missing account name argument!");
 
 my $mailHomeDir = '/var/lib/vmail/user/' . $account;
 
-if [ -d $mailHomeDir ] {
+if ( -d $mailHomeDir ) {
     exit system('/bin/rm', '-rf', $mailHomeDir);
 } else {
     warn ("Home directory for $account account does not exist; skipped");
