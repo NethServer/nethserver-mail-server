@@ -103,14 +103,14 @@ foreach (qw(create modify delete)) {
 }
 
 event_actions('user-create',
-	      'nethserver-mail-pseudonym-create' => '03',
+	      'nethserver-mail-default-pseudonyms-create' => '03',
               'nethserver-mail-account-update' => '30');
 
 event_actions('user-modify',
               'nethserver-mail-account-update' => '30');
 
 event_actions('user-delete',
-	      'nethserver-mail-pseudonym-delete' => '03',
+	      'nethserver-mail-default-pseudonyms-delete' => '03',
 	      'nethserver-mail-account-cleanup' => '30');
 
 
@@ -128,7 +128,7 @@ foreach (qw(create modify delete)) {
 }
 
 event_actions('group-create',
-	      'nethserver-mail-pseudonym-create' => '03',
+	      'nethserver-mail-default-pseudonyms-create' => '03',
 	      'nethserver-mail-account-update' => '30',
 	      'nethserver-mail-group-acl-adjust' => '95');
 
@@ -137,7 +137,7 @@ event_actions('group-modify',
 	      'nethserver-mail-group-acl-adjust' => '95');
 
 event_actions('group-delete',
-	      'nethserver-mail-pseudonym-delete' => '03',
+	      'nethserver-mail-default-pseudonyms-delete' => '03',
 	      'nethserver-mail-group-acl-cleanup' => '03',
 	      'nethserver-mail-account-cleanup' => '30');
 
