@@ -38,7 +38,7 @@ event_templates('nethserver-mail-server-update',
 
 event_actions('nethserver-mail-server-update',
 	      'initialize-default-databases' => '00',
-	      'nethserver-mail-pseudonyms-initialize' => '01',
+	      'nethserver-mail-pseudonym-initialize' => '01',
 	      'nethserver-mail-server-conf' => '20',
 	      'nethserver-mail-postmap-update' => '30',
 	      'nethserver-mail-account-update' => '40',
@@ -77,6 +77,8 @@ my @pseudonymTemplates = qw(
     /etc/postfix/internal_access
 );
 
+event_actions('pseudonym-create', 'nethserver-mail-pseudonym-initialize' => '01');
+
 foreach (qw(create modify delete)) {
     event_templates('pseudonym-' . $_, @pseudonymTemplates);
     event_actions('pseudonym-'   . $_, 
@@ -85,6 +87,7 @@ foreach (qw(create modify delete)) {
 	);
     event_services('pseudonym-'  . $_, 'postfix' => 'reload');
 }
+
 
 
 #
