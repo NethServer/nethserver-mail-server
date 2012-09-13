@@ -1,0 +1,27 @@
+#!/usr/bin/perl
+
+#
+# nethserver-mail-pseudonyms-initialize
+#
+# Initialize existing pseudonyms records in AccountsDB
+#
+# Copyright (C) 2012 Nethesis srl
+#
+
+use strict;
+use esmith::AccountsDB;
+
+my $event = shift;
+
+my $accountsDb = esmith::AccountsDB->open();
+
+foreach my $pseudonymRecord ($accountsDb->pseudonyms()) {
+    my $account = $pseudonymRecord->prop('Account');
+    
+    # Initialize _prevAccount prop, where is stored the Account value
+    # during record update.
+    if( $account && ! $pseudonymRecord->prop('_prevAccount') ) {
+	$pseudonymRecord->set_prop('_prevAccount', $account);
+    }
+}
+
