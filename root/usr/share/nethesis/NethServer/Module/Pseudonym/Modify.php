@@ -79,11 +79,28 @@ class Modify extends \Nethgui\Controller\Table\Modify
             }
         }
     }
-
+    
+    /**
+     * Do not really delete the record, but change its type.
+     * @param string $key
+     */
+    protected function processDelete($key)
+    {
+        $accountDb = $this->getPlatform()->getDatabase('accounts');
+        $accountDb->setType($key, 'pseudonym-deleted');
+        $deleteProcess = $this->getPlatform()->signalEvent('pseudonym-delete', array($key));
+        if ($deleteProcess->getExitCode() === 0) {
+            parent::processDelete($key);
+        }
+    }
+    
     public function onParametersSaved($changedParameters)
     {
         if ($this->getIdentifier() === 'update') {
             $event = 'modify';
+        } elseif ($this->getIdentifier() === 'delete') {
+            // pseudonym-delete event is rasied by processDelete() method
+            return;
         } else {
             $event = $this->getIdentifier();
         }

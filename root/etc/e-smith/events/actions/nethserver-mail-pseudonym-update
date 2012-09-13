@@ -61,13 +61,16 @@ if($prevAccount && $prevAccount ne $account) {
 	# remove the pseudonym from the previous account mail attribute:
 	@prevAddressList = grep { $_ ne $pseudonym } @prevAddressList;
 
+	# warn "Setting $prevAccount address list: " . join(', ', @prevAddressList) . "\n";
+
 	if(@prevAddressList) {
 	    $prevAccountEntry->replace(mail => \@prevAddressList);
 	} else {
 	    $prevAccountEntry->replace(mail => '');
 	}
-
+	$prevAccountEntry->update($nsDirectory);
     }
+
 
     # Store the Account value for future changes:
     $accountsDb->set_prop($pseudonym, '_prevAccount', $account);

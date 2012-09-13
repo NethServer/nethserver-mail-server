@@ -3,7 +3,7 @@
 #
 # NethServer -- nethserver-mail-pseudonym-create
 #
-# Create default account pseudonyms
+# Create default pseudonyms for the given account
 #
 # Copyright (C) 2012 Nethesis srl
 #

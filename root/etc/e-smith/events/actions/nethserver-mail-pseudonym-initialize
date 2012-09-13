@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 #
-# nethserver-mail-pseudonyms-initialize
+# NethServer -- nethserver-mail-pseudonym-initialize
 #
 # Initialize existing pseudonyms records in AccountsDB
 #
@@ -11,11 +11,19 @@
 use strict;
 use esmith::AccountsDB;
 
-my $event = shift;
+my $event = shift || die('Missing event argument');
+my $pseudonym = shift;
 
 my $accountsDb = esmith::AccountsDB->open();
+my @records = ();
 
-foreach my $pseudonymRecord ($accountsDb->pseudonyms()) {
+if($pseudonym) {
+    @records = ($accountsDb->get($pseudonym));
+} else {
+    @records = $accountsDb->pseudonyms();
+}
+
+foreach my $pseudonymRecord (@records) {
     my $account = $pseudonymRecord->prop('Account');
     
     # Initialize _prevAccount prop, where is stored the Account value
