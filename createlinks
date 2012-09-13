@@ -80,7 +80,7 @@ foreach (qw(create modify delete)) {
     event_templates('pseudonym-' . $_, @pseudonymTemplates);
     event_actions('pseudonym-'   . $_, 
 		  'nethserver-mail-postmap-update' => '30',
-		  'nethserver-mail-sync-ldap' => '30',
+		  'nethserver-mail-pseudonym-update' => '30',
 	);
     event_services('pseudonym-'  . $_, 'postfix' => 'reload');
 }
