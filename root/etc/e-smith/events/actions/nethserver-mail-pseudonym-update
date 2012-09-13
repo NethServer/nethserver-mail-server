@@ -53,7 +53,7 @@ if($ldapEntry) {
 
 # Update the previously related Account in the same manner:
 my $prevAccount = $pseudonymRecord->prop('_prevAccount');
-if($prevAccount) {
+if($prevAccount && $prevAccount ne $account) {
     my $prevAccountEntry = $nsDirectory->getUser($prevAccount);
     if($prevAccountEntry) {
 	my @prevAddressList = @{$prevAccountEntry->get_value('mail', asref => 1)};
@@ -68,9 +68,10 @@ if($prevAccount) {
 	}
 
     }
+
+    # Store the Account value for future changes:
+    $accountsDb->set_prop($pseudonym, '_prevAccount', $account);
 }
 
-# Store the Account for future changes:
-$accountsDb->set_prop($pseudonym, '_prevAccount', $account);
 
 exit 0;
