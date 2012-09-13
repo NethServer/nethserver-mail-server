@@ -234,7 +234,7 @@ sub createGroupDefaultPseudonyms($)
 sub _createPseudonymRecords()
 {
     my $self = shift;
-    my $username = shift;
+    my $account = shift;
     my @prefixList = @_;
 
     my @domainList = $self->getDeliveryDomains();
@@ -244,9 +244,10 @@ sub _createPseudonymRecords()
 	    my $address = $_ . '@' . $domain;
 	    my $props = {
 		'type' => 'pseudonym',
-		'Account' => $username,
+		'Account' => $account,
 		'ControlledBy' => 'system',
-		'Access' => 'public'
+		'Access' => 'public',
+		'_prevAccount' => $account,
 	    };
 	    
 	    my $newRecord = $self->{AccountsDb}->new_record($address, $props);
