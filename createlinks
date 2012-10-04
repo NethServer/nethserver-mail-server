@@ -23,18 +23,18 @@ my @saveTemplates = qw(
     /etc/dovecot/sieve-scripts/before.sieve
 );
 
-#
-# nethserver-mail-server-UPDATE event
-#
 
-event_templates('nethserver-mail-server-update', 
+# UPDATE, UNINSTALL templates
+event_templates($_,
 		@saveTemplates, 
 		'/etc/postfix/master.cf',
 		'/etc/dovecot/ldap.conf',
 		'/etc/sysconfig/dovecot',
 		'/etc/dovecot/master-users'
-    );
+    ) foreach (qw(nethserver-mail-server-update nethserver-mail-server-uninstall));
 
+
+# UPDATE actions/services:
 event_actions('nethserver-mail-server-update',
 	      'initialize-default-databases' => '00',
 	      'nethserver-mail-pseudonym-initialize' => '01',
@@ -47,6 +47,18 @@ event_actions('nethserver-mail-server-update',
 event_services('nethserver-mail-server-update',
 	       'dovecot' => 'restart',
 	       'postfix' => 'restart');
+
+
+# UNINSTALL actions/services:
+event_actions('nethserver-mail-server-uninstall',
+	      'nethserver-mail-server-uninstall' => '02',
+	      'firewall-adjust' => '30',
+	      'runlevel-adjust' => '40');
+
+event_services('nethserver-mail-server-uninstall',
+	       'postfix' => 'reload');
+
+
 
 
 #
@@ -151,4 +163,5 @@ foreach (qw(create delete modify)) {
 		    '/etc/postfix/vmailbox');
     event_actions('domain-'   . $_, 'nethserver-mail-postmap-update' => '30');
 }
+
 

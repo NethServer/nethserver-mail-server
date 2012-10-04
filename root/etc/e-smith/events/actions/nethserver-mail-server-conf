@@ -32,9 +32,11 @@ if(@schemas) {
 my $ldap = NethServer::Directory::connect();
 $ldap->loadLdifSchema('qmail', '/etc/openldap/schema/qmail.ldif') || die("Could not load the qmail LDIF schema for dovecot");
 
+#
+# Manage dovecot daemon
+#
 NethServer::Service::manage_add('nethserver-mail-server',
-				'dovecot',
-				'postfix');
+				'dovecot');
 
 #
 # Adjust LDAP ACLs to allow dovecot read on any field through ldapi:// socket.

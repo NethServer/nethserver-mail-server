@@ -1,0 +1,37 @@
+#!/usr/bin/perl
+
+#
+# NethServer
+#
+# Copyright (C) 2012 Nethesis srl
+# See COPYING for licensing informations
+#
+
+use NethServer::Service;
+use esmith::ConfigDB;
+
+
+#
+# Release dovecot daemon:
+#
+
+NethServer::Service::manage_remove('nethserver-mail-server',
+				   'dovecot');
+
+#
+# Unregister postfix tables:
+#
+my $configDb = esmith::ConfigDB->open() || die("Could not open ConfigDB");
+my @postmapUpdateList = split(',', $configDb->get_prop('postfix', 'PostmapUpdateList'));
+
+my $reTables = join('|', qw(
+    virtual 
+    transport
+    vmailbox
+    internal_access
+    recipient_bcc
+));
+
+@postmapUpdateList = grep {!/^($reTables)$/} @postmapUpdateList;
+
+$configDb->set_prop('postfix', 'PostmapUpdateList', join(',', @postmapUpdateList));
