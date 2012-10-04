@@ -25,9 +25,6 @@ my $configDb = esmith::ConfigDB->open() || die("Could not open ConfigDB");
 my @postmapUpdateList = split(',', $configDb->get_prop('postfix', 'PostmapUpdateList'));
 
 my $reTables = join('|', qw(
-    virtual 
-    transport
-    vmailbox
     internal_access
     recipient_bcc
 ));
