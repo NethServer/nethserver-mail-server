@@ -19,7 +19,6 @@ my @saveTemplates = qw(
     /etc/postfix/vmailbox
     /etc/postfix/internal_access
     /etc/postfix/recipient_bcc
-    /etc/postfix/submission_whitelist
     /etc/dovecot/dovecot.conf
     /etc/dovecot/sieve-scripts/before.sieve
 );
@@ -33,7 +32,6 @@ event_templates('nethserver-mail-server-update',
 		'/etc/dovecot/ldap.conf',
 		'/etc/sysconfig/dovecot',
 		'/etc/dovecot/master-users',
-		'/etc/postfix/master.cf',
     );
 
 event_actions('nethserver-mail-server-update',
