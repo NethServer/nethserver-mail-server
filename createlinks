@@ -29,9 +29,10 @@ my @saveTemplates = qw(
 
 event_templates('nethserver-mail-server-update', 
 		@saveTemplates, 
+		'/etc/postfix/master.cf',
 		'/etc/dovecot/ldap.conf',
 		'/etc/sysconfig/dovecot',
-		'/etc/dovecot/master-users',
+		'/etc/dovecot/master-users'
     );
 
 event_actions('nethserver-mail-server-update',
