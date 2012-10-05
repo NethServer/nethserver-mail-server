@@ -27,6 +27,7 @@ my @postmapUpdateList = split(',', $configDb->get_prop('postfix', 'PostmapUpdate
 my $reTables = join('|', qw(
     internal_access
     recipient_bcc
+    virtual
 ));
 
 @postmapUpdateList = grep {!/^($reTables)$/} @postmapUpdateList;

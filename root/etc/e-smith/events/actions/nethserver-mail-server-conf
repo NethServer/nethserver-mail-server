@@ -55,6 +55,7 @@ my @postmapUpdateList = split(',', $configDb->get_prop('postfix', 'PostmapUpdate
 foreach my $table (qw(
     internal_access
     recipient_bcc
+    virtual
 )) {
     if ( ! grep($table eq $_, @postmapUpdateList) ) {
 	push @postmapUpdateList, $table;
