@@ -41,8 +41,9 @@ event_actions('nethserver-mail-server-update',
 	      'nethserver-mail-server-conf' => '20',
 	      'nethserver-mail-postmap-update' => '30',
 	      'nethserver-mail-account-update' => '40',
-	      'firewall-adjust' => '30',
-	      'runlevel-adjust' => '40');
+	      'nethserver-mail-sieve-compile' => '50',
+	      'firewall-adjust' => '60',
+	      'runlevel-adjust' => '70');
 
 event_services('nethserver-mail-server-update',
 	       'dovecot' => 'restart',
