@@ -4,11 +4,8 @@
 #
 {
     use esmith::DomainsDB;
+    use NethServer::System;
     my $domainsDb = esmith::DomainsDB->open() || die('Could not open DomainsDB');
-
-
-    $hostname = `hostname -f` || 'localhost';
-    chomp($hostname);
     
     $OUT = '';
     
@@ -17,7 +14,7 @@
 	    next;
 	}
 
-	$OUT .= sprintf("postmaster@%-37s postmaster\@%s\n", $domainRecord->key, $hostname);
+	$OUT .= sprintf("postmaster@%-37s postmaster\@%s\n", $domainRecord->key, join('.', $SystemName, $DomainName));
     }
 }
 
