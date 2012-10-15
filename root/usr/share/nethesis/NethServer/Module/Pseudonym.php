@@ -56,7 +56,7 @@ class Pseudonym extends \Nethgui\Controller\TableController
 
     public function prepareViewForColumnKey(\Nethgui\Controller\Table\Read $action, \Nethgui\View\ViewInterface $view, $key, $values, &$rowMetadata)
     {
-        if (in_array($values['Account'], $this->getDisabledAccounts())) {
+        if ( ! isset($values['Account']) || in_array($values['Account'], $this->getDisabledAccounts())) {
             $rowMetadata['rowCssClass'] = trim($rowMetadata['rowCssClass'] . ' user-locked');
         }
         return strval($key);

@@ -25,7 +25,8 @@ if (! defined $pseudonymRecord || $pseudonymRecord->prop('type') !~ /^pseudonym(
 my $account = $pseudonymRecord->prop('Account');
     
 if( ! $account ) {
-    die('Missing Account value in pseudonym record ' . $pseudonym);
+    warn('Missing Account relation in pseudonym record ' . $pseudonym . "... skipped.\n");
+    exit(0);
 }
     
 
