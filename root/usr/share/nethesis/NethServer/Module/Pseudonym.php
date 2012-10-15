@@ -39,7 +39,7 @@ class Pseudonym extends \Nethgui\Controller\TableController
         $columns = array(
             'Key',
             'Account',
-            'Access',
+            'Flag',
             'Actions'
         );
 
@@ -54,12 +54,26 @@ class Pseudonym extends \Nethgui\Controller\TableController
         parent::initialize();
     }
 
-    public function prepareViewForColumnKey(\Nethgui\Controller\Table\Read $action, \Nethgui\View\ViewInterface $view, $key, $values, &$rowMetadata)
+
+    public function prepareViewForColumnFlag(\Nethgui\Controller\Table\Read $action, \Nethgui\View\ViewInterface $view, $key, $values, &$rowMetadata)
     {
+        $flag = '';
+
         if ( ! isset($values['Account']) || in_array($values['Account'], $this->getDisabledAccounts())) {
             $rowMetadata['rowCssClass'] = trim($rowMetadata['rowCssClass'] . ' user-locked');
+            $flag .= 'L';
+        } else {
+            $flag .= '-';
         }
-        return strval($key);
+
+        if($values['Access'] === 'private') {
+            $rowMetadata['rowCssClass'] = trim($rowMetadata['rowCssClass'] . ' user-new');
+            $flag .= 'P';
+        } else {
+            $flag .= '-';
+        }
+
+        return $flag;
     }
 
     private function getDisabledAccounts()

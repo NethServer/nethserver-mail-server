@@ -10,7 +10,7 @@ $L['Current_label'] = 'Current selection';
 
 $L['Key_label'] = 'Email';
 $L['Account_label'] = 'Account';
-$L['Access_label'] = 'Accessible from local networks only';
+$L['Flag_label'] = 'Attributes';
 
 $L['Description_label'] = 'Description';
 $L['pseudonym_label'] = 'Email address';
