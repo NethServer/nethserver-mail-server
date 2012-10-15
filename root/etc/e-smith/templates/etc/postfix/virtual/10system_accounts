@@ -4,7 +4,6 @@
 #
 {
     use esmith::DomainsDB;
-    use NethServer::System;
     my $domainsDb = esmith::DomainsDB->open() || die('Could not open DomainsDB');
     
     $OUT = '';
