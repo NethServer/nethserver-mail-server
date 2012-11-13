@@ -17,7 +17,7 @@ my $account = shift;
 
 my $accountRecord = $accountsDb->get($account);
 
-if($accountRecord->prop('type') ne 'group') {
+if($accountRecord->prop('type') !~ /^group(-deleted)?$/) {
     die("Account `$account` is not a group");
 }
 
