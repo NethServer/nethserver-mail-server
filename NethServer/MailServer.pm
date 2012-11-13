@@ -54,7 +54,7 @@ sub getMailboxes()
 	$mailboxes{$_} = 1 foreach (@{$mbxList});
     }
 
-    my $domainExp = join('|', $self->getDeliveryDomains(), getVirtualMailboxDomain());
+    my $domainExp = join('|', getVirtualMailboxDomain());
 
     return grep { /\@($domainExp)$/ } keys %mailboxes;
 }
