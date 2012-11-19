@@ -38,6 +38,11 @@ foreach my $accountRecord (@accounts) {
 	die("Account `$account` is not a group");
     }
 
+    # Skip group if mail is disabled. Fixes #1560
+    if($accountRecord->prop('MailStatus') ne 'enabled') {
+	next;
+    }
+
     my $imap = NethServer::MailServer->connectAclManager($account . '*vmail');
 	    
     if( ! $imap) {
