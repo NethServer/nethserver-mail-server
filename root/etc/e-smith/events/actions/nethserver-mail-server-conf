@@ -10,10 +10,12 @@
 use NethServer::Service;
 use NethServer::Directory;
 use esmith::ConfigDB;
+use User::pwent;
+use User::grent;
 
 # Get dovecot user and group id
-my $uid = (getpwnam('dovecot'))[2] or die('Missing dovecot user'); 
-my $gid = (getgrnam('dovecot'))[2] or die('Missing dovecot group');
+my $uid = getpwnam('dovecot')->uid or die('Missing dovecot user'); 
+my $gid = getgrnam('dovecot')->gid or die('Missing dovecot group');
 
 #
 # Remove the LDAP misc schema, because it conflicts with qmail schema
@@ -64,6 +66,19 @@ foreach my $table (qw(
 
 $configDb->set_prop('postfix', 'PostmapUpdateList', join(',', @postmapUpdateList));
 
+# Refs #1516 -- Add vmail user into amavis group, to allow bayes DB
+# updates through sa-learn
+{
+    my $amavisGroup = getgrnam('amavis') || die('Could not find amavis group');
+    
+    if( ! grep { $_ eq 'vmail'} @{$amavisGroup->members()} ) {
+	system('/usr/sbin/usermod', qw(-a -G amavis vmail));
+	if( $? != 0) {
+	    die;
+	}
+    }
+
+}
 
 
 
