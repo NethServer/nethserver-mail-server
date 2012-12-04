@@ -1,0 +1,33 @@
+#!/usr/bin/perl
+
+#
+# NethServer
+#
+# Copyright (C) 2012 Nethesis srl
+# See COPYING for licensing informations
+#
+
+use strict;
+use NethServer::Service;
+use NethServer::Directory;
+use User::pwent;
+use User::grent;
+
+if( ! NethServer::Service::is_enabled('dovecot')) {
+    warn "dovecot service is currently not enabled, skipping ldap ACL setup.\n";
+    exit 0;
+}
+
+# Get dovecot user and group id
+my $dovecotUser = getpwnam('dovecot') or die('Missing dovecot user'); 
+my $dovecotGroup = getgrnam('dovecot') or die('Missing dovecot group');
+
+#
+# Adjust LDAP ACLs to allow dovecot read on any field through ldapi:// socket.
+#
+my $ldapAccessDirective = 'by dn.exact="gidNumber=' . $dovecotGroup->gid . 
+    '+uidNumber=' . $dovecotUser->uid . ',cn=peercred,cn=external,cn=auth" read';
+
+NethServer::Directory::addAccessDirective($ldapAccessDirective, 'userPassword');
+NethServer::Directory::addAccessDirective($ldapAccessDirective, '*');
+

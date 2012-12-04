@@ -10,17 +10,14 @@
 use NethServer::Service;
 use NethServer::Directory;
 use esmith::ConfigDB;
-use User::pwent;
 use User::grent;
+use strict;
 
-# Get dovecot user and group id
-my $uid = getpwnam('dovecot')->uid or die('Missing dovecot user'); 
-my $gid = getgrnam('dovecot')->gid or die('Missing dovecot group');
 
 #
 # Remove the LDAP misc schema, because it conflicts with qmail schema
 #
-@schemas = glob('/etc/openldap/slapd.d/cn\=config/cn\=schema/cn=\{*\}misc.ldif');
+my @schemas = glob('/etc/openldap/slapd.d/cn\=config/cn\=schema/cn=\{*\}misc.ldif');
 if(@schemas) {
     NethServer::Service::stop('slapd');
     unlink @schemas;
@@ -39,14 +36,6 @@ $ldap->loadLdifSchema('qmail', '/etc/openldap/schema/qmail.ldif') || die("Could 
 #
 NethServer::Service::manage_add('nethserver-mail-server',
 				'dovecot');
-
-#
-# Adjust LDAP ACLs to allow dovecot read on any field through ldapi:// socket.
-#
-my $ldapAccessDirective = qq(by dn.exact="gidNumber=$gid+uidNumber=$uid,cn=peercred,cn=external,cn=auth" read);
-
-NethServer::Directory::addAccessDirective($ldapAccessDirective, 'userPassword');
-NethServer::Directory::addAccessDirective($ldapAccessDirective, '*');
 
 #
 # Register some postfix tables to be updated with nethserver-mail-postmap-update action
@@ -69,7 +58,7 @@ $configDb->set_prop('postfix', 'PostmapUpdateList', join(',', @postmapUpdateList
 # Refs #1516 -- Add vmail user into amavis group, to allow bayes DB
 # updates through sa-learn
 {
-    my $amavisGroup = getgrnam('amavis') || die('Could not find amavis group');
+    my $amavisGroup = getgrnam('amavis') or die('Could not find amavis group');
     
     if( ! grep { $_ eq 'vmail'} @{$amavisGroup->members()} ) {
 	system('/usr/sbin/usermod', qw(-a -G amavis vmail));

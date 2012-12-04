@@ -23,6 +23,11 @@ my @saveTemplates = qw(
     /etc/dovecot/sieve-scripts/before.sieve
 );
 
+# When updating nethserver-directory, dovecot LDAP user acl must be set
+# again, otherwise we are locked out:
+event_actions('nethserver-directory-update', qw(
+	      nethserver-mail-server-ldapsetup 30
+));
 
 # UPDATE, UNINSTALL templates
 event_templates($_,
@@ -39,6 +44,7 @@ event_actions('nethserver-mail-server-update',
 	      'initialize-default-databases' => '00',
 	      'nethserver-mail-pseudonym-initialize' => '01',
 	      'nethserver-mail-server-conf' => '20',
+	      'nethserver-mail-server-ldapsetup' => '21',
 	      'nethserver-mail-postmap-update' => '30',
 	      'nethserver-mail-account-update' => '40',
 	      'nethserver-mail-sieve-compile' => '50',
