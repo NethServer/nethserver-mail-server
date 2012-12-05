@@ -1,0 +1,18 @@
+{
+    #
+    # 20vmail_delivery -- deliver notification to vmail Mailbox
+    #
+
+    use NethServer::MailServer;
+
+    $OUT = undef;
+
+    if(defined $userRecord->prop('MailStatus') && $userRecord->prop('MailStatus') eq 'enabled') {
+	my $srv = new NethServer::MailServer();
+	my @pseudonyms = $srv->getAccountPseudonyms($userRecord->key);
+
+	$OUT = shift @pseudonyms; 
+    }
+
+    defined $OUT ? $OUT : '';
+}
