@@ -1,0 +1,83 @@
+Summary: Mail server implementation based on postfix and dovecot packages
+Name: nethserver-mail-server
+Version: @@VERSION@@
+Release: @@RELEASE@@%{?dist}
+License: GPL
+URL: http://dev.nethesis.it/projects/%{name}
+Source0: %{name}-%{version}.tar.gz
+BuildArch: noarch
+
+Requires: dovecot >= 2.0.9, dovecot-pigeonhole >= 2.0.9, dovecot-antispam >= 0.0.48
+Requires: nethserver-mail-common
+Requires: perl(Text::Unidecode)
+Requires: cyrus-sasl-plain, cyrus-sasl-ldap, cyrus-sasl-ntlm, cyrus-sasl-md5
+
+BuildRequires: perl
+BuildRequires: nethserver-devtools
+
+%description
+Mail server implementation based on postfix and dovecot packages.
+
+%prep
+%setup
+
+%build
+mkdir -p root%{perl_vendorlib}
+mv -v NethServer root%{perl_vendorlib}
+perl createlinks
+
+%install
+rm -rf $RPM_BUILD_ROOT
+(cd root; find . -depth -print | cpio -dump $RPM_BUILD_ROOT)
+%{genfilelist} \
+    --dir /var/lib/vmail 'attr(0700,vmail,vmail)' \
+    --dir /var/lib/vmail/user 'attr(0700,vmail,vmail)' \
+    $RPM_BUILD_ROOT \
+    > %{name}-%{version}-filelist
+echo "%doc COPYING" >> %{name}-%{version}-filelist
+
+%clean
+rm -rf $RPM_BUILD_ROOT
+
+%pre
+source /etc/nethserver/rpm_hook_functions
+# ensure vmail user exists:
+if ! id vmail >/dev/null 2>&1 ; then
+   useradd -c 'Virtual mailboxes owner' -r -d /var/lib/vmail/ -s /sbin/nologin vmail
+fi
+
+# add vmail group to postfix user
+usermod -G vmail -a postfix
+
+
+%post
+source /etc/nethserver/rpm_hook_functions
+event_queue add %{name}-update
+
+%preun
+source /etc/nethserver/rpm_hook_functions
+signal_event %{name}-uninstall
+
+
+%files -f %{name}-%{version}-filelist
+%defattr(-,root,root)
+
+
+%changelog
+* Wed Nov 21 2012 Davide Principi <davide.principi@nethesis.it> - 7.105.0-6.nh
+- Added dovecot-antispam dependency
+
+* Thu Oct  4 2012 Davide Principi <davide.principi@nethesis.it> - 6.104.125-5.nh
+- Added uninstall scriptlet
+
+* Thu Jun 21 2012 Davide Principi <davide.principi@nethesis.it> - 4.nh
+- Fixed /var/lib/vmail path
+- Added cyrus-sasl dependencies
+
+* Fri Jun 15 2012 Davide Principi <davide.principi@nethesis.it> - 3.nh
+- Added perl(Text::Unidecode) dependency
+- Relocated NethServer/ directory under "perl_vendorlib"
+
+* Thu Jun  7 2012 Davide Principi <davide.principi@nethesis.it> - 2.nh
+- Initial build.
+
