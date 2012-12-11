@@ -63,21 +63,7 @@ signal_event %{name}-uninstall
 %defattr(-,root,root)
 
 
+
+
 %changelog
-* Wed Nov 21 2012 Davide Principi <davide.principi@nethesis.it> - 7.105.0-6.nh
-- Added dovecot-antispam dependency
-
-* Thu Oct  4 2012 Davide Principi <davide.principi@nethesis.it> - 6.104.125-5.nh
-- Added uninstall scriptlet
-
-* Thu Jun 21 2012 Davide Principi <davide.principi@nethesis.it> - 4.nh
-- Fixed /var/lib/vmail path
-- Added cyrus-sasl dependencies
-
-* Fri Jun 15 2012 Davide Principi <davide.principi@nethesis.it> - 3.nh
-- Added perl(Text::Unidecode) dependency
-- Relocated NethServer/ directory under "perl_vendorlib"
-
-* Thu Jun  7 2012 Davide Principi <davide.principi@nethesis.it> - 2.nh
-- Initial build.
 
