@@ -27,6 +27,11 @@
 use esmith::Build::CreateLinks qw(:all);
 use File::Path;
 
+# dovecot certificate paths
+my @certificates = (qw(
+                /etc/pki/dovecot/private/dovecot.pem
+                /etc/pki/dovecot/certs/dovecot.pem
+));
 
 # expanded templates on SAVE event
 my @saveTemplates = qw(
@@ -49,6 +54,7 @@ event_actions('nethserver-directory-update', qw(
 # UPDATE, UNINSTALL templates
 event_templates($_,
 		@saveTemplates, 
+		@certificates,
 		'/etc/postfix/master.cf',
 		'/etc/dovecot/ldap.conf',
 		'/etc/sysconfig/dovecot',
@@ -189,3 +195,11 @@ foreach (qw(create delete modify)) {
 }
 
 
+#
+# certificate-update event
+#
+event_templates('certificate-update', @certificates);
+
+event_services('certificate-update', qw(
+               dovecot restart
+));
