@@ -16,6 +16,7 @@ plugin \{
 service lmtp \{
 
     user = vmail
+    client_limit = 1
 { 
     if($dovecot{LmtpInetListenerStatus} eq 'enabled') {
 	# my $addresses = join(', ', '::1', '127.0.0.1', $InternalInterface{IPAddress});
