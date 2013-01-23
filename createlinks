@@ -72,6 +72,7 @@ event_actions('nethserver-mail-server-update',
 	      'nethserver-mail-postmap-update' => '30',
 	      'nethserver-mail-account-update' => '40',
 	      'nethserver-mail-sieve-compile' => '50',
+	      'nethserver-mail-server-init-system-users' => '50',
 	      'firewall-adjust' => '60',
 	      'runlevel-adjust' => '70');
 

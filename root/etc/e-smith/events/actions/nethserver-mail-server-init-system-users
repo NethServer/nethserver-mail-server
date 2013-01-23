@@ -1,0 +1,61 @@
+#!/bin/bash
+
+#
+# Copyright (C) 2012 Nethesis S.r.l.
+# http://www.nethesis.it - support@nethesis.it
+# 
+# This script is part of NethServer.
+# 
+# NethServer is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License,
+# or any later version.
+# 
+# NethServer is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with NethServer.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+#
+# Initialize system user's virtual mailboxes, by copying existing
+# messages to /var/lib/vmail/user/<username>/mbox.
+#
+
+# only owner has r/w access to files created by this scritpt:
+umask 077
+
+# disable noclobber flag:
+set +C 
+
+for USER in `cut -d : -f 1 /etc/dovecot/system-users`; do
+
+    MAIL_HOME="/var/lib/vmail/user/${USER}"
+
+    MBOX_SRC="/var/mail/${USER}"
+    MBOX_DST="${MAIL_HOME}/mbox"
+    
+
+    # skip unknown users
+    id "${USER}" &>/dev/null || continue
+
+    # skip non-existing
+    [ -a "${MBOX_SRC}" ] || continue
+
+    # skip empty files
+    [ -s "${MBOX_SRC}" ] || continue
+
+    # create MAIL_HOME directory setting perms 700
+    ! [ -d "${MAIL_HOME}" ] && mkdir -p -m 700 "${MAIL_HOME}"
+
+    echo "Migrating ${USER} mailbox: ${MBOX_SRC} => ${MBOX_DST}";
+
+    # copy original mailbox then truncate it
+    cat "${MBOX_SRC}" >> "${MBOX_DST}" && echo -n "" > "${MBOX_SRC}"
+    chown -R vmail.vmail "${MAIL_HOME}"
+
+
+done
