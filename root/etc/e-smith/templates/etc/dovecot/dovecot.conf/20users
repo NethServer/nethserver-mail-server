@@ -10,10 +10,16 @@ last_valid_uid = { $uid; }
 mail_uid = vmail
 mail_gid = vmail
 
-# Password database: ldap
+# Password database for standard users: ldap
 passdb \{
     driver = ldap
     args = /etc/dovecot/ldap.conf
+\}
+
+# Password database for system users (admin): shadow
+passdb \{
+  driver = pam
+  args = max_requests=100 failure_show_msg=yes blocking=yes 
 \}
 
 # Use the password lookup query to prefetch userdb fields (for IMAP)
@@ -21,11 +27,17 @@ userdb \{
        driver = prefetch
 \}
 
-# User database (for LMTP)
+# User database for standard users:
 userdb \{ 
        driver = ldap
        args = /etc/dovecot/ldap.conf       
 \}      
+
+# User database for admin user:
+userdb \{
+  driver = passwd-file
+  args = /etc/dovecot/system-users
+\}
 
 # Location of mailboxes:
 mail_location = maildir:~/Maildir
