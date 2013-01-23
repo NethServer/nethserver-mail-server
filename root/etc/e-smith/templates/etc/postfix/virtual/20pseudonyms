@@ -1,6 +1,6 @@
 
 #
-# 20psudonyms -- Virtual addresses list:
+# 20pseudonyms -- map to mailboxes:
 #
 {
     use NethServer::MailServer;

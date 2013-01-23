@@ -3,9 +3,13 @@
 # 10system_accounts
 #
 {
+    #
+    # postmaster is required by RFC822 sec 6.3
+    # admin is our default catch-all mailbox (see #1622)
+    #
     use esmith::DomainsDB;
     my $domainsDb = esmith::DomainsDB->open() || die('Could not open DomainsDB');
-    
+    my $fqdn = join('.', $SystemName, $DomainName);
     $OUT = '';
     
     foreach $domainRecord ($domainsDb->get_all_by_prop(type => 'domain')) {
@@ -13,7 +17,8 @@
 	    next;
 	}
 
-	$OUT .= sprintf("postmaster@%-37s postmaster\@%s\n", $domainRecord->key, join('.', $SystemName, $DomainName));
+	$OUT .= sprintf("postmaster@%-37s postmaster\@%s\n", $domainRecord->key, $fqdn);
+	$OUT .= sprintf("admin@%-42s admin\@%s\n", $domainRecord->key, $fqdn);
     }
 }
 
