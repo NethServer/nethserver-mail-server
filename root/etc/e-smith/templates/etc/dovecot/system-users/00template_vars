@@ -1,0 +1,10 @@
+{
+    #
+    # vmail user uid and gid
+    #
+ 
+    $gid = (getgrnam('vmail'))[2] or die('Missing vmail group');
+    $uid = (getpwnam('vmail'))[2] or die('Missing vmail user'); 
+
+    '';
+}
