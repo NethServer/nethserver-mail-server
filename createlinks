@@ -54,12 +54,13 @@ event_actions('nethserver-directory-update', qw(
 # UPDATE, UNINSTALL templates
 event_templates($_,
 		@saveTemplates, 
-		@certificates,
-		'/etc/postfix/master.cf',
-		'/etc/dovecot/ldap.conf',
-		'/etc/sysconfig/dovecot',
-		'/etc/dovecot/master-users'
-    ) foreach (qw(nethserver-mail-server-update nethserver-mail-server-uninstall));
+		@certificates, qw(
+		/etc/postfix/master.cf
+		/etc/dovecot/ldap.conf
+		/etc/sysconfig/dovecot
+                /etc/dovecot/system-users
+		/etc/dovecot/master-users
+)) foreach (qw(nethserver-mail-server-update nethserver-mail-server-uninstall));
 
 
 # UPDATE actions/services:
