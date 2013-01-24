@@ -12,6 +12,13 @@
 }
 # 
 virtual_alias_maps = { scalar @localDomains ? 'hash:/etc/postfix/virtual' : '' }
+
+# The default mail delivery transport and next-hop destination 
+# for final delivery to domains listed with $virtual_mailbox_domains:
 virtual_transport = lmtp:unix:/var/run/dovecot/lmtp
+
+# Optional message delivery transport that the local(8) 
+# delivery agent should use for mailbox delivery:
+mailbox_transport = lmtp:unix:/var/run/dovecot/lmtp
 
 

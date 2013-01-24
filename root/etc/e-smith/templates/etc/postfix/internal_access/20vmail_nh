@@ -1,1 +1,6 @@
-vmail.nh		reject
+#
+# 20vmail_nh -- internal domain: forbidden access
+#
+vmail.nh			reject
+
+
