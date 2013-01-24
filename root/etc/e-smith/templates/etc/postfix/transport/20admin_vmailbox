@@ -2,13 +2,13 @@
 # 20admin_vmailbox -- deliver admin's mail through dovecot LMTP listener
 #
 {
+	my $transport = 'lmtp:unix:/var/run/dovecot/lmtp';
 	for my $domain ((
 	   'localhost',
-	   'localhost.localdomain',
 	   join('.', 'localhost', $DomainName),
 	   join('.', $SystemName, $DomainName),
 	)) {
-	   $OUT .= sprintf("admin@%-40s lmtp:unix:/var/run/dovecot/lmtp\n", $domain);
+	   $OUT .= sprintf("admin@%-40s %s\n", $domain, $transport);
 	}
 }
 
