@@ -62,8 +62,11 @@ signal_event %{name}-uninstall
 %files -f %{name}-%{version}-filelist
 %defattr(-,root,root)
 
-
-
-
 %changelog
+* Thu Jan 31 2013 Davide Principi <davide.principi@nethesis.it> - 1.1.0-1.ns6
+- Added postfix/SystemUserRecipientStatus prop. Refs #1635
+- Removed localhost.localdomain from transport delivery table. Refs #1635
+- Migrate admin's standard mailbox to vmail storage. Refs #1622
+- Grant IMAP access to system users in /etc/dovecot/system-users passwd database. Refs #1622
+- Dovecot certificates under nethserver-base certificate management. Refs #1634
 
