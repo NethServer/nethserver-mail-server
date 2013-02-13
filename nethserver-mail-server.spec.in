@@ -8,12 +8,12 @@ Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
 
 Requires: dovecot >= 2.0.9, dovecot-pigeonhole >= 2.0.9, dovecot-antispam >= 0.0.48
-Requires: nethserver-mail-common
+Requires: nethserver-mail-common >= 1.0.1-2
 Requires: perl(Text::Unidecode)
 Requires: cyrus-sasl-plain, cyrus-sasl-ldap, cyrus-sasl-ntlm, cyrus-sasl-md5
 
 BuildRequires: perl
-BuildRequires: nethserver-devtools
+BuildRequires: nethserver-devtools >= 1.0.0
 
 %description
 Mail server implementation based on postfix and dovecot packages.
