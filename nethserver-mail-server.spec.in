@@ -3,7 +3,7 @@ Name: nethserver-mail-server
 Version: @@VERSION@@
 Release: @@RELEASE@@
 License: GPL
-URL: http://dev.nethesis.it/projects/%{name}
+URL: %{url_prefix}/%{name} 
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
 
