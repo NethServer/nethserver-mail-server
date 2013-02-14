@@ -4,5 +4,5 @@
 #
 # Close stderr on dovecot startup
 #
-OPTIONS="2>-"
+OPTIONS="2>&-"
 
