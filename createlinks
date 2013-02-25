@@ -66,6 +66,7 @@ event_templates($_,
 # UPDATE actions/services:
 event_actions('nethserver-mail-server-update', qw(
 	      initialize-default-databases 00
+              nethserver-mail-default-domain-create 01
 	      nethserver-mail-pseudonym-initialize 01
 	      nethserver-mail-server-conf 20
 	      nethserver-mail-server-ldapsetup 21
