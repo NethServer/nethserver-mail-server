@@ -64,17 +64,18 @@ event_templates($_,
 
 
 # UPDATE actions/services:
-event_actions('nethserver-mail-server-update',
-	      'initialize-default-databases' => '00',
-	      'nethserver-mail-pseudonym-initialize' => '01',
-	      'nethserver-mail-server-conf' => '20',
-	      'nethserver-mail-server-ldapsetup' => '21',
-	      'nethserver-mail-postmap-update' => '30',
-	      'nethserver-mail-account-update' => '40',
-	      'nethserver-mail-sieve-compile' => '50',
-	      'nethserver-mail-server-init-system-users' => '50',
-	      'firewall-adjust' => '60',
-	      'runlevel-adjust' => '70');
+event_actions('nethserver-mail-server-update', qw(
+	      initialize-default-databases 00
+	      nethserver-mail-pseudonym-initialize 01
+	      nethserver-mail-server-conf 20
+	      nethserver-mail-server-ldapsetup 21
+	      nethserver-mail-postmap-update 30
+	      nethserver-mail-account-update 40
+	      nethserver-mail-sieve-compile 50
+	      nethserver-mail-server-init-system-users 50
+	      firewall-adjust 60
+	      runlevel-adjust 70
+));
 
 event_services('nethserver-mail-server-update',
 	       'dovecot' => 'restart',
