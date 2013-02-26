@@ -34,14 +34,23 @@ class Modify extends \Nethgui\Controller\Table\Modify
 
     public function initialize()
     {
+        $keyValidator = $this->createValidator()
+                ->orValidator(
+                    $this->createValidator()->regexp('/^[A-Za-z0-9_-](\.?[A-Za-z0-9_-]+)*@$/i'),
+                    $this->createValidator()->email()
+                )->maxLength(196);
+
         $parameterSchema = array(
-            array('pseudonym', Validate::EMAIL, Table::KEY),
+            array('pseudonym', $keyValidator, Table::KEY),
             array('Description', Validate::ANYTHING, Table::FIELD),
             array('Account', Validate::USERNAME, Table::FIELD),
             array('Access', $this->createValidator()->memberOf('public', 'private'), Table::FIELD),
         );
 
         $this->setSchema($parameterSchema);
+
+        $this->setDefaultValue('localAddress', '');
+        $this->setDefaultValue('domainAddress', '');
 
         parent::initialize();
     }
@@ -57,7 +66,7 @@ class Modify extends \Nethgui\Controller\Table\Modify
         // we must explicitly validate the pseudonym parameter because is not posted with create request
         if ($this->getRequest()->isMutation() && $this->getIdentifier() === 'create') {
             if ($this->getValidator('pseudonym')->evaluate($this->parameters['pseudonym']) !== TRUE) {
-                $report->addValidationError($this, 'localAddress', $this->getValidator('pseudonym'));
+                $report->addValidationErrorMessage($this, 'localAddress', 'valid_email,malformed-localpart');
             }
         }
     }
@@ -75,11 +84,11 @@ class Modify extends \Nethgui\Controller\Table\Modify
         if ( ! $this->getRequest()->isMutation() && $this->getRequest()->isValidated()) {
             $view['AccountDatasource'] = new \NethServer\Module\Pseudonym\AccountDatasource($this, $view->getTranslator(), $view['Account']);
             if ($this->getIdentifier() === 'create') {
-                $view['domainAddressDatasource'] = $this->readDomainAddressDatasource();
+                $view['domainAddressDatasource'] = $this->readDomainAddressDatasource($view);
             }
         }
     }
-    
+
     /**
      * Do not really delete the record, but change its type.
      * @param string $key
@@ -93,7 +102,7 @@ class Modify extends \Nethgui\Controller\Table\Modify
             parent::processDelete($key);
         }
     }
-    
+
     public function onParametersSaved($changedParameters)
     {
         if ($this->getIdentifier() === 'update') {
@@ -107,9 +116,9 @@ class Modify extends \Nethgui\Controller\Table\Modify
         $this->getPlatform()->signalEvent(sprintf('pseudonym-%s@post-process', $event), array($this->parameters['pseudonym']));
     }
 
-    private function readDomainAddressDatasource()
+    private function readDomainAddressDatasource(\Nethgui\View\ViewInterface $view)
     {
-        $domains = array();
+        $domains = array(array('', $view->translate('ANY_DOMAIN')));
 
         foreach ($this->getPlatform()->getDatabase('domains')->getAll('domain') as $key => $prop) {
             $domains[] = array($key, $key);

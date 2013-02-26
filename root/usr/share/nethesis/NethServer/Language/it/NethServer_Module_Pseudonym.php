@@ -16,4 +16,5 @@ $L['Pseudonym_Title'] = 'Indirizzi email';
 $L['Users_label'] = 'Utenti'; 
 $L['domainAddress_label'] = 'Dominio'; 
 $L['localAddress_label'] = 'Indirizzo email'; 
-$L['pseudonym_label'] = 'Indirizzo email'; 
+$L['pseudonym_label'] = 'Indirizzo email';
+$L['ANY_DOMAIN'] = '[tutti i domini]';

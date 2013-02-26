@@ -15,4 +15,5 @@ $L['Pseudonym_Title'] = 'Email addresses';
 $L['Users_label'] = 'Users'; 
 $L['domainAddress_label'] = 'Domain'; 
 $L['localAddress_label'] = 'Email address'; 
-$L['pseudonym_label'] = 'Email address'; 
+$L['pseudonym_label'] = 'Email address';
+$L['ANY_DOMAIN'] = '[all domains]';
