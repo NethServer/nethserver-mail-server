@@ -1,0 +1,84 @@
+#!/usr/bin/perl
+
+#
+# Copyright (C) 2013 Nethesis S.r.l.
+# http://www.nethesis.it - support@nethesis.it
+# 
+# This script is part of NethServer.
+# 
+# NethServer is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License,
+# or any later version.
+# 
+# NethServer is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with NethServer.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+use strict;
+
+use NethServer::Migrate 'migrateDir';
+use User::pwent;
+
+my $event = shift;
+my $sourceDir = shift;
+my $errors = 0;
+
+my $accountsDb = esmith::AccountsDB->open() or die("Could not open destination account db\n");
+
+foreach my $accountRecord ($accountsDb->users()) {
+
+    my $userName = $accountRecord->key;
+    my $pwuser = getpwnam($userName);
+
+    if( ! $pwuser) {
+	warn "[ERROR] Could not find user in passwd database: $userName\n";
+	$errors ++;
+	next;
+    }
+
+    my $srcMaildir = $pwuser->dir . '/Maildir';
+    my $dstMaildir = '/var/lib/vmail/user/' . $userName . '/Maildir';
+
+    if( ! -d $srcMaildir) {
+	warn "[ERROR] Could not find user $userName source $srcMaildir directory \n";
+	$errors ++;
+	next;
+    }
+
+    if( ! -d $dstMaildir) {
+	warn "[ERROR] Could not find user $userName destination $dstMaildir directory\n";
+	$errors ++;
+	next;
+    }
+
+    if(defined $accountRecord->prop('MailStatus') 
+       && $accountRecord->prop('MailStatus') eq 'enabled') {
+	migrateDir($srcMaildir, $dstMaildir);
+
+	#
+	# Set vmail ownership:
+	#
+	system(qw(chown -R vmail.vmail), $dstMaildir);
+	if($? != 0) {
+	    warn "[ERROR] Failed to change ownership of files in $dstMaildir\n";
+	    $errors ++
+	}
+    }
+
+}
+
+
+if($errors > 0) {
+    warn "[WARNING] $errors error(s) occurred in nethserver-samba-data action\n";
+    exit(1);
+}
+
+# action ends:
+exit(0);
+

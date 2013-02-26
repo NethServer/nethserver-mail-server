@@ -1,0 +1,197 @@
+#!/usr/bin/perl
+
+#
+# Copyright (C) 2013 Nethesis S.r.l.
+# http://www.nethesis.it - support@nethesis.it
+# 
+# This script is part of NethServer.
+# 
+# NethServer is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License,
+# or any later version.
+# 
+# NethServer is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with NethServer.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+use strict;
+use esmith::AccountsDB;
+use esmith::DomainsDB;
+use esmith::event;
+
+my $event = shift;
+my $sourceDir = shift;
+my $esmithDbDir = '/home/e-smith/db';
+my $errors = 0;
+
+if( ! -d $sourceDir) {
+    die("Could not find source directory $sourceDir\n");
+}
+
+my $srcAccountsDb = esmith::AccountsDB->open_ro(join('', $sourceDir, $esmithDbDir, '/accounts')) or die("Could not open source accounts database in $sourceDir \n");
+my $dstAccountsDb = esmith::AccountsDB->open() or die("Could not open destination account db\n");
+
+my $srcDomainsDb = esmith::DomainsDB->open_ro(join('', $sourceDir, $esmithDbDir, '/domains')) or die("Could not open source domains database in $sourceDir \n");
+my $dstDomainsDb = esmith::DomainsDB->open() or die("Could not open destination domains db\n");
+
+my %modifiedAccounts = ();
+
+#
+# loop on domains
+#
+foreach my $srcDomain ($srcDomainsDb->domains()) {
+    if($dstDomainsDb->get($srcDomain->key)) {
+	warn "[WARNING] skip existing domain " . $srcDomain->key . "\n";
+	next;
+    }
+
+    $dstDomainsDb->new_record($srcDomain->key,
+			      'type' => 'domain',
+			      'AlwaysBccStatus' => 'disabled',
+			      'Description' => $srcDomain->prop('Description') || '',
+			      'DisclaimerStatus' => 'disabled',
+			      'TransportType' => 'LocalDelivery',
+			      'UnknownRecipientsActionDeliverMailbox' => '',
+			      'UnknownRecipientsActionType' => 'bounce'
+    );
+
+    if( ! esmith::event::event_signal('domain-create', $srcDomain->key)) {
+	warn("[ERROR] domain-create " . $srcDomain->key . " event failed\n");
+	$errors++;
+    }
+
+}
+
+#
+# loop on pseudonyms:
+#
+foreach my $srcPseudonym ($srcAccountsDb->pseudonyms()) {
+
+    my $accountName = $srcPseudonym->prop('Account');
+    my $pseudonym = $srcPseudonym->key;
+
+    # Add @-suffix for domainless pseudonyms
+    if($pseudonym !~ /@/) {
+	$pseudonym .= '@';
+    }
+
+    $dstAccountsDb->new_record($pseudonym,
+			       'type' => 'pseudonym',
+			       'Account' => $accountName,
+			       'Access' => $srcPseudonym->prop('Visible') eq 'internal' ? 'private' : 'public'
+	);
+
+
+    if( ! $modifiedAccounts{$accountName}) {
+	if( ! configureAccount($accountName)) {
+	    $errors++;
+	}
+    }
+
+    # Mark the account as modified:
+    $modifiedAccounts{$accountName} = 1;
+
+    if( ! esmith::event::event_signal('pseudonym-create', $pseudonym)) {
+	warn("[ERROR] pseudonym-create $pseudonym event failed\n");
+	$errors++;
+    }
+
+}
+
+   
+if($errors > 0) {
+    warn "[WARNING] $errors error(s) occurred in nethserver-samba-data action\n";
+    exit(1);
+}
+
+# action ends:
+exit(0);
+
+
+
+
+#
+# configureAccount -- enable Mail* props on the given account (group
+# or user)
+#
+sub configureAccount($)
+{
+    my $accountName = shift;
+    my $accountRecord = $dstAccountsDb->get($accountName);
+    my $sourceAccountRecord = $srcAccountsDb->get($accountName);
+    my %mailForwardProps = ();
+
+    if( ! $accountRecord ) {
+	warn "[ERROR] destination account record not found: $accountName\n";
+	return 0;
+    }
+
+    if( ! $sourceAccountRecord ) {
+	warn "[ERROR] source account record not found: $accountName\n";
+	return 0;
+    }
+
+    if($accountRecord->prop('type') eq 'user') {
+	#
+	# configure mail forward props:
+	#
+	if( ! $sourceAccountRecord->prop('EmailForward') 
+	    || $sourceAccountRecord->prop('EmailForward') eq 'local') {
+	    %mailForwardProps = (
+		MailForwardStatus => 'disabled',
+		MailForwardKeepMessageCopy => 'no',
+		);
+	} elsif($sourceAccountRecord->prop('EmailForward') eq 'forward') {
+	    %mailForwardProps = (
+		MailForwardStatus => 'enabled',
+		MailForwardKeepMessageCopy => 'no',
+		);
+	} elsif($sourceAccountRecord->prop('EmailForward') eq 'both') {
+	    %mailForwardProps = (
+		MailForwardStatus => 'enabled',
+		MailForwardKeepMessageCopy => 'yes',
+		);
+	}
+
+	$mailForwardProps{MailForwardAddress} = $sourceAccountRecord->prop('ForwardAddress');
+	
+	#
+	# merge also some default values:
+	#
+	$accountRecord->merge_props(qw(
+            MailSpamRetentionStatus  disabled
+            MailStatus       enabled
+            MailQuotaType    default
+            MailQuotaCustom  15
+        ), %mailForwardProps);
+
+	if( ! esmith::event::event_signal('user-modify', $accountName)) {
+	    warn("[ERROR] user-modify $accountName event failed\n");
+	    return 0;
+	}
+
+    } elsif($accountRecord->prop('type') eq 'group') {
+
+	$accountRecord->merge_props(qw(        
+             MailStatus       enabled
+             MailDeliveryType copy
+        ));
+
+	if( ! esmith::event::event_signal('group-modify', $accountName)) {
+	    warn("[ERROR] group-modify $accountName event failed\n");
+	    return 0;
+	}
+
+    } else {
+	warn "[ERROR] invalid account record type: $accountName\n";
+	return 0;
+    }
+
+    return 1; # SUCCESS!
+}
