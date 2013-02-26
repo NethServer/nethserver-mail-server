@@ -100,61 +100,83 @@ sub getMailboxAliases()
 {
     my $self = shift;
     my %aliasMap = ();
+    my $vdomain = getVirtualMailboxDomain();
 
     foreach my $record ($self->{AccountsDb}->pseudonyms()) {
 	my $pseudonym = $record->key;
-
-	if($pseudonym !~ m/^[^@]+@.+$/) {
-	    warn ("Missing domain part in pseudonym `$pseudonym`: skipped\n");
-	    next;
-	}
-
 	my $account = $record->prop('Account');
-	my $domain = $pseudonym;
-	my $vdomain = getVirtualMailboxDomain();
+	my $accountRecord = $self->{AccountsDb}->get($account);
 
-	# Trim the address part:
-	$domain =~ s/([^@]+@)//;
+	my $address = '';
+	my @domains = ();
+	my $isComplete;
+	my @destinations = ();
 
-	if(! $domain ) {
-	    $self->{debug} && warn "Found pseudonym key `$pseudonym` without \@domain suffix: skipped";
-	    next;
+	if($pseudonym =~ m/^([^@]+)@(.+)$/) {
+	    # complete mail address
+	    $address = $1;
+	    @domains = ($2);
+	    $isComplete = 1;
+	} elsif($pseudonym =~ m/^([^@]+)$/) {
+	    # domain-less pseudonym #1665
+	    $address = $1;
+	    @domains = $self->getDeliveryDomains();
+	    $isComplete = 0;
 	}
 
-	my $accountRecord = $self->{AccountsDb}->get($account);
-	my $domainRecord = $self->{DomainsDb}->get($domain);
 
-	# Skip the pseudonym if the refered account is not 
-	# enabled.
-	if(! defined($accountRecord) ) {
+	if( ! defined $accountRecord) {
+	    # Skip the pseudonym if the referred account is not 
+	    # enabled.
 	    $self->{debug} && warn "Account `$account` not found";
 	    next;
+
 	} elsif($accountRecord->prop('type') eq 'user'
 	    &&  $accountRecord->prop('MailStatus') eq 'enabled') {
 
+	    #
+	    # user accounts
+	    #
+
 	    if($accountRecord->prop('MailForwardStatus') eq 'enabled') {
 		if($accountRecord->prop('MailForwardKeepMessageCopy') eq 'yes') {
-		    $aliasMap{$pseudonym} = ["$account\@$vdomain", $accountRecord->prop('MailForwardAddress')];
+		    @destinations = ("$account\@$vdomain", $accountRecord->prop('MailForwardAddress'));
 		} else {
-		    $aliasMap{$pseudonym} = [$accountRecord->prop('MailForwardAddress')];
+		    @destinations = ($accountRecord->prop('MailForwardAddress'));
 		}	       
 	    } else {
-		$aliasMap{$pseudonym} = ["$account\@$vdomain"];
+		@destinations = ("$account\@$vdomain");
 	    }
 
 	} elsif($accountRecord->prop('type') eq 'group'
 	    &&  $accountRecord->prop('MailStatus') eq 'enabled') {
 
+	    #
+	    # group accounts
+	    #
+
 	    if($accountRecord->prop('MailDeliveryType') eq 'copy') {
-		my @MailEnabledMemberList = grep { 
+		# search group members having MailStatus enabled
+		my @mailEnabledMemberList = grep { 
 		    $self->{AccountsDb}->get_prop($_, 'MailStatus') eq 'enabled' 
 		} split(',', $accountRecord->prop('Members'));
 		
-		$aliasMap{$pseudonym} = [map { $_ . '@' . $vdomain } @MailEnabledMemberList];
+		@destinations = map { $_ . '@' . $vdomain } @mailEnabledMemberList;
 	    } elsif($accountRecord->prop('MailDeliveryType')eq 'shared') {
-		$aliasMap{$pseudonym} = ["$account\@$vdomain"];
+
+		@destinations = ("$account\@$vdomain");
 	    }
 	} 
+
+	if(@destinations) {
+	    foreach ( map { $address . '@' . $_ } @domains ) {
+		# complete pseudonyms takes precedence over
+		# domain-less pseudonyms:
+		if($isComplete || ! defined $aliasMap{$_}) {
+		    $aliasMap{$_} = [@destinations];
+		}
+	    }
+	}
 
     }
 
