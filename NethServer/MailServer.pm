@@ -112,16 +112,13 @@ sub getMailboxAliases()
 	my $isComplete;
 	my @destinations = ();
 
-	if($pseudonym =~ m/^([^@]+)@(.+)$/) {
+	if($pseudonym =~ m/^([^@]+)@(.+)?$/) {
 	    # complete mail address
 	    $address = $1;
-	    @domains = ($2);
-	    $isComplete = 1;
-	} elsif($pseudonym =~ m/^([^@]+)$/) {
-	    # domain-less pseudonym #1665
-	    $address = $1;
-	    @domains = $self->getDeliveryDomains();
-	    $isComplete = 0;
+	    $isComplete = defined $2;
+	    push @domains, ($isComplete ? $2 : $self->getDeliveryDomains());
+	} else {
+	    next;
 	}
 
 
@@ -283,23 +280,22 @@ sub _createPseudonymRecords()
 
     my @domainList = $self->getDeliveryDomains();
     
+    # Create a domain-less pseudonym for each prefix Refs #1665:
     foreach (@prefixList) {
-	foreach my $domain (@domainList) {
-	    my $address = $_ . '@' . $domain;
-	    my $props = {
-		'type' => 'pseudonym',
-		'Account' => $account,
-		'ControlledBy' => 'system',
-		'Access' => 'public',
-		'_prevAccount' => $account,
-	    };
-	    
-	    my $newRecord = $self->{AccountsDb}->new_record($address, $props);
-	    
-	    if( ! $newRecord) {
-		$self->{debug} && warn ("Pseudonym ${address} already exists");
-	    }
-	}
+	my $address = $_ . '@';
+	my $props = {
+	    'type' => 'pseudonym',
+	    'Account' => $account,
+	    'ControlledBy' => 'system',
+	    'Access' => 'public',
+	    '_prevAccount' => $account,
+	};
+
+	my $newRecord = $self->{AccountsDb}->new_record($address, $props);
+
+	if( ! $newRecord) {
+	    $self->{debug} && warn ("Pseudonym '${address}' already exists!");
+	}	
     }
 
 }
