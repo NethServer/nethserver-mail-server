@@ -51,7 +51,7 @@ foreach my $srcDomain ($srcDomainsDb->domains()) {
 	next;
     }
 
-    $dstDomainsDb->new_record($srcDomain->key,
+    $dstDomainsDb->new_record($srcDomain->key, {
 			      'type' => 'domain',
 			      'AlwaysBccStatus' => 'disabled',
 			      'Description' => $srcDomain->prop('Description') || '',
@@ -59,7 +59,7 @@ foreach my $srcDomain ($srcDomainsDb->domains()) {
 			      'TransportType' => 'LocalDelivery',
 			      'UnknownRecipientsActionDeliverMailbox' => '',
 			      'UnknownRecipientsActionType' => 'bounce'
-    );
+    });
 
     if( ! esmith::event::event_signal('domain-create', $srcDomain->key)) {
 	warn("[ERROR] domain-create " . $srcDomain->key . " event failed\n");
@@ -81,11 +81,11 @@ foreach my $srcPseudonym ($srcAccountsDb->pseudonyms()) {
 	$pseudonym .= '@';
     }
 
-    $dstAccountsDb->new_record($pseudonym,
+    $dstAccountsDb->new_record($pseudonym, {
 			       'type' => 'pseudonym',
 			       'Account' => $accountName,
 			       'Access' => $srcPseudonym->prop('Visible') eq 'internal' ? 'private' : 'public'
-	);
+			       });
 
 
     if( ! $modifiedAccounts{$accountName}) {
@@ -106,7 +106,7 @@ foreach my $srcPseudonym ($srcAccountsDb->pseudonyms()) {
 
    
 if($errors > 0) {
-    warn "[WARNING] $errors error(s) occurred in nethserver-samba-data action\n";
+    warn "[WARNING] $errors error(s) occurred in $0 action\n";
     exit(1);
 }
 
@@ -123,6 +123,7 @@ exit(0);
 sub configureAccount($)
 {
     my $accountName = shift;
+
     my $accountRecord = $dstAccountsDb->get($accountName);
     my $sourceAccountRecord = $srcAccountsDb->get($accountName);
     my %mailForwardProps = ();
