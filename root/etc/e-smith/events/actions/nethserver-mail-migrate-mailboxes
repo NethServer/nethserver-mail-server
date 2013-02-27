@@ -24,6 +24,8 @@ use strict;
 
 use NethServer::Migrate 'migrateDir';
 use User::pwent;
+use esmith::AccountsDB;
+use File::Path;
 
 my $event = shift;
 my $sourceDir = shift;
@@ -37,7 +39,7 @@ foreach my $accountRecord ($accountsDb->users()) {
     my $pwuser = getpwnam($userName);
 
     if( ! $pwuser) {
-	warn "[ERROR] Could not find user in passwd database: $userName\n";
+	warn "[ERROR] $userName skipped: is not found in user in passwd database\n";
 	$errors ++;
 	next;
     }
@@ -46,15 +48,12 @@ foreach my $accountRecord ($accountsDb->users()) {
     my $dstMaildir = '/var/lib/vmail/user/' . $userName . '/Maildir';
 
     if( ! -d $srcMaildir) {
-	warn "[ERROR] Could not find user $userName source $srcMaildir directory \n";
-	$errors ++;
+	warn "[WARNING] User $userName skipped: could not find source directory $srcMaildir\n";
 	next;
     }
 
     if( ! -d $dstMaildir) {
-	warn "[ERROR] Could not find user $userName destination $dstMaildir directory\n";
-	$errors ++;
-	next;
+	File::Path::make_path($dstMaildir, {mode => 0700, user => 'vmail', group => 'vmail'});
     }
 
     if(defined $accountRecord->prop('MailStatus') 
@@ -75,7 +74,7 @@ foreach my $accountRecord ($accountsDb->users()) {
 
 
 if($errors > 0) {
-    warn "[WARNING] $errors error(s) occurred in nethserver-samba-data action\n";
+    warn "[WARNING] $errors error(s) occurred in $0 action\n";
     exit(1);
 }
 
