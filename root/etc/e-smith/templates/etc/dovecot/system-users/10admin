@@ -1,1 +1,1 @@
-admin:x:{$uid}:{$gid}::/var/lib/vmail/user/admin:/bin/bash:userdb_mail=mbox:~/Maildir:INBOX=~/mbox
+admin:x:{$uid}:{$gid}::/var/lib/vmail/user/admin:/bin/bash:
