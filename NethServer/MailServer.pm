@@ -300,11 +300,33 @@ sub _createPseudonymRecords()
 
 }
 
+=head2 ->getAccountMailAddresses($account)
+
+Return a list of email address for the given $account argument
+
+=cut
+sub getAccountMailAddresses($) 
+{
+    my $self = shift;
+    my $account = shift;
+
+    my @addresses = ();
+    foreach my $pseudonymRecord ($self->_getAccountPseudonymRecords($account)) {
+	my $key = $pseudonymRecord->key; 
+	if($key =~ /\@$/) {
+	    # Expand domainless pseudonyms, by appending domain names:
+	    push @addresses, map { $key . $_ } $self->getDeliveryDomains();
+	} else {
+	    push @addresses, $key; 
+	}
+    }
+    return @addresses;
+}
 
 
-=head2 ->getAccountPseudonyms($)
+=head2 ->getAccountPseudonyms($account)
 
-Return a list of pseudonym keys pointing to the given $username argument
+Return a list of pseudonym keys pointing to the given $account argument
 
 =cut
 sub getAccountPseudonyms($) 
