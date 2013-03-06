@@ -28,15 +28,17 @@
 
 use esmith::AccountsDB;
 use NethServer::Directory;
+use NethServer::MailServer;
 use strict;
 
 my $event = shift || die("Missing event name argument");
 my $accountsDb = esmith::AccountsDB->open() || die('Could not open AccountsDB');
 my $nsDirectory = NethServer::Directory->new();
-
+my $mailServer = NethServer::MailServer->new();
 
 my $pseudonym = shift;
 my $pseudonymRecord = $accountsDb->get($pseudonym);
+
 
 if (! defined $pseudonymRecord || $pseudonymRecord->prop('type') !~ /^pseudonym(-deleted)?$/) {
     die('Invalid pseudonym record: ' . $pseudonym);
@@ -49,17 +51,7 @@ if( ! $account ) {
     exit(0);
 }
     
-
-my @addressList = ();    
-    
-    
-# Find all pseudonyms for Account:    
-foreach ($accountsDb->pseudonyms()) {
-    if($_->prop('Account') eq $account) {
-	push @addressList, $_->key();
-    } 
-}
-
+my @addressList = $mailServer->getAccountMailAddresses($account);
 my $ldapEntry = $nsDirectory->getUser($account);
 
 # Update the LDAP entry with the new address list:
