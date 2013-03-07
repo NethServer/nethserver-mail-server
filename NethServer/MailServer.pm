@@ -181,12 +181,12 @@ sub getMailboxAliases()
 }
 
 
-=head2 ->createAccountDefaultPseudonyms($)
+=head2 ->createAccountDefaultPseudonyms($account)
 
 Create account pseudonyms according to our rules
 
 =cut
-sub createAccountDefaultPseudonyms($)
+sub createAccountDefaultPseudonyms($account)
 {
     my $self = shift;
     my $account = shift;
@@ -203,7 +203,7 @@ sub createAccountDefaultPseudonyms($)
     }       
 }
 
-=head2 ->createUserDefaultPseudonyms($)
+=head2 ->createUserDefaultPseudonyms($username)
 
 Create user pseudonyms according to our rules
 
@@ -239,7 +239,7 @@ sub createUserDefaultPseudonyms($)
     return 1;
 }
 
-=head2 ->createGroupDefaultPseudonyms($)
+=head2 ->createGroupDefaultPseudonyms($groupname)
 
 Create a group pseudonym groupname@domain
 
@@ -376,7 +376,7 @@ sub getDeliveryDomains()
     return @domainList;
 }
 
-=head2 connectAclManager
+=head2 ->connectAclManager($account)
 
 Create a connection to the IMAP server, to configure ACLs
 
@@ -389,7 +389,7 @@ sub connectAclManager
     return NethServer::MailServer::AclManager->new(login => $account);
 }
 
-=head2 getDovecotSharedPath
+=head2 ::getDovecotSharedPath($group)
 
 Return the path of the shared mailfolder for the given group name
 
@@ -401,7 +401,7 @@ sub getDovecotSharedPath($)
 }
 
 
-=head2 getInteralAddresses()
+=head2 ->getInteralAddresses()
 
 Return the list of internal (aka private) email addresses. Recipients
 in this list are visible only to local clients (mynetworks).
