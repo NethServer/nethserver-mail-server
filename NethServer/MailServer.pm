@@ -26,6 +26,7 @@
 use strict;
 package NethServer::MailServer;
 
+use Sys::Hostname;
 use esmith::AccountsDB;
 use esmith::DomainsDB;
 use Encode;
@@ -102,9 +103,11 @@ sub getMailboxAliases()
     my %aliasMap = ();
     my $vdomain = getVirtualMailboxDomain();
 
+    my $hostname = hostname;
+
     foreach my $record ($self->{AccountsDb}->pseudonyms()) {
 	my $pseudonym = $record->key;
-	my $account = $record->prop('Account');
+	my $account = $record->prop('Account') || '';
 	my $accountRecord = $self->{AccountsDb}->get($account);
 
 	my $address = '';
@@ -112,7 +115,7 @@ sub getMailboxAliases()
 	my $isComplete;
 	my @destinations = ();
 
-	if($pseudonym =~ m/^([^@]+)@(.+)?$/) {
+	if($pseudonym =~ m'^([^@]+)@(.+)?$') {
 	    # complete mail address
 	    $address = $1;
 	    $isComplete = defined $2;
@@ -122,9 +125,13 @@ sub getMailboxAliases()
 	}
 
 
-	if( ! defined $accountRecord) {
-	    # Skip the pseudonym if the referred account is not 
-	    # enabled.
+	if($account eq '') {
+	    # Handling of (null) empty string Account -- see #1726
+	    @destinations = ('postmaster@' . $hostname);
+
+	} elsif( ! defined $accountRecord) {
+	    # Skip the pseudonym if the referred account does not
+	    # exist.
 	    $self->{debug} && warn "Account `$account` not found";
 	    next;
 
@@ -186,7 +193,7 @@ sub getMailboxAliases()
 Create account pseudonyms according to our rules
 
 =cut
-sub createAccountDefaultPseudonyms($account)
+sub createAccountDefaultPseudonyms($)
 {
     my $self = shift;
     my $account = shift;
