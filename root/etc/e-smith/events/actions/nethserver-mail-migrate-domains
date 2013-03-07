@@ -75,26 +75,31 @@ foreach my $srcPseudonym ($srcAccountsDb->pseudonyms()) {
 
     my $accountName = $srcPseudonym->prop('Account');
     my $pseudonym = $srcPseudonym->key;
+    my $accountRecordStatus = 1;  # The related account record is available.
 
     # Add @-suffix for domainless pseudonyms
-    if($pseudonym !~ /@/) {
+    if($pseudonym !~ m'@') {
 	$pseudonym .= '@';
     }
 
-    $dstAccountsDb->new_record($pseudonym, {
-			       'type' => 'pseudonym',
-			       'Account' => $accountName,
-			       'Access' => $srcPseudonym->prop('Visible') eq 'internal' ? 'private' : 'public'
-			       });
-
-
+    # The first time is referenced, configure the account record:
     if( ! $modifiedAccounts{$accountName}) {
-	if( ! configureAccount($accountName)) {
+	$accountRecordStatus = configureAccount($accountName);
+        # 0 => FAILURE, 
+	# 1 => AVAILABLE, 
+	# 2 => map to NULL Account. Refs #1726
+	if($accountRecordStatus == 0) {
 	    $errors++;
 	}
     }
 
-    # Mark the account as modified:
+    $dstAccountsDb->new_record($pseudonym, {
+			       'type' => 'pseudonym',
+			       'Account' => $accountRecordStatus == 2 ? '' : $accountName,
+			       'Access' => $srcPseudonym->prop('Visible') eq 'internal' ? 'private' : 'public'
+			       });
+
+    # Mark the account as modified, to skip configureAccount() call:
     $modifiedAccounts{$accountName} = 1;
 
     if( ! esmith::event::event_signal('pseudonym-create', $pseudonym)) {
@@ -129,8 +134,8 @@ sub configureAccount($)
     my %mailForwardProps = ();
 
     if( ! $accountRecord ) {
-	warn "[ERROR] destination account record not found: $accountName\n";
-	return 0;
+	warn "[WARNING] destination account record not found: $accountName\n";
+	return 2; # MISSING ACCOUNT RECORD! Map to null-account. See #1726
     }
 
     if( ! $sourceAccountRecord ) {
