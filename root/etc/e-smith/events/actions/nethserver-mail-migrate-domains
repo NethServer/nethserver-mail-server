@@ -40,7 +40,8 @@ my $dstAccountsDb = esmith::AccountsDB->open() or die("Could not open destinatio
 my $srcDomainsDb = esmith::DomainsDB->open_ro(join('', $sourceDir, $esmithDbDir, '/domains')) or die("Could not open source domains database in $sourceDir \n");
 my $dstDomainsDb = esmith::DomainsDB->open() or die("Could not open destination domains db\n");
 
-my %modifiedAccounts = ();
+# Save the state of account records (see usage below):
+my %accountStatus = ();
 
 #
 # loop on domains
@@ -75,32 +76,31 @@ foreach my $srcPseudonym ($srcAccountsDb->pseudonyms()) {
 
     my $accountName = $srcPseudonym->prop('Account');
     my $pseudonym = $srcPseudonym->key;
-    my $accountRecordStatus = 1;  # The related account record is available.
 
     # Add @-suffix for domainless pseudonyms
     if($pseudonym !~ m'@') {
 	$pseudonym .= '@';
     }
 
-    # The first time is referenced, configure the account record:
-    if( ! $modifiedAccounts{$accountName}) {
-	$accountRecordStatus = configureAccount($accountName);
-        # 0 => FAILURE, 
-	# 1 => AVAILABLE, 
+    # The first time is referenced, configure the account record and
+    # save the status to skip this step on the next cycle:
+    if( ! defined $accountStatus{$accountName}) {
+	$accountStatus{$accountName} = configureAccount($accountName);
+        # 0 => error, 
+	# 1 => configured correctly, 
 	# 2 => map to NULL Account. Refs #1726
-	if($accountRecordStatus == 0) {
+	if($accountStatus{$accountName} == 0) {
 	    $errors++;
 	}
     }
 
     $dstAccountsDb->new_record($pseudonym, {
 			       'type' => 'pseudonym',
-			       'Account' => $accountRecordStatus == 2 ? '' : $accountName,
-			       'Access' => $srcPseudonym->prop('Visible') eq 'internal' ? 'private' : 'public'
+			       'Account' => $accountStatus{$accountName} == 2 ? '' : $accountName,
+			       'Access' => $srcPseudonym->prop('Visible') eq 'internal' ? 'private' : 'public',
+			       'Description' => ''
 			       });
 
-    # Mark the account as modified, to skip configureAccount() call:
-    $modifiedAccounts{$accountName} = 1;
 
     if( ! esmith::event::event_signal('pseudonym-create', $pseudonym)) {
 	warn("[ERROR] pseudonym-create $pseudonym event failed\n");
