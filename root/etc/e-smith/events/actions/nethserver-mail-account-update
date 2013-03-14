@@ -65,15 +65,15 @@ foreach my $accountRecord (@accountList) {
 
     my $mailServer = NethServer::MailServer->new();
 
-    my @accountPseudonyms = $mailServer->getAccountPseudonyms($accountRecord->key);
+    my @addressList = $mailServer->getAccountMailAddresses($accountRecord->key);
 
     if( ! grep(/^qmailUser$/, $ldapEntry->get_value('objectClass')))  {
 	$ldapEntry->add(objectClass => 'qmailUser', mail => '');
 	$ldapEntry->update($ldap);
     }
 
-    if(@accountPseudonyms) {
-	$ldapEntry->replace(mail => \@accountPseudonyms);
+    if(@addressList) {
+	$ldapEntry->replace(mail => \@addressList);
     } else {
 	$ldapEntry->replace(mail => '');
     }
