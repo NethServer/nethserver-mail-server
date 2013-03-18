@@ -22,7 +22,7 @@ namespace {
   type = shared
   separator = /
   prefix = Shared/%%n/
-  location = maildir:/var/lib/vmail/user/%%n/Maildir:INDEX=~/Maildir/shared/%%n
+  location = maildir:/var/lib/nethserver/vmail/%%n/Maildir:INDEX=~/Maildir/shared/%%n
   subscriptions = no
   list = children
 }
@@ -35,7 +35,7 @@ protocol imap {
 
 plugin {
   acl = vfile
-  acl_shared_dict = file:/var/lib/vmail/shared-mailboxes.db
+  acl_shared_dict = file:/var/lib/nethserver/vmail/shared-mailboxes.db
 }
 
 service dict {

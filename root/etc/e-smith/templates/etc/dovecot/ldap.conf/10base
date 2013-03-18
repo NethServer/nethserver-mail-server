@@ -15,10 +15,10 @@ default_pass_scheme = CRYPT
 pass_filter = (&(objectClass=posixAccount)(uid=%n)(accountStatus=active))
 
 # Prefetch quota, home and system_groups_user value:
-pass_attrs = uid=user, userPassword=password, mailQuotaSize=userdb_quota_rule=*:bytes=%$M, =userdb_home=/var/lib/vmail/user/%n, =userdb_system_groups_user=%n
+pass_attrs = uid=user, userPassword=password, mailQuotaSize=userdb_quota_rule=*:bytes=%$M, =userdb_home=/var/lib/nethserver/vmail/%n, =userdb_system_groups_user=%n
 
 user_filter = (&(objectClass=posixAccount)(uid=%n)(accountStatus=active))
-user_attrs = mailQuotaSize=quota_rule=*:bytes=%$M, =home=/var/lib/vmail/user/%n, =system_groups_user=%n
+user_attrs = mailQuotaSize=quota_rule=*:bytes=%$M, =home=/var/lib/nethserver/vmail/%n, =system_groups_user=%n
 
 iterate_attrs = uid=user
 iterate_filter = (&(objectClass=posixAccount)(accountStatus=active))

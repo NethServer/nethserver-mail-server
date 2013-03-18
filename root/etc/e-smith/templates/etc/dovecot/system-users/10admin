@@ -1,1 +1,1 @@
-admin:x:{$uid}:{$gid}::/var/lib/vmail/user/admin:/bin/bash:
+admin:x:{$uid}:{$gid}::/var/lib/nethserver/vmail/admin:/bin/bash:

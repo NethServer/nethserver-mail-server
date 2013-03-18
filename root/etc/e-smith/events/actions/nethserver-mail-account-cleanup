@@ -31,7 +31,7 @@ use strict;
 my $event = shift || die("Missing event argument!");
 my $account = shift || die("Missing account name argument!");
 
-my $mailHomeDir = '/var/lib/vmail/user/' . $account;
+my $mailHomeDir = '/var/lib/nethserver/vmail/' . $account;
 
 if ( -d $mailHomeDir ) {
     exit system('/bin/rm', '-rf', $mailHomeDir);

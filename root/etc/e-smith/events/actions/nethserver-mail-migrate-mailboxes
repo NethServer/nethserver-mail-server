@@ -41,7 +41,7 @@ my $accountsDb = esmith::AccountsDB->open() or die("Could not open destination a
 foreach my $userName ('admin', map { $_->key } $accountsDb->users()) {
 
     my $srcMaildir;
-    my $dstMaildir = '/var/lib/vmail/user/' . $userName . '/Maildir';
+    my $dstMaildir = '/var/lib/nethserver/vmail/' . $userName . '/Maildir';
     my $accountRecord;
 
     if($userName eq 'admin') {

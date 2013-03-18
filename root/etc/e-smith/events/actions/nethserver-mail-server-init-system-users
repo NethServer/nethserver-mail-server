@@ -22,7 +22,7 @@
 
 #
 # Initialize system user's virtual mailboxes, by copying existing
-# messages to /var/lib/vmail/user/<username>/mbox.
+# messages to /var/lib/nethserver/vmail/<username>/mbox.
 #
 
 # only owner has r/w access to files created by this scritpt:

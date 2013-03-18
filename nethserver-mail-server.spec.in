@@ -29,10 +29,8 @@ perl createlinks
 %install
 rm -rf $RPM_BUILD_ROOT
 (cd root; find . -depth -print | cpio -dump $RPM_BUILD_ROOT)
-%{genfilelist} \
-    --dir /var/lib/vmail 'attr(0700,vmail,vmail)' \
-    --dir /var/lib/vmail/user 'attr(0700,vmail,vmail)' \
-    $RPM_BUILD_ROOT \
+%{genfilelist} $RPM_BUILD_ROOT \
+    --dir /var/lib/nethserver/vmail 'attr(0700,vmail,vmail)' \
     > %{name}-%{version}-filelist
 echo "%doc COPYING" >> %{name}-%{version}-filelist
 
@@ -43,7 +41,7 @@ rm -rf $RPM_BUILD_ROOT
 source /etc/nethserver/rpm_hook_functions
 # ensure vmail user exists:
 if ! id vmail >/dev/null 2>&1 ; then
-   useradd -c 'Virtual mailboxes owner' -r -d /var/lib/vmail/ -s /sbin/nologin vmail
+   useradd -c 'Virtual mailboxes owner' -r -M -d /var/lib/nethserver/vmail -s /sbin/nologin vmail
 fi
 
 # add vmail group to postfix user
