@@ -27,11 +27,48 @@ $spamRetentionPanel = $view->fieldsetSwitch('MailSpamRetentionStatus', 'enabled'
     )
 ;
 
+/*
+ * The jsCode below updates the mail address list with values from the
+ * FirstName and LastName fields.
+ */
+$jsCode = <<<"EOJSCODE"
+jQuery(document).ready(function($) {
+
+    // The update view handler, invoked when the tab Service is shown:
+    var updateMailAddresses = function() {
+        var parts = [
+            $('#User_create_FirstName').val(), 
+            $('#User_create_LastName').val()
+        ];
+
+        if( ! parts[1]) {
+            parts.splice(1);
+        }
+
+        if( ! parts[0]) {
+            parts.splice(0);
+        }
+
+        var addressPart = parts.join('.').toLowerCase();
+
+        $('.CreateMailAddresses li').each(function(index, node) {
+            var address = $(node).text();
+            $(node).text(addressPart + address.substr(address.lastIndexOf('@')));
+        });
+
+    }
+
+    $('.CreateMailAddresses').parents('.Tabs').first().bind('tabsshow', updateMailAddresses);
+
+    updateMailAddresses();
+});
+EOJSCODE;
 
 if ($view->getModule()->showPseudonymControls) {
+    $view->includeJavascript($jsCode);
     $mailAddresses = $view->fieldsetSwitch('CreateMailAddresses', 'enabled', $view::FIELDSETSWITCH_CHECKBOX | $view::FIELDSETSWITCH_EXPANDABLE)
         ->setAttribute('uncheckedValue', 'disabled')
-        ->insert($view->textList('MailAddressList')->setAttribute('tag', 'div.labeled-control/ul.CreateMailAddresses/li'));
+        ->insert($view->textList('MailAddressList')->setAttribute('tag', 'div.CreateMailAddresses labeled-control/ul/li'));
 } else {
     $mailAddresses = $view->fieldset()->setAttribute('template', $T('MailAddressList_label'))
         ->insert($view->textList('MailAddressList'));
