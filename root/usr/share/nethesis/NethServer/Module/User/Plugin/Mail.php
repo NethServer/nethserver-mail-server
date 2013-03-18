@@ -32,6 +32,8 @@ use Nethgui\Controller\Table\Modify as Table;
 class Mail extends \Nethgui\Controller\Table\RowPluginAction
 {
 
+    public $showPseudonymControls = FALSE;
+
     protected function initializeAttributes(\Nethgui\Module\ModuleAttributesInterface $base)
     {
         return \Nethgui\Module\SimpleModuleAttributesProvider::extendModuleAttributes($base, 'Service', 30);
@@ -39,10 +41,15 @@ class Mail extends \Nethgui\Controller\Table\RowPluginAction
 
     public function initialize()
     {
+        if($this->getPluggableActionIdentifier() === 'create') {
+            $this->showPseudonymControls = TRUE;
+        }
+
         $quotaValidator1 = $this->createValidator()->greatThan(0)->lessThan(501);
         $quotaValidator2 = $this->createValidator()->equalTo('unlimited');
 
         $this->declareParameter('QuotaStatus', FALSE, array('configuration', 'dovecot', 'QuotaStatus'));
+        $this->declareParameter('CreatePseudonyms', Validate::SERVICESTATUS);
 
         $this->setSchemaAddition(array(
             array('MailStatus', Validate::SERVICESTATUS, Table::FIELD),
@@ -70,6 +77,19 @@ class Mail extends \Nethgui\Controller\Table\RowPluginAction
         $h['unlimited'] = $view->translate('Unlimited_quota');
         $view['MailQuotaCustomDatasource'] = \Nethgui\Renderer\AbstractRenderer::hashToDatasource($h);
 
+        $defaultPseudonyms = array();
+
+        if ($this->getRequest()->isValidated() && ! $this->getRequest()->isMutation() && $this->showPseudonymControls === TRUE) {
+            $view['CreatePseudonyms'] = 'enabled'; // default value
+            foreach ($this->getPlatform()->getDatabase('domains')->getAll('domain') as $domainKey => $domainRecord) {
+                if (isset($domainRecord['TransportType']) && $domainRecord['TransportType'] === 'LocalDelivery') {
+                    $defaultPseudonyms[] = '@' . $domainKey;
+                }
+            }
+        }
+
+        $view['DefaultPseudonyms'] = $defaultPseudonyms;
+
         $view['MailSpamRetentionTimeDatasource'] = \Nethgui\Renderer\AbstractRenderer::hashToDatasource(array(
                 '1d' => $view->translate('${0} day', array(1)),
                 '2d' => $view->translate('${0} days', array(2)),
@@ -82,6 +102,13 @@ class Mail extends \Nethgui\Controller\Table\RowPluginAction
                 '180d' => $view->translate('${0} days', array(180)),
                 'infinite' => $view->translate('ever'),
             ));
+    }
+
+    protected function onParametersSaved($changedParameters)
+    {
+        if ($this->parameters['CreatePseudonyms'] === 'enabled') {
+            $this->getPlatform()->signalEvent('user-create-pseudonyms@post-process', array($this->getAdapter()->getKeyValue()));
+        }
     }
 
 }

@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 #
-# NethServer -- nethserver-mail-pseudonym-create
+# NethServer -- nethserver-mail-default-pseudonyms-create
 #
 # Create default pseudonyms for the given account
 #

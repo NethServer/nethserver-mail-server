@@ -10,4 +10,5 @@ $L['MailQuotaType_label'] = 'Custom mailbox quota';
 $L['MailSpamRetentionStatus_label'] = 'Customize spam message retention'; 
 $L['MailStatus_label'] = 'Email'; 
 $L['Unlimited_quota'] = 'Unlimited'; 
-$L['ever'] = 'ever'; 
+$L['ever'] = 'ever';
+$L['CreatePseudonyms_label'] = 'Create default email addresses';

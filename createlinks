@@ -147,9 +147,9 @@ foreach (qw(create modify delete)) {
     event_services('user-'  . $_, 'postfix' => 'reload');
 }
 
-event_actions('user-create',
-	      'nethserver-mail-default-pseudonyms-create' => '03',
-              'nethserver-mail-account-update' => '30');
+event_actions('user-create', qw(
+              nethserver-mail-account-update 30
+));
 
 event_actions('user-modify',
               'nethserver-mail-account-update' => '30');
@@ -215,4 +215,17 @@ event_services('certificate-update', qw(
 event_actions('migration-import', qw(
     nethserver-mail-migrate-domains      30
     nethserver-mail-migrate-mailboxes    40
+));
+
+
+#
+# user-create-pseudonyms event (refs #1623)
+#
+event_templates('user-create-pseudonyms', @pseudonymTemplates);
+event_actions('user-create-pseudonyms', qw(
+    nethserver-mail-default-pseudonyms-create 00
+    nethserver-mail-postmap-update 30
+));
+event_services('user-create-pseudonyms', qw(
+    postfix reload
 ));

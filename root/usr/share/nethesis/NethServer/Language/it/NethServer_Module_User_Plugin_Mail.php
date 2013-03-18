@@ -10,4 +10,6 @@ $L['MailQuotaType_label'] = 'Quota email personalizzata';
 $L['MailSpamRetentionStatus_label'] = 'Conserva messaggi spam personalizzata '; 
 $L['MailStatus_label'] = 'Email'; 
 $L['Unlimited_quota'] = 'Illimitata'; 
-$L['ever'] = 'sempre'; 
+$L['ever'] = 'sempre';
+$L['CreatePseudonyms_label'] = 'Crea gli indirizzi email predefiniti';
+
