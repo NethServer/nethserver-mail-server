@@ -29,11 +29,12 @@ $spamRetentionPanel = $view->fieldsetSwitch('MailSpamRetentionStatus', 'enabled'
 
 
 if ($view->getModule()->showPseudonymControls) {
-    $createPseudonyms = $view->fieldsetSwitch('CreatePseudonyms', 'enabled', $view::FIELDSETSWITCH_CHECKBOX | $view::FIELDSETSWITCH_EXPANDABLE)
+    $mailAddresses = $view->fieldsetSwitch('CreateMailAddresses', 'enabled', $view::FIELDSETSWITCH_CHECKBOX | $view::FIELDSETSWITCH_EXPANDABLE)
         ->setAttribute('uncheckedValue', 'disabled')
-        ->insert($view->textList('DefaultPseudonyms')->setAttribute('tag', 'div.labeled-control/ul/li.DefaultMailAddress'));
+        ->insert($view->textList('MailAddressList')->setAttribute('tag', 'div.labeled-control/ul.CreateMailAddresses/li'));
 } else {
-    $createPseudonyms = $view->literal('');
+    $mailAddresses = $view->fieldset()->setAttribute('template', $T('MailAddressList_label'))
+        ->insert($view->textList('MailAddressList'));
 }
 
 echo $view->fieldsetSwitch('MailStatus', 'enabled', $view::FIELDSETSWITCH_CHECKBOX | $view::FIELDSETSWITCH_EXPANDABLE)
@@ -41,7 +42,7 @@ echo $view->fieldsetSwitch('MailStatus', 'enabled', $view::FIELDSETSWITCH_CHECKB
     ->insert($forwardPanel)
     ->insert($quotaPanel)
     ->insert($spamRetentionPanel)
-    ->insert($createPseudonyms)
+    ->insert($mailAddresses)
 ;
 
 

@@ -11,5 +11,6 @@ $L['MailSpamRetentionStatus_label'] = 'Conserva messaggi spam personalizzata ';
 $L['MailStatus_label'] = 'Casella email';
 $L['Unlimited_quota'] = 'Illimitata'; 
 $L['ever'] = 'sempre';
-$L['CreatePseudonyms_label'] = 'Crea gli indirizzi email predefiniti';
+$L['CreateMailAddresses_label'] = 'Crea gli indirizzi email predefiniti';
+$L['MailAddressList_label'] = 'Indirizzi email';
 

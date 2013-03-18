@@ -31,7 +31,6 @@ use Nethgui\Controller\Table\Modify as Table;
  */
 class Mail extends \Nethgui\Controller\Table\RowPluginAction
 {
-
     public $showPseudonymControls = FALSE;
 
     protected function initializeAttributes(\Nethgui\Module\ModuleAttributesInterface $base)
@@ -41,7 +40,7 @@ class Mail extends \Nethgui\Controller\Table\RowPluginAction
 
     public function initialize()
     {
-        if($this->getPluggableActionIdentifier() === 'create') {
+        if ($this->getPluggableActionIdentifier() === 'create') {
             $this->showPseudonymControls = TRUE;
         }
 
@@ -49,7 +48,7 @@ class Mail extends \Nethgui\Controller\Table\RowPluginAction
         $quotaValidator2 = $this->createValidator()->equalTo('unlimited');
 
         $this->declareParameter('QuotaStatus', FALSE, array('configuration', 'dovecot', 'QuotaStatus'));
-        $this->declareParameter('CreatePseudonyms', Validate::SERVICESTATUS);
+        $this->declareParameter('CreateMailAddresses', Validate::SERVICESTATUS);
 
         $this->setSchemaAddition(array(
             array('MailStatus', Validate::SERVICESTATUS, Table::FIELD),
@@ -66,6 +65,19 @@ class Mail extends \Nethgui\Controller\Table\RowPluginAction
         parent::initialize();
     }
 
+    private function getLocalDomains()
+    {
+        $localDomains = array();
+
+        foreach ($this->getPlatform()->getDatabase('domains')->getAll('domain') as $domainKey => $domainRecord) {
+            if (isset($domainRecord['TransportType']) && $domainRecord['TransportType'] === 'LocalDelivery') {
+                $localDomains[] = $domainKey;
+            }
+        }
+
+        return $localDomains;
+    }
+
     public function prepareView(\Nethgui\View\ViewInterface $view)
     {
         parent::prepareView($view);
@@ -77,18 +89,40 @@ class Mail extends \Nethgui\Controller\Table\RowPluginAction
         $h['unlimited'] = $view->translate('Unlimited_quota');
         $view['MailQuotaCustomDatasource'] = \Nethgui\Renderer\AbstractRenderer::hashToDatasource($h);
 
-        $defaultPseudonyms = array();
+        $pseudonymList = array();
 
-        if ($this->getRequest()->isValidated() && ! $this->getRequest()->isMutation() && $this->showPseudonymControls === TRUE) {
-            $view['CreatePseudonyms'] = 'enabled'; // default value
-            foreach ($this->getPlatform()->getDatabase('domains')->getAll('domain') as $domainKey => $domainRecord) {
-                if (isset($domainRecord['TransportType']) && $domainRecord['TransportType'] === 'LocalDelivery') {
-                    $defaultPseudonyms[] = '@' . $domainKey;
+
+        if ($this->getRequest()->isValidated()) {
+            if ($this->showPseudonymControls === TRUE) {
+                $view['CreateMailAddresses'] = 'enabled'; // default value
+                $pseudonymList = array_map(function ($domain) {
+                        return '@' . $domain;
+                    }, $this->getLocalDomains());
+            } else {
+                // Find all pseudonyms (mail addresses) that point to this account:
+                $account = $this->getAdapter()->getKeyValue();
+                $localDomains = $this->getLocalDomains();
+                foreach ($this->getPlatform()->getDatabase('accounts')->getAll('pseudonym') as $pseudonymKey => $pseudonymRecord) {
+                    if ( ! isset($pseudonymRecord['Account']) || $pseudonymRecord['Account'] !== $account) {
+                        // skip unrelated records
+                        continue;
+                    }
+
+                    // Expand domain-less pseudonyms, if required:
+                    if(preg_match('/@$/', $pseudonymKey)) {
+                        foreach($localDomains as $domain) {
+                            $pseudonymList[] = $pseudonymKey . $domain;
+                        }
+                    } else {
+                        $pseudonymList[] = $pseudonymKey;
+                    }
                 }
             }
         }
 
-        $view['DefaultPseudonyms'] = $defaultPseudonyms;
+        sort($pseudonymList);
+
+        $view['MailAddressList'] = $pseudonymList;
 
         $view['MailSpamRetentionTimeDatasource'] = \Nethgui\Renderer\AbstractRenderer::hashToDatasource(array(
                 '1d' => $view->translate('${0} day', array(1)),
@@ -106,7 +140,7 @@ class Mail extends \Nethgui\Controller\Table\RowPluginAction
 
     protected function onParametersSaved($changedParameters)
     {
-        if ($this->parameters['CreatePseudonyms'] === 'enabled') {
+        if ($this->parameters['CreateMailAddresses'] === 'enabled') {
             $this->getPlatform()->signalEvent('user-create-pseudonyms@post-process', array($this->getAdapter()->getKeyValue()));
         }
     }
