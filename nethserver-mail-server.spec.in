@@ -61,6 +61,17 @@ signal_event %{name}-uninstall
 %defattr(-,root,root)
 
 %changelog
+* Tue Mar 19 2013 Davide Principi <davide.principi@nethesis.it> - 1.2.0-1.ns6
+- vmail storage moved from /var/lib/vmail into /var/lib/nethserver/vmail, removing user/ subdir. Refs #1739
+- Optionally, create default user's mail addresses during user creation. #1623
+- IMAP access to admin's mailbox. #1622
+- Migration support. #1669 #1726
+- Support domainless pseudonyms. #1665
+- Create default primary mail domain record. #1530 
+- /etc/sysconfig/dovecot template: fixed wrong bash syntax to close stderr descriptor. Fixes #1656 
+- *.spec: use %{url_prefix} macro in URL tag; set minimum version requirements. #1654 #1653
+
+
 * Thu Jan 31 2013 Davide Principi <davide.principi@nethesis.it> - 1.1.0-1.ns6
 - Added postfix/SystemUserRecipientStatus prop. Refs #1635
 - Removed localhost.localdomain from transport delivery table. Refs #1635
