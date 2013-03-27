@@ -72,10 +72,25 @@ foreach my $srcDomain ($srcDomainsDb->domains()) {
 #
 # loop on pseudonyms:
 #
-foreach my $srcPseudonym ($srcAccountsDb->pseudonyms()) {
+foreach my $srcRecord ($srcAccountsDb->get_all) {
 
-    my $accountName = $srcPseudonym->prop('Account');
-    my $pseudonym = $srcPseudonym->key;
+    my $accountName;
+    my $pseudonym;
+    my $accessType;
+
+    my $srcRecordType = $srcRecord->prop('type');
+
+    if($srcRecordType eq 'pseudonym') {
+	$accountName = $srcRecord->prop('Account');
+	$pseudonym = $srcRecord->key;
+	$accessType = $srcRecord->prop('Visible') eq 'internal' ? 'private' : 'public';
+    } elsif ($srcRecordType eq 'group' || $srcRecordType eq 'user') {
+	$accountName = $srcRecord->key;
+	$pseudonym = $accountName . '@';
+	$accessType = 'public';
+    } else {
+	next;
+    }
 
     # Add @-suffix for domainless pseudonyms
     if($pseudonym !~ m'@') {
@@ -97,7 +112,7 @@ foreach my $srcPseudonym ($srcAccountsDb->pseudonyms()) {
     $dstAccountsDb->new_record($pseudonym, {
 			       'type' => 'pseudonym',
 			       'Account' => $accountStatus{$accountName} == 2 ? '' : $accountName,
-			       'Access' => $srcPseudonym->prop('Visible') eq 'internal' ? 'private' : 'public',
+			       'Access' => $accessType,
 			       'Description' => ''
 			       });
 
@@ -108,7 +123,6 @@ foreach my $srcPseudonym ($srcAccountsDb->pseudonyms()) {
     }
 
 }
-
    
 if($errors > 0) {
     warn "[WARNING] $errors error(s) occurred in $0 action\n";
