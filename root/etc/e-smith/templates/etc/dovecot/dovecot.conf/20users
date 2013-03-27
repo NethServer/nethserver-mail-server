@@ -39,6 +39,11 @@ userdb \{
   args = /etc/dovecot/system-users
 \}
 
+userdb \{
+       driver = ldap
+       args = /etc/dovecot/active-directory.ldap
+\}
+
 # Location of mailboxes:
 mail_location = maildir:~/Maildir
 

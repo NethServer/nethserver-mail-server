@@ -1,0 +1,25 @@
+#
+# Active Directory Dovecot configuration
+#
+
+uris = ldap://{'davidep7.vboxnet1.tld'}
+
+sasl_bind = yes
+sasl_mech = gssapi
+tls = no
+
+base = cn=users,dc=vboxnet1,dc=tld
+scope = onelevel
+default_pass_scheme = CRYPT
+
+pass_filter = (&(|(sAMAccountName=%n)(mail=%u))(!(UserAccountControl:1.2.840.113556.1.4.803:=2)))
+
+# Prefetch quota, home and system_groups_user value:
+pass_attrs = uid=user, userPassword=password, mailQuotaSize=userdb_quota_rule=*:bytes=%$M, =userdb_home=/var/lib/nethserver/vmail/%n, =userdb_system_groups_user=%n
+
+user_filter = (&(objectClass=posixAccount)(uid=%n)(accountStatus=active))
+user_attrs = mailQuotaSize=quota_rule=*:bytes=%$M, =home=/var/lib/nethserver/vmail/%n, =system_groups_user=%n
+
+iterate_attrs = uid=user
+iterate_filter = (&(objectClass=posixAccount)(accountStatus=active))
+
