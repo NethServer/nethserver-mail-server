@@ -162,7 +162,7 @@ sub getMailboxAliases()
 	    if($accountRecord->prop('MailDeliveryType') eq 'copy') {
 		# search group members having MailStatus enabled
 		my @mailEnabledMemberList = grep { 
-		    $self->{AccountsDb}->get_prop($_, 'MailStatus') eq 'enabled' 
+		    ($self->{AccountsDb}->get_prop($_, 'MailStatus') || '') eq 'enabled' 
 		} split(',', $accountRecord->prop('Members'));
 		
 		@destinations = map { $_ . '@' . $vdomain } @mailEnabledMemberList;
