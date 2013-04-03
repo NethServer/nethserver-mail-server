@@ -9,4 +9,5 @@
 	@submission_recipient_restrictions = map { $_ eq 'reject_unauth_destination' ? ('permit_sasl_authenticated',  $_) : $_ } @submission_recipient_restrictions;
     }
 
+    '';
 }

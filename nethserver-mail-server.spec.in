@@ -33,6 +33,7 @@ rm -rf $RPM_BUILD_ROOT
     --dir /var/lib/nethserver/vmail 'attr(0700,vmail,vmail)' \
     > %{name}-%{version}-filelist
 echo "%doc COPYING" >> %{name}-%{version}-filelist
+echo "%doc migration/sync_maildirs.sh"  >> %{name}-%{version}-filelist
 
 %clean
 rm -rf $RPM_BUILD_ROOT

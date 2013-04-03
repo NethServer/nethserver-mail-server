@@ -72,10 +72,26 @@ foreach my $srcDomain ($srcDomainsDb->domains()) {
 #
 # loop on pseudonyms:
 #
-foreach my $srcPseudonym ($srcAccountsDb->pseudonyms()) {
+foreach my $srcRecord ($srcAccountsDb->get_all) {
 
-    my $accountName = $srcPseudonym->prop('Account');
-    my $pseudonym = $srcPseudonym->key;
+    my $accountName;
+    my $pseudonym;
+    my $accessType;
+    my $Account;
+
+    my $srcRecordType = $srcRecord->prop('type');
+
+    if($srcRecordType eq 'pseudonym') {
+	$accountName = $srcRecord->prop('Account');
+	$pseudonym = $srcRecord->key;
+	$accessType = $srcRecord->prop('Visible') eq 'internal' ? 'private' : 'public';
+    } elsif ($srcRecordType eq 'group' || $srcRecordType eq 'user') {
+	$accountName = $srcRecord->key;
+	$pseudonym = $accountName . '@';
+	$accessType = 'public';
+    } else {
+	next;
+    }
 
     # Add @-suffix for domainless pseudonyms
     if($pseudonym !~ m'@') {
@@ -86,18 +102,32 @@ foreach my $srcPseudonym ($srcAccountsDb->pseudonyms()) {
     # save the status to skip this step on the next cycle:
     if( ! defined $accountStatus{$accountName}) {
 	$accountStatus{$accountName} = configureAccount($accountName);
-        # 0 => error, 
-	# 1 => configured correctly, 
-	# 2 => map to NULL Account. Refs #1726
-	if($accountStatus{$accountName} == 0) {
+        # '' => error, 
+	# resolved $accountName => configured correctly, 
+	# 'NULL' => map to NULL Account. Refs #1726
+	if($accountStatus{$accountName} eq '') {
 	    $errors++;
+	}
+    }
+
+    #
+    # Unmap $accountStatus value/error code #1805
+    #
+    if($accountStatus{$accountName} eq 'NULL') {
+	$Account = '';
+    } elsif($accountStatus{$accountName} eq '') {
+	$Account = $accountName;
+    } else {
+	$Account = $accountStatus{$accountName};
+	if($Account ne $accountName) {
+	    warn "[INFO] pseudonym account $accountName mapped to $Account\n";
 	}
     }
 
     $dstAccountsDb->new_record($pseudonym, {
 			       'type' => 'pseudonym',
-			       'Account' => $accountStatus{$accountName} == 2 ? '' : $accountName,
-			       'Access' => $srcPseudonym->prop('Visible') eq 'internal' ? 'private' : 'public',
+			       'Account' => $Account,
+			       'Access' => $accessType,
 			       'Description' => ''
 			       });
 
@@ -108,7 +138,6 @@ foreach my $srcPseudonym ($srcAccountsDb->pseudonyms()) {
     }
 
 }
-
    
 if($errors > 0) {
     warn "[WARNING] $errors error(s) occurred in $0 action\n";
@@ -123,27 +152,33 @@ exit(0);
 
 #
 # configureAccount -- enable Mail* props on the given account (group
-# or user)
+# or user). Returns a string:
 #
-sub configureAccount($)
+# - the account name, resolved by flattening recursive pseudonyms
+# - 'NULL' string, if the account was not found
+# - '' empty string, if an error occurred
+#
+sub configureAccount
 {
-    my $accountName = shift;
+    my $accountName = @_[0];
+    my $watchDog = @_[1] || 0;
 
     my $accountRecord = $dstAccountsDb->get($accountName);
     my $sourceAccountRecord = $srcAccountsDb->get($accountName);
     my %mailForwardProps = ();
 
-    if( ! $accountRecord ) {
-	warn "[WARNING] destination account record not found: $accountName\n";
-	return 2; # MISSING ACCOUNT RECORD! Map to null-account. See #1726
-    }
-
     if( ! $sourceAccountRecord ) {
 	warn "[ERROR] source account record not found: $accountName\n";
-	return 0;
+	return '';
     }
 
-    if($accountRecord->prop('type') eq 'user') {
+    if($sourceAccountRecord->prop('type') eq 'user') {
+
+	if( ! $accountRecord ) {
+	    warn "[WARNING] destination user record not found: $accountName\n";
+	    return 'NULL'; # MISSING ACCOUNT RECORD! Map to null-account. See #1726
+	}
+
 	#
 	# configure mail forward props:
 	#
@@ -179,10 +214,15 @@ sub configureAccount($)
 
 	if( ! esmith::event::event_signal('user-modify', $accountName)) {
 	    warn("[ERROR] user-modify $accountName event failed\n");
-	    return 0;
+	    return '';
 	}
 
-    } elsif($accountRecord->prop('type') eq 'group') {
+    } elsif($sourceAccountRecord->prop('type') eq 'group') {
+
+	if( ! $accountRecord ) {
+	    warn "[WARNING] destination group record not found: $accountName\n";
+	    return 'NULL'; # MISSING ACCOUNT RECORD! Map to null-account. See #1726
+	}
 
 	$accountRecord->merge_props(qw(        
              MailStatus       enabled
@@ -191,13 +231,17 @@ sub configureAccount($)
 
 	if( ! esmith::event::event_signal('group-modify', $accountName)) {
 	    warn("[ERROR] group-modify $accountName event failed\n");
-	    return 0;
+	    return '';
 	}
 
+    } elsif($sourceAccountRecord->prop('type') eq 'pseudonym' && $watchDog < 3) {
+	# Flatten pseudonym pointing to another pseudonym
+	return configureAccount($sourceAccountRecord->prop('Account'), $watchDog + 1);
+
     } else {
-	warn "[ERROR] invalid account record type: $accountName\n";
-	return 0;
+	warn "[WARNING] invalid account record type: $accountName\n";
+	return 'NULL';
     }
 
-    return 1; # SUCCESS!
+    return $accountName; # SUCCESS!
 }
