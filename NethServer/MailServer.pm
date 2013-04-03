@@ -142,15 +142,10 @@ sub getMailboxAliases()
 	    # user accounts
 	    #
 
-	    if($accountRecord->prop('MailForwardStatus') eq 'enabled') {
-		if($accountRecord->prop('MailForwardKeepMessageCopy') eq 'yes') {
-		    @destinations = ("$account\@$vdomain", $accountRecord->prop('MailForwardAddress'));
-		} else {
-		    @destinations = ($accountRecord->prop('MailForwardAddress'));
-		}	       
-	    } else {
-		@destinations = ("$account\@$vdomain");
-	    }
+	    @destinations = (
+		@destinations, 
+		$self->_resolveDestination($account, $accountRecord)
+		);
 
 	} elsif($accountRecord->prop('type') eq 'group'
 	    &&  $accountRecord->prop('MailStatus') eq 'enabled') {
@@ -160,12 +155,20 @@ sub getMailboxAliases()
 	    #
 
 	    if($accountRecord->prop('MailDeliveryType') eq 'copy') {
-		# search group members having MailStatus enabled
-		my @mailEnabledMemberList = grep { 
-		    ($self->{AccountsDb}->get_prop($_, 'MailStatus') || '') eq 'enabled' 
-		} split(',', $accountRecord->prop('Members'));
 		
-		@destinations = map { $_ . '@' . $vdomain } @mailEnabledMemberList;
+		@destinations = map { 
+		    my $userRecord = $self->{AccountsDb}->get($_);
+
+		    # search group members having MailStatus enabled		    
+		    if(defined $userRecord 
+		       && ($userRecord->prop('MailStatus') || '') eq 'enabled') {
+			$self->_resolveDestination($_, $userRecord);
+		    } else {
+			();
+		    }
+			
+		} split(',', $accountRecord->prop('Members'));
+
 	    } elsif($accountRecord->prop('MailDeliveryType')eq 'shared') {
 
 		@destinations = ("$account\@$vdomain");
@@ -187,6 +190,30 @@ sub getMailboxAliases()
     return %aliasMap;
 }
 
+
+sub _resolveDestination() 
+{
+    my $self = shift;
+    my $account = shift;
+    my $accountRecord = shift;
+    my $vdomain = getVirtualMailboxDomain();
+
+    my @destinations = ();
+
+    if( ! defined $accountRecord  || $accountRecord->prop('type') ne 'user') {
+	@destinations = ();
+    } elsif($accountRecord->prop('MailForwardStatus') eq 'enabled') {
+	if($accountRecord->prop('MailForwardKeepMessageCopy') eq 'yes') {
+	    @destinations = ("$account\@$vdomain", $accountRecord->prop('MailForwardAddress'));
+	} else {
+	    @destinations = ($accountRecord->prop('MailForwardAddress'));
+	}	       
+    } else {
+	@destinations = ("$account\@$vdomain");
+    }
+
+    return @destinations;
+}
 
 =head2 ->createAccountDefaultPseudonyms($account)
 
