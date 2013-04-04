@@ -16,10 +16,9 @@
 	if(defined $domainRecord->prop('UnknownRecipientsActionType') 
 	   && $domainRecord->prop('UnknownRecipientsActionType') eq 'deliver'
 	   && defined $domainRecord->prop('UnknownRecipientsActionDeliverMailbox')) {
-	    $OUT .= sprintf("@%-47s %s@%s\n", 
+	    $OUT .= sprintf("@%-47s %s\n", 
 			    $domainRecord->key, 
-			    $domainRecord->prop('UnknownRecipientsActionDeliverMailbox'), 
-			    NethServer::MailServer::getVirtualMailboxDomain()
+			    $domainRecord->prop('UnknownRecipientsActionDeliverMailbox')
 		);
 
 	} elsif (defined $domainRecord->prop('UnknownRecipientsActionType') 

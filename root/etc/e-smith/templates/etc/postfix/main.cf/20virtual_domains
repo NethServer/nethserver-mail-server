@@ -1,11 +1,7 @@
 #
 # 20virtual_domains -- Virtual domains are { 
     use NethServer::MailServer;
-    @localDomains = ( 
-                   NethServer::MailServer->new()->getDeliveryDomains(),
-                   NethServer::MailServer::getVirtualMailboxDomain()
-                  );
-
+    @localDomains = NethServer::MailServer->new()->getDeliveryDomains();
     @virtual_mailbox_domains = (@localDomains, @virtual_mailbox_domains);
 
     scalar @localDomains ? 'enabled' : 'disabled'; 
@@ -13,12 +9,12 @@
 # 
 virtual_alias_maps = { scalar @localDomains ? 'hash:/etc/postfix/virtual' : '' }
 
+# Message delivery transport that the local(8) 
+# delivery agent should use for mailbox delivery:
+mailbox_transport = lmtp:unix:/var/run/dovecot/lmtp
+
 # The default mail delivery transport and next-hop destination 
 # for final delivery to domains listed with $virtual_mailbox_domains:
 virtual_transport = lmtp:unix:/var/run/dovecot/lmtp
-
-# Optional message delivery transport that the local(8) 
-# delivery agent should use for mailbox delivery:
-mailbox_transport = lmtp:unix:/var/run/dovecot/lmtp
 
 
