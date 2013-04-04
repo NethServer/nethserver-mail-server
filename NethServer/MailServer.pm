@@ -1,6 +1,6 @@
 
 #
-# NethServer Mail package
+# NethServer MailServer package
 #
 
 #
@@ -23,9 +23,10 @@
 # along with NethServer.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-use strict;
+
 package NethServer::MailServer;
 
+use strict;
 use Sys::Hostname;
 use esmith::AccountsDB;
 use esmith::DomainsDB;
@@ -56,26 +57,6 @@ sub new
     $self->{DomainsDb} = esmith::DomainsDB->open();
 
     return $self;
-}
-
-=head2 ->getMailboxes()
-
-Return the list of currently active mailboxes
-
-=cut
-sub getMailboxes()
-{
-    my $self = shift;
-
-    my %mailboxes = ();
-
-    my %aliases = $self->getMailboxAliases();
-
-    while ( my ($alias, $mbxList) = each %aliases ) {
-	$mailboxes{$_} = 1 foreach (@{$mbxList});
-    }
-
-    return grep { $_ !~ /\@/ } keys %mailboxes;
 }
 
 
