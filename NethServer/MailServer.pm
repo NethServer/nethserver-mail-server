@@ -431,7 +431,7 @@ Return the path of the shared mailfolder for the given group name
 sub getDovecotSharedPath($)
 {
     my $group = shift;
-    return '/var/lib/vmail/user/' . $group . '/Maildir/dovecot-shared';
+    return '/var/lib/nethserver/vmail/' . $group . '/Maildir/dovecot-shared';
 }
 
 
