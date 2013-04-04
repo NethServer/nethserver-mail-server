@@ -1,0 +1,8 @@
+{
+    #
+    # 00template_vars
+    #
+    use NethServer::MailServer;
+    $mailServer = NethServer::MailServer->new();
+    '';
+}

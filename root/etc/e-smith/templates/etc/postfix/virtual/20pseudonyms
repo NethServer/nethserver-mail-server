@@ -1,11 +1,8 @@
-
 #
 # 20pseudonyms -- map to mailboxes:
 #
 {
-    use NethServer::MailServer;
-    my $ms = NethServer::MailServer->new();
-    my %aliases = $ms->getMailboxAliases();
+    my %aliases = $mailServer->getMailboxAliases();
 
     if(%aliases) {
 	$OUT = '';
@@ -13,10 +10,9 @@
 	    if( ! scalar @{$mailboxes} ) {
 		next; # skip alias, if mailbox list is empty
 	    }
-	    $OUT .= sprintf("%-48s %s\n", $alias, join(",\n ", @{$mailboxes}));
+	    $OUT .= sprintf("%-38s %s\n", $alias, join(", ", @{$mailboxes}));
 	}
     } else {
 	$OUT = "# no virtual address defined\n";
     }
 }
-

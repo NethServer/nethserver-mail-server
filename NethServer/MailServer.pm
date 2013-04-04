@@ -27,7 +27,6 @@
 package NethServer::MailServer;
 
 use strict;
-use Sys::Hostname;
 use esmith::AccountsDB;
 use esmith::DomainsDB;
 use Encode;
@@ -69,33 +68,17 @@ sub getMailboxAliases()
 {
     my $self = shift;
     my %aliasMap = ();
-    my $vdomain = getVirtualMailboxDomain();
-
-    my $hostname = hostname;
 
     foreach my $record ($self->{AccountsDb}->pseudonyms()) {
 	my $pseudonym = $record->key;
 	my $account = $record->prop('Account') || '';
 	my $accountRecord = $self->{AccountsDb}->get($account);
 
-	my $address = '';
-	my @domains = ();
-	my $isComplete;
 	my @destinations = ();
-
-	if($pseudonym =~ m'^([^@]+)@(.+)?$') {
-	    # complete mail address
-	    $address = $1;
-	    $isComplete = defined $2;
-	    push @domains, ($isComplete ? $2 : $self->getDeliveryDomains());
-	} else {
-	    next;
-	}
-
 
 	if($account eq '') {
 	    # Handling of (null) empty string Account -- see #1726
-	    @destinations = ('postmaster@' . $hostname);
+	    @destinations = ('postmaster');
 
 	} elsif( ! defined $accountRecord) {
 	    # Skip the pseudonym if the referred account does not
@@ -107,13 +90,12 @@ sub getMailboxAliases()
 	    &&  $accountRecord->prop('MailStatus') eq 'enabled') {
 
 	    #
-	    # user accounts
+	    # user account: check if MailStatus is enabled
 	    #
 
-	    @destinations = (
-		@destinations, 
-		$self->_resolveDestination($account, $accountRecord)
-		);
+	    if(($accountRecord->prop('MailStatus') || '') eq 'enabled') {
+		@destinations = ($account);
+	    }
 
 	} elsif($accountRecord->prop('type') eq 'group'
 	    &&  $accountRecord->prop('MailStatus') eq 'enabled') {
@@ -130,27 +112,34 @@ sub getMailboxAliases()
 		    # search group members having MailStatus enabled		    
 		    if(defined $userRecord 
 		       && ($userRecord->prop('MailStatus') || '') eq 'enabled') {
-			$self->_resolveDestination($_, $userRecord);
+			($_);
 		    } else {
 			();
 		    }
 			
 		} split(',', $accountRecord->prop('Members'));
 
-	    } elsif($accountRecord->prop('MailDeliveryType')eq 'shared') {
-
-		@destinations = ("$account");
+	    } elsif(($accountRecord->prop('MailDeliveryType') || '') eq 'shared') {
+		@destinations = ($account);
 	    }
 	} 
 
-	if(@destinations) {
-	    foreach ( map { $address . '@' . $_ } @domains ) {
-		# complete pseudonyms takes precedence over
-		# domain-less pseudonyms:
-		if($isComplete || ! defined $aliasMap{$_}) {
-		    $aliasMap{$_} = [@destinations];
-		}
+	my ($localPart, $domainPart) = split('@', $pseudonym);
+	my @dbKeys;
+
+	if($domainPart) {
+	    @dbKeys = $domainPart;
+	} else {
+	    @dbKeys = $self->getDeliveryDomains();
+	}
+
+	foreach (map { $localPart . '@' . $_ } @dbKeys) {
+	    if( ! defined $aliasMap{$_}) {
+		$aliasMap{$_} = [];
 	    }
+	    if(@destinations) {
+		push @{$aliasMap{$_}}, @destinations;
+	    }	    
 	}
 
     }
@@ -158,30 +147,6 @@ sub getMailboxAliases()
     return %aliasMap;
 }
 
-
-sub _resolveDestination() 
-{
-    my $self = shift;
-    my $account = shift;
-    my $accountRecord = shift;
-    my $vdomain = getVirtualMailboxDomain();
-
-    my @destinations = ();
-
-    if( ! defined $accountRecord  || $accountRecord->prop('type') ne 'user') {
-	@destinations = ();
-    } elsif($accountRecord->prop('MailForwardStatus') eq 'enabled') {
-	if($accountRecord->prop('MailForwardKeepMessageCopy') eq 'yes') {
-	    @destinations = ("$account", $accountRecord->prop('MailForwardAddress'));
-	} else {
-	    @destinations = ($accountRecord->prop('MailForwardAddress'));
-	}	       
-    } else {
-	@destinations = ("$account");
-    }
-
-    return @destinations;
-}
 
 =head2 ->createAccountDefaultPseudonyms($account)
 
