@@ -75,20 +75,7 @@ sub getMailboxes()
 	$mailboxes{$_} = 1 foreach (@{$mbxList});
     }
 
-    my $domainExp = join('|', getVirtualMailboxDomain());
-
-    return grep { /\@($domainExp)$/ } keys %mailboxes;
-}
-
-
-=head2 ->getVirtualMailboxDomain() 
-
-Return the internal virtual mailbox domain
-
-=cut 
-sub getVirtualMailboxDomain()
-{
-    return 'vmail.nh';
+    return grep { $_ !~ /\@/ } keys %mailboxes;
 }
 
 
@@ -171,7 +158,7 @@ sub getMailboxAliases()
 
 	    } elsif($accountRecord->prop('MailDeliveryType')eq 'shared') {
 
-		@destinations = ("$account\@$vdomain");
+		@destinations = ("$account");
 	    }
 	} 
 
@@ -204,12 +191,12 @@ sub _resolveDestination()
 	@destinations = ();
     } elsif($accountRecord->prop('MailForwardStatus') eq 'enabled') {
 	if($accountRecord->prop('MailForwardKeepMessageCopy') eq 'yes') {
-	    @destinations = ("$account\@$vdomain", $accountRecord->prop('MailForwardAddress'));
+	    @destinations = ("$account", $accountRecord->prop('MailForwardAddress'));
 	} else {
 	    @destinations = ($accountRecord->prop('MailForwardAddress'));
 	}	       
     } else {
-	@destinations = ("$account\@$vdomain");
+	@destinations = ("$account");
     }
 
     return @destinations;
