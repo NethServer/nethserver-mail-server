@@ -1,0 +1,19 @@
+{
+    #
+    # 30ads
+    #
+
+    if(defined $smb && $smb{ServerRole} && $smb{ServerRole} eq 'ADS') {
+	$OUT = <<'CONF';
+#
+# 30ads -- Active Directory as user database
+#
+userdb {
+       driver = ldap
+       args = /etc/dovecot/active-directory.conf
+}
+CONF
+    } else {
+	$OUT = '';
+    }   
+}

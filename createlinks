@@ -61,6 +61,7 @@ event_templates($_,
 		/etc/sysconfig/dovecot
                 /etc/dovecot/system-users
 		/etc/dovecot/master-users
+                /etc/dovecot/active-directory.conf
 )) foreach (qw(nethserver-mail-server-update nethserver-mail-server-uninstall));
 
 
@@ -230,3 +231,12 @@ event_actions('user-create-pseudonyms', qw(
 event_services('user-create-pseudonyms', qw(
     postfix reload
 ));
+
+
+#
+# nethserver-samba-save/update: expand our templates for AD integration
+#
+event_templates($_, qw(
+    /etc/dovecot/dovecot.conf
+    /etc/dovecot/active-directory.conf
+)) foreach (qw(nethserver-samba-save nethserver-samba-update));
