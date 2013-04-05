@@ -60,6 +60,7 @@ foreach my $table (qw(
     internal_access
     recipient_bcc
     virtual
+    aliases
 )) {
     if ( ! grep($table eq $_, @postmapUpdateList) ) {
 	push @postmapUpdateList, $table;

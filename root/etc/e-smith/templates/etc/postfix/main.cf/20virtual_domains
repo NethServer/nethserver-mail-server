@@ -8,6 +8,7 @@
 }
 # 
 virtual_alias_maps = { scalar @localDomains ? 'hash:/etc/postfix/virtual' : '' }
+alias_maps = hash:/etc/aliases, hash:/etc/postfix/aliases
 
 # Message delivery transport that the local(8) 
 # delivery agent should use for mailbox delivery:

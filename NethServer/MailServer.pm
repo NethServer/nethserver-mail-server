@@ -58,6 +58,40 @@ sub new
     return $self;
 }
 
+=head2 ->getMailboxForwards()
+
+Return an hash with account forward settings 
+
+=cut
+
+sub getMailboxForwards() 
+{
+    my $self = shift;
+    my %forwards = ();
+
+    foreach my $accountRecord ($self->{AccountsDb}->users()) {
+	if ($accountRecord->prop('MailStatus') ne 'enabled') {
+	    next;
+	}
+
+	my @destinations = ();
+	my $account = $accountRecord->key;
+	
+	if($accountRecord->prop('MailForwardStatus') eq 'enabled') {
+
+	    push @destinations, $accountRecord->prop('MailForwardAddress');
+
+	    if($accountRecord->prop('MailForwardKeepMessageCopy') ne 'yes') {
+		push @destinations, $account;
+	    }
+	    
+	    $forwards{$account} = \@destinations;
+	} 
+
+    }
+
+    return %forwards;
+}
 
 =head2 ->getMailboxAliases()
 

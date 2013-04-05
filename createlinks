@@ -39,6 +39,7 @@ my @saveTemplates = qw(
     /etc/postfix/transport
     /etc/postfix/virtual
     /etc/postfix/vmailbox
+    /etc/postfix/aliases
     /etc/postfix/internal_access
     /etc/postfix/recipient_bcc
     /etc/dovecot/dovecot.conf
@@ -139,7 +140,7 @@ foreach (qw(create modify delete)) {
 # user-* events expand and reload postfix table templates
 #
 
-my @userTemplates = @pseudonymTemplates;
+my @userTemplates = (@pseudonymTemplates, '/etc/postfix/aliases');
 
 foreach (qw(create modify delete)) {
     event_templates('user-' . $_, @userTemplates);

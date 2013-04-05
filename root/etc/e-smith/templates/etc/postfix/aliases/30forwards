@@ -1,0 +1,19 @@
+#
+# 30forwards
+#
+{
+    my %forwards = $mailServer->getMailboxForwards();
+
+    if(%forwards) {
+	$OUT = '';
+	while( my ($account, $addresses) = each %forwards  ) {	    
+	    if( ! scalar @{$addresses} ) {
+		next; # skip forward, if address list is empty
+	    }
+	    $OUT .= sprintf("%-16s %s\n", $account, join(', ', @{$addresses}));
+	}
+    } else {
+	$OUT = "# no forward address defined\n";
+    }
+
+}
