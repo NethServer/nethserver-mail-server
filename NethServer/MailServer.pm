@@ -81,7 +81,7 @@ sub getMailboxForwards()
 
 	    push @destinations, $accountRecord->prop('MailForwardAddress');
 
-	    if($accountRecord->prop('MailForwardKeepMessageCopy') ne 'yes') {
+	    if($accountRecord->prop('MailForwardKeepMessageCopy') eq 'yes') {
 		push @destinations, $account;
 	    }
 	    
