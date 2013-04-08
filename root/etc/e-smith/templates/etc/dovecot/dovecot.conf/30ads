@@ -3,15 +3,25 @@
     # 30ads
     #
 
-    if(defined $smb && $smb{ServerRole} && $smb{ServerRole} eq 'ADS') {
+    #
+    # FIXME: disabled -- see below
+    #
+    my $IMPLEMENTED = 0;
+
+    if($IMPLEMENTED && defined $smb && $smb{ServerRole} && $smb{ServerRole} eq 'ADS') {
 	$OUT = <<'CONF';
 #
-# 30ads -- Active Directory as user database
+# 30ads -- Active Directory as user database. This will not work until
+# GSSAPI authentication on AD LDAP works. The keytab file must be configured
+# properly to do that: 
+#  - http://hg.dovecot.org/dovecot-2.0/rev/cec7fa92ff48
+#  - http://www.dovecot.org/list/dovecot/2011-February/057122.html
 #
 userdb {
        driver = ldap
        args = /etc/dovecot/active-directory.conf
 }
+
 CONF
     } else {
 	$OUT = '';
