@@ -9,8 +9,9 @@
 
     if(defined $userRecord->prop('MailStatus') && $userRecord->prop('MailStatus') eq 'enabled') {
 	my $srv = new NethServer::MailServer();
-	my @pseudonyms = $srv->getAccountPseudonyms($userRecord->key);
+	my @pseudonyms = $srv->getAccountMailAddresses($userRecord->key);
 
+	# Pick the first email address:
 	$OUT = shift @pseudonyms; 
     }
 
