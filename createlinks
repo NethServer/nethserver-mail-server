@@ -197,7 +197,10 @@ foreach (qw(create delete modify)) {
 		    '/etc/postfix/recipient_bcc', 
 		    '/etc/postfix/virtual',
 		    '/etc/postfix/vmailbox');
-    event_actions('domain-'   . $_, 'nethserver-mail-postmap-update' => '30');
+    event_actions('domain-'   . $_, 
+                  'nethserver-mail-postmap-update' => '30',
+                  'nethserver-mail-ldap-sync' => 40
+    );
 }
 
 

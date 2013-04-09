@@ -1,0 +1,72 @@
+#!/usr/bin/perl
+
+#
+# nethserver-mail-account-update
+#
+# Set / Unset a custom mail quota for specific user(s) and group(s)
+#
+
+#
+# Copyright (C) 2012 Nethesis S.r.l.
+# http://www.nethesis.it - support@nethesis.it
+# 
+# This script is part of NethServer.
+# 
+# NethServer is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License,
+# or any later version.
+# 
+# NethServer is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with NethServer.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+use esmith::AccountsDB;
+use NethServer::Directory;
+use NethServer::MailServer;
+use strict;
+
+my $event = shift || die("Missing event name argument");
+my $domain = shift;
+
+my $accountsDb = esmith::AccountsDB->open_ro();
+
+my @accountList = ($accountsDb->users(), $accountsDb->groups());
+
+my $ldap = NethServer::Directory->new() || die("LDAP connection error");
+    
+my $mailServer = NethServer::MailServer->new();
+
+foreach my $accountRecord (@accountList) {
+
+    if($accountRecord->prop('type') ne 'user'
+	&& $accountRecord->prop('type') ne 'group') {
+	warn "Skipping invalid account type:" . $accountRecord->key . "\n";
+	next;
+    }
+
+    my $ldapEntry = $ldap->getUser($accountRecord->key);
+
+    if( ! defined $ldapEntry ) {
+	warn("Account `" . $accountRecord->key . "` has not been found!\n");
+	next;
+    }
+
+    my @addressList = $mailServer->getAccountMailAddresses($accountRecord->key);
+
+    if(@addressList) {
+	$ldapEntry->replace(mail => \@addressList);
+    } else {
+	$ldapEntry->replace(mail => '');
+    }
+    
+    $ldapEntry->update($ldap);
+}
+
+
+exit(0);
