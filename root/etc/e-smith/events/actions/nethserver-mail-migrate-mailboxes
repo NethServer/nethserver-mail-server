@@ -43,9 +43,11 @@ foreach my $userName ('admin', map { $_->key } $accountsDb->users()) {
     my $srcMaildir;
     my $dstMaildir = '/var/lib/nethserver/vmail/' . $userName . '/Maildir';
     my $accountRecord;
+    my $cleanupMaildir = 0;
 
     if($userName eq 'admin') {
 	$srcMaildir = $sourceDir . '/home/e-smith/Maildir';
+	$cleanupMaildir = 0;
     } else {
 	my $pwuser = getpwnam($userName);
 
@@ -56,6 +58,7 @@ foreach my $userName ('admin', map { $_->key } $accountsDb->users()) {
 	}
 
 	$srcMaildir = $pwuser->dir . '/Maildir';
+	$cleanupMaildir = 1;
 	$accountRecord = $accountsDb->get($userName);
     }
 
@@ -74,7 +77,7 @@ foreach my $userName ('admin', map { $_->key } $accountsDb->users()) {
     if($userName eq 'admin' || (defined $accountRecord->prop('MailStatus') 
        && $accountRecord->prop('MailStatus') eq 'enabled')) {
 	migrateDir($srcMaildir, $dstMaildir);
-
+       
 	#
 	# Set vmail ownership:
 	#
@@ -90,6 +93,13 @@ foreach my $userName ('admin', map { $_->key } $accountsDb->users()) {
 	system(qw(chmod -R g-rwxXst,o=g), $dstMaildir);
 	if($? != 0) {
 	    warn "[WARNING] Failed to clean up permissions of files in $dstMaildir\n";
+	}
+
+	#
+	# Cleanup Maildir/ in user's home directory 
+	#
+	if($cleanupMaildir) {
+	    rmdir $srcMaildir;
 	}
     }
 
