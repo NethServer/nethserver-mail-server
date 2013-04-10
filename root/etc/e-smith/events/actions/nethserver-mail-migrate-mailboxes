@@ -59,7 +59,7 @@ foreach my $userName ('admin', map { $_->key } $accountsDb->users()) {
 	$accountRecord = $accountsDb->get($userName);
     }
 
-    if ( -l $srcDirPrefix . '.dovecot.sieve') {	
+    if ( -l ($srcDirPrefix . '.dovecot.sieve')) {	
 	# Create the link to the active sieve script (Refs #1815):
 	symlink(readlink($srcDirPrefix . '.dovecot.sieve'), $dstDirPrefix . '.dovecot.sieve');
     }
@@ -70,7 +70,7 @@ foreach my $userName ('admin', map { $_->key } $accountsDb->users()) {
 	my $dstDir = $dstDirPrefix . $tgtDir;
     
 	if( ! -d $srcDir) {
-	    warn "[WARNING] User $userName skipped: could not find source directory $srcDir\n";
+	    warn "[WARNING] User $userName/$tgtDir skipped: could not find source directory $srcDir\n";
 	    next;
 	}
 
