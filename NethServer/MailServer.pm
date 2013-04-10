@@ -69,24 +69,44 @@ sub getMailboxForwards()
     my $self = shift;
     my %forwards = ();
 
-    foreach my $accountRecord ($self->{AccountsDb}->users()) {
-	if ($accountRecord->prop('MailStatus') ne 'enabled') {
+    foreach my $accountRecord ($self->{AccountsDb}->users(), $self->{AccountsDb}->groups()) {
+	if (($accountRecord->prop('MailStatus') || '') ne 'enabled') {
 	    next;
 	}
 
 	my @destinations = ();
 	my $account = $accountRecord->key;
 	
-	if($accountRecord->prop('MailForwardStatus') eq 'enabled') {
+	if($accountRecord->prop('type') eq 'user' 
+	   && $accountRecord->prop('MailForwardStatus') eq 'enabled') {
 
 	    push @destinations, $accountRecord->prop('MailForwardAddress');
 
 	    if($accountRecord->prop('MailForwardKeepMessageCopy') eq 'yes') {
 		push @destinations, $account;
-	    }
+	    }	   
 	    
+	} elsif($accountRecord->prop('type') eq 'group' 
+		&& $accountRecord->prop('MailDeliveryType') eq 'copy') {
+		
+	    @destinations = map { 
+		    my $userRecord = $self->{AccountsDb}->get($_);
+		    
+		    # search group members having MailStatus enabled		    
+		    if(defined $userRecord 
+		       && ($userRecord->prop('MailStatus') || '') eq 'enabled') {
+			($_);
+		    } else {
+			();
+		    }
+		    
+	    } split(',', $accountRecord->prop('Members'));
+	    
+	}
+
+	if(@destinations) {
 	    $forwards{$account} = \@destinations;
-	} 
+	}
 
     }
 
@@ -137,25 +157,8 @@ sub getMailboxAliases()
 	    #
 	    # group accounts
 	    #
+	    @destinations = ($account);
 
-	    if($accountRecord->prop('MailDeliveryType') eq 'copy') {
-		
-		@destinations = map { 
-		    my $userRecord = $self->{AccountsDb}->get($_);
-
-		    # search group members having MailStatus enabled		    
-		    if(defined $userRecord 
-		       && ($userRecord->prop('MailStatus') || '') eq 'enabled') {
-			($_);
-		    } else {
-			();
-		    }
-			
-		} split(',', $accountRecord->prop('Members'));
-
-	    } elsif(($accountRecord->prop('MailDeliveryType') || '') eq 'shared') {
-		@destinations = ($account);
-	    }
 	} 
 
 	my ($localPart, $domainPart) = split('@', $pseudonym);
