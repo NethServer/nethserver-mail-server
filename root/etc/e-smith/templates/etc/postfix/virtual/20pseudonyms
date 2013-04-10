@@ -6,11 +6,12 @@
 
     if(%aliases) {
 	$OUT = '';
-	while( my ($alias, $mailboxes) = each %aliases  ) {	    
-	    if( ! scalar @{$mailboxes} ) {
+	foreach my $alias ( sort keys %aliases ) {
+	    my @mailboxes = @{$aliases{$alias}};
+	    if( ! scalar @mailboxes ) {
 		next; # skip alias, if mailbox list is empty
 	    }
-	    $OUT .= sprintf("%-38s %s\n", $alias, join(", ", @{$mailboxes}));
+	    $OUT .= sprintf("%-38s %s\n", $alias, join(", ", @mailboxes));
 	}
     } else {
 	$OUT = "# no virtual address defined\n";

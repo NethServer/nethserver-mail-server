@@ -6,11 +6,12 @@
 
     if(%forwards) {
 	$OUT = '';
-	while( my ($account, $addresses) = each %forwards  ) {	    
-	    if( ! scalar @{$addresses} ) {
+	foreach my $account ( sort keys %forwards ) {
+	    my @addresses = @{$forwards{$account}};
+	    if( ! scalar @addresses ) {
 		next; # skip forward, if address list is empty
 	    }
-	    $OUT .= sprintf("%-16s %s\n", $account, join(', ', @{$addresses}));
+	    $OUT .= sprintf("%-16s %s\n", $account, join(', ', @addresses));
 	}
     } else {
 	$OUT = "# no forward address defined\n";
