@@ -29,89 +29,95 @@ use File::Path;
 use File::Temp;
 
 my $event = shift;
-my $sourceDir = shift;
+my $migrationRootDir = shift;
 my $errors = 0;
 
 my $accountsDb = esmith::AccountsDB->open() or die("Could not open destination account db\n");
 
-
 #
-# Migrate admin and user mailboxes
+# Migrate Maildir/ and sieve/ (#1815) subdirs from admin and user home
+# directories
 #
 foreach my $userName ('admin', map { $_->key } $accountsDb->users()) {
-
-    my $srcMaildir;
-    my $dstMaildir = '/var/lib/nethserver/vmail/' . $userName . '/Maildir';
+   
+    my $srcDirPrefix;
+    my $dstDirPrefix = '/var/lib/nethserver/vmail/' . $userName . '/';
     my $accountRecord;
-    my $cleanupMaildir = 0;
-
+    
     if($userName eq 'admin') {
-	$srcMaildir = $sourceDir . '/home/e-smith/Maildir';
-	$cleanupMaildir = 0;
+	$srcDirPrefix = $migrationRootDir . '/home/e-smith/';
     } else {
 	my $pwuser = getpwnam($userName);
-
+	
 	if( ! $pwuser) {
 	    warn "[ERROR] $userName skipped: not found in passwd database\n";
 	    $errors ++;
 	    next;
 	}
-
-	$srcMaildir = $pwuser->dir . '/Maildir';
-	$cleanupMaildir = 1;
+	
+	$srcDirPrefix = $pwuser->dir . '/';
 	$accountRecord = $accountsDb->get($userName);
     }
 
-    if( ! -d $srcMaildir) {
-	warn "[WARNING] User $userName skipped: could not find source directory $srcMaildir\n";
-	next;
+    if ( -l $srcDirPrefix . '.dovecot.sieve') {	
+	# Create the link to the active sieve script (Refs #1815):
+	symlink(readlink($srcDirPrefix . '.dovecot.sieve'), $dstDirPrefix . '.dovecot.sieve');
     }
+    
+    foreach my $tgtDir (qw(Maildir sieve)) {
+    
+	my $srcDir = $srcDirPrefix . $tgtDir;
+	my $dstDir = $dstDirPrefix . $tgtDir;
+    
+	if( ! -d $srcDir) {
+	    warn "[WARNING] User $userName skipped: could not find source directory $srcDir\n";
+	    next;
+	}
 
-    if( ! -d $dstMaildir) {
-	File::Path::make_path($dstMaildir, {mode => 0700, user => 'vmail', group => 'vmail'});
-    }
-
-    #
-    # Migrate maildir only if MailStatus is enabled or the user is "admin":
-    #
-    if($userName eq 'admin' || (defined $accountRecord->prop('MailStatus') 
-       && $accountRecord->prop('MailStatus') eq 'enabled')) {
-	migrateDir($srcMaildir, $dstMaildir);
-       
-	#
-	# Set vmail ownership:
-	#
-	system(qw(chown -R vmail.vmail), $dstMaildir);
-	if($? != 0) {
-	    warn "[ERROR] Failed to change ownership of files in $dstMaildir\n";
-	    $errors ++
+	if( ! -d $dstDir) {
+	    File::Path::make_path($dstDir, {mode => 0700, user => 'vmail', group => 'vmail'});
 	}
 
 	#
-	# Fix permissions
+	# Migrate maildir only if MailStatus is enabled or the user is "admin":
 	#
-	system(qw(chmod -R g-rwxXst,o=g), $dstMaildir);
-	if($? != 0) {
-	    warn "[WARNING] Failed to clean up permissions of files in $dstMaildir\n";
+	if($userName eq 'admin' || (defined $accountRecord->prop('MailStatus') 
+	   && $accountRecord->prop('MailStatus') eq 'enabled')) {
+	    migrateDir($srcDir, $dstDir);
+
+	    #
+	    # Set vmail ownership:
+	    #
+	    system(qw(chown -R vmail.vmail), $dstDir);
+	    if($? != 0) {
+		warn "[ERROR] Failed to change ownership of files in $dstDir\n";
+		$errors ++
+	    }
+
+	    #
+	    # Fix permissions
+	    #
+	    system(qw(chmod -R g-rwxXst,o=g), $dstDir);
+	    if($? != 0) {
+		warn "[WARNING] Failed to clean up permissions of files in $dstDir\n";
+	    }
+
+	    #
+	    # Cleanup POSIX acls in destination Maildir/
+	    #
+	    system(qw(/usr/bin/setfacl --remove-all --recursive), $dstDir);
+	    if($? != 0) {
+		warn "[WARNING] Failed to clean up POSIX acls of files in $dstDir\n";
+	    }
+
+	    #
+	    # Remove empty Maildir/ in user's home directory 
+	    #
+	    rmdir $srcDir;
 	}
 
-	#
-	# Cleanup POSIX acls in destination Maildir/
-	#
-	system(qw(/usr/bin/setfacl --remove-all --recursive), $dstMaildir);
-	if($? != 0) {
-	    warn "[WARNING] Failed to clean up POSIX acls of files in $dstMaildir\n";
-	}
-
-	#
-	# Remove empty Maildir/ in user's home directory 
-	#
-	if($cleanupMaildir) {
-	    rmdir $srcMaildir;
-	}
-    }
-
-}
+    } # end foreach tgtDir
+} # end foreach userName
 
 
 if($errors > 0) {
