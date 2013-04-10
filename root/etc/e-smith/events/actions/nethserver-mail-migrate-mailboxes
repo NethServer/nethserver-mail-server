@@ -96,7 +96,15 @@ foreach my $userName ('admin', map { $_->key } $accountsDb->users()) {
 	}
 
 	#
-	# Cleanup Maildir/ in user's home directory 
+	# Cleanup POSIX acls in destination Maildir/
+	#
+	system(qw(/usr/bin/setfacl --remove-all --recursive), $dstMaildir);
+	if($? != 0) {
+	    warn "[WARNING] Failed to clean up POSIX acls of files in $dstMaildir\n";
+	}
+
+	#
+	# Remove empty Maildir/ in user's home directory 
 	#
 	if($cleanupMaildir) {
 	    rmdir $srcMaildir;
