@@ -70,6 +70,8 @@ sub getMailboxForwards()
     my %forwards = ();
 
     foreach my $accountRecord ($self->{AccountsDb}->users(), $self->{AccountsDb}->groups()) {
+
+	# Nothing to do, if MailStatus is disabled
 	if (($accountRecord->prop('MailStatus') || '') ne 'enabled') {
 	    next;
 	}
@@ -87,7 +89,8 @@ sub getMailboxForwards()
 	    }	   
 	    
 	} elsif($accountRecord->prop('type') eq 'group' 
-		&& $accountRecord->prop('MailDeliveryType') eq 'copy') {
+		&& ( ! $accountRecord->prop('MailDeliveryType') # empty === copy
+		     || $accountRecord->prop('MailDeliveryType') eq 'copy')) {
 		
 	    @destinations = map { 
 		    my $userRecord = $self->{AccountsDb}->get($_);
@@ -101,6 +104,12 @@ sub getMailboxForwards()
 		    }
 		    
 	    } split(',', $accountRecord->prop('Members'));
+
+	    # If the group has no members, forward message to
+	    # postmaster (1822).
+	    if( ! @destinations) {
+		@destinations = 'postmaster';
+	    }
 	    
 	}
 

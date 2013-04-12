@@ -164,7 +164,7 @@ event_actions('user-delete',
 # group-* events expand and reload postfix table templates
 #
 
-my @groupTemplates = @pseudonymTemplates;
+my @groupTemplates = (@pseudonymTemplates, '/etc/postfix/aliases');
 
 foreach (qw(create modify delete)) {
     event_templates('group-' . $_, @groupTemplates);
@@ -192,10 +192,12 @@ event_actions('group-delete',
 # domain-* events: expand recipient_bcc map
 #
 foreach (qw(create delete modify)) {
-    event_templates('domain-' . $_, 
-		    '/etc/postfix/recipient_bcc', 
-		    '/etc/postfix/virtual',
-		    '/etc/postfix/vmailbox');
+    event_templates('domain-' . $_, qw(
+		    /etc/postfix/recipient_bcc
+		    /etc/postfix/virtual
+                    /etc/postfix/aliases
+		    /etc/postfix/vmailbox
+    ));
     event_actions('domain-'   . $_, 
                   'nethserver-mail-postmap-update' => '30',
                   'nethserver-mail-ldap-sync' => 40
