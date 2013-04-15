@@ -1,0 +1,13 @@
+{
+    #
+    # 30submission_legacy -- Enable SMTP AUTH through SASL on public
+    # smtp port 25.
+    #
+ 
+    if($postfix{SubmissionPolicyType} eq 'legacy') {
+	# Announce AUTH support:
+	push @smtpd_public_options, 'smtpd_sasl_auth_enable=yes';
+    }
+
+    '';
+}
