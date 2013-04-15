@@ -44,30 +44,6 @@ if(@schemas) {
 my $ldap = NethServer::Directory::connect();
 $ldap->loadLdifSchema('qmail', '/etc/openldap/schema/qmail.ldif') || die("Could not load the qmail LDIF schema for dovecot");
 
-#
-# Manage dovecot daemon
-#
-NethServer::Service::manage_add('nethserver-mail-server',
-				'dovecot');
-
-#
-# Register some postfix tables to be updated with nethserver-mail-postmap-update action
-#
-my $configDb = esmith::ConfigDB->open() || die("Could not open ConfigDB");
-my @postmapUpdateList = split(',', $configDb->get_prop('postfix', 'PostmapUpdateList'));
-
-foreach my $table (qw(
-    internal_access
-    recipient_bcc
-    virtual
-    aliases
-)) {
-    if ( ! grep($table eq $_, @postmapUpdateList) ) {
-	push @postmapUpdateList, $table;
-    }
-}
-
-$configDb->set_prop('postfix', 'PostmapUpdateList', join(',', @postmapUpdateList));
 
 # Refs #1516 -- Add vmail user into amavis group, to allow bayes DB
 # updates through sa-learn
