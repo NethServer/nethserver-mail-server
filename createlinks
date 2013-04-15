@@ -74,27 +74,12 @@ event_actions('nethserver-mail-server-update', qw(
 	      nethserver-mail-server-ldapsetup 21
 	      nethserver-mail-postmap-update 30
 	      nethserver-mail-account-update 40
-	      firewall-adjust 60
-	      runlevel-adjust 70
 	      nethserver-mail-server-init-system-users 99
 ));
 
 event_services('nethserver-mail-server-update',
 	       'dovecot' => 'restart',
 	       'postfix' => 'restart');
-
-
-# UNINSTALL actions/services:
-event_actions('nethserver-mail-server-uninstall',
-	      'nethserver-mail-server-uninstall' => '02',
-	      'firewall-adjust' => '30',
-	      'runlevel-adjust' => '40');
-
-event_services('nethserver-mail-server-uninstall',
-	       'postfix' => 'reload');
-
-
-
 
 #
 # nethserver-mail-server-SAVE event
