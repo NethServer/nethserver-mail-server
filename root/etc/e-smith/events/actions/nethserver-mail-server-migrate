@@ -20,7 +20,7 @@
 # along with NethServer.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-use esmith::DB::db;
+use esmith::ConfigDB;
 use esmith::event;
 use File::Copy;
 use File::Basename;
@@ -35,32 +35,53 @@ if( ! -d $sourceDir) {
     die("Could not find dir $sourceDir");
 }
 
-my $srcConfigDb = esmith::DB::db->open_ro(join('', $sourceDir, $esmithDbDir, '/configuration')) || die("Could not open source configuration database in $sourceDir \n");
+my $srcConfigDb = esmith::ConfigDB->open_ro(join('', $sourceDir, $esmithDbDir, '/configuration')) || die("Could not open source configuration database in $sourceDir \n");
 
-my $dstConfigDb = esmith::DB::db->open('configuration') || die("Could not open destination account db\n");
+my $dstConfigDb = esmith::ConfigDB->open('configuration') || die("Could not open destination account db\n");
 
+#
+# Enable legacy submission policy (#1818)
+#
+$dstConfigDb->set_prop('postfix', 'SubmissionPolicyType', 'legacy');
+
+#
+# Migrate spam setting (#1820)
+#
 my $spamassassinRecord = $srcConfigDb->get('spamassassin');
 if( ! $spamassassinRecord) {
     warn "[INFO] spamassassin key not found in source ConfigDB. Skipped.\n";
-    exit (0);
+} else {
+    my $dovecotRecord = $dstConfigDb->get('dovecot');
+    if( ! $dovecotRecord ) {
+	warn "[ERROR] dovecot key not found in destination ConfigDB.\n";
+	$errors++;
+    } else {
+
+	my %dstProps = $dovecotRecord->props;
+	my %srcProps = $spamassassinRecord->props;
+	
+	$dstProps{SpamFolder} = defined $srcProps{SortSpam} && $srcProps{SortSpam} eq 'enabled' ? 'junkmail' : '';
+	$dstProps{SpamRetentionTime} = int($srcProps{MessageRetentionTime}) == 0 ? 'infinite' : translateFromDays($srcProps{MessageRetentionTime});
+	
+	$dovecotRecord->merge_props(%dstProps);
+	
+    }
 }
+
+# Activate changes:
+if( ! esmith::event::event_signal('nethserver-mail-server-update')) {
+    warn "[ERROR] nethserver-mail-server-update failed!";
+    $errors ++;
+}
+$dstConfigDb->reload();
+
    
-my $dovecotRecord = $dstConfigDb->get('dovecot');
-if( ! $dovecotRecord ) {
-    warn "[ERROR] dovecot key not found in destination ConfigDB.\n";
-    exit(1);
-}
+exit($errors == 0 ? 0 : 1);
 
-my %dstProps = $dovecotRecord->props;
-my %srcProps = $spamassassinRecord->props;
 
-$dstProps{SpamFolder} = defined $srcProps{SortSpam} && $srcProps{SortSpam} eq 'enabled' ? 'junkmail' : '';
-$dstProps{SpamRetentionTime} = int($srcProps{MessageRetentionTime}) == 0 ? 'infinite' : translateFromDays($srcProps{MessageRetentionTime});
-
-$dovecotRecord->merge_props(%dstProps);
-
-exit(0);
-
+#
+# Find an approximation of spam retention time to supported values
+#
 sub translateFromDays
 {
     my $r = shift;
