@@ -64,7 +64,7 @@ jQuery(document).ready(function($) {
 });
 EOJSCODE;
 
-if ($view->getModule()->showPseudonymControls) {
+if ($view->getModule()->getPluggableActionIdentifier() === 'create') {
     $view->includeJavascript($jsCode);
     $mailAddresses = $view->fieldsetSwitch('CreateMailAddresses', 'enabled', $view::FIELDSETSWITCH_CHECKBOX | $view::FIELDSETSWITCH_EXPANDABLE)
         ->setAttribute('uncheckedValue', 'disabled')

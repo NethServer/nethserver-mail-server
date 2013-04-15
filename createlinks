@@ -235,6 +235,18 @@ event_services('user-create-pseudonyms', qw(
     postfix reload
 ));
 
+#
+# group-create-pseudonyms event (refs #1795)
+#
+event_templates('group-create-pseudonyms', @pseudonymTemplates);
+event_actions('group-create-pseudonyms', qw(
+    nethserver-mail-default-pseudonyms-create 00
+    nethserver-mail-postmap-update 30
+));
+event_services('group-create-pseudonyms', qw(
+    postfix reload
+));
+
 
 #
 # nethserver-samba-save/update: expand our templates for AD integration

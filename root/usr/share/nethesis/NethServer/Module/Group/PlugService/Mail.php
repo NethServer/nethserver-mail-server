@@ -39,6 +39,8 @@ class Mail extends \Nethgui\Controller\Table\RowPluginAction
 
     public function initialize()
     {
+        $this->declareParameter('CreateMailAddresses', Validate::SERVICESTATUS);
+
         $this->setSchemaAddition(array(
             array('MailStatus', Validate::SERVICESTATUS, Table::FIELD),
             array('MailDeliveryType', $this->createValidator()->memberOf('copy', 'shared'), Table::FIELD),
@@ -46,6 +48,25 @@ class Mail extends \Nethgui\Controller\Table\RowPluginAction
         $this->setDefaultValue('MailStatus', 'disabled');
         $this->setDefaultValue('MailDeliveryType', 'copy');
         parent::initialize();
+    }
+
+    public function prepareView(\Nethgui\View\ViewInterface $view)
+    {
+        parent::prepareView($view);
+
+        if ($this->hasAdapter()) {
+            $view['MailAddressList'] = new \NethServer\Module\Pseudonym\AccountPseudonymIterator($this->getAdapter()->getKeyValue(), $this->getPlatform());
+            if ($this->getPluggableActionIdentifier() === 'create') {
+                $view['CreateMailAddresses'] = 'enabled';
+            }
+        }
+    }
+
+    protected function onParametersSaved($changedParameters)
+    {
+        if ($this->parameters['CreateMailAddresses'] === 'enabled') {
+            $this->getPlatform()->signalEvent('group-create-pseudonyms@post-process', array($this->getAdapter()->getKeyValue()));
+        }
     }
 
 }
