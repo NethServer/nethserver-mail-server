@@ -1,0 +1,13 @@
+{
+    #
+    # 30mail_server
+    #
+
+    push @postmapList, qw(
+	internal_access
+	recipient_bcc
+	virtual
+	aliases
+    );
+    '';
+}
