@@ -9,8 +9,8 @@ protocol lmtp \{
 
 # Global sieve script, executed BEFORE user's private scripts:
 plugin \{
-    sieve_before = /etc/dovecot/sieve-scripts/before.sieve
-    sieve_after = /etc/dovecot/sieve-scripts/after.sieve
+    sieve_before = /var/lib/nethserver/sieve-scripts/before.sieve
+    sieve_after = /var/lib/nethserver/sieve-scripts/after.sieve
     sieve_extensions = +imapflags
 \}
 

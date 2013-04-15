@@ -43,7 +43,7 @@ my @saveTemplates = qw(
     /etc/postfix/internal_access
     /etc/postfix/recipient_bcc
     /etc/dovecot/dovecot.conf
-    /etc/dovecot/sieve-scripts/before.sieve
+    /var/lib/nethserver/sieve-scripts/before.sieve
 );
 
 # When updating nethserver-directory, dovecot LDAP user acl must be set
@@ -74,7 +74,6 @@ event_actions('nethserver-mail-server-update', qw(
 	      nethserver-mail-server-ldapsetup 21
 	      nethserver-mail-postmap-update 30
 	      nethserver-mail-account-update 40
-	      nethserver-mail-sieve-compile 50
 	      firewall-adjust 60
 	      runlevel-adjust 70
 	      nethserver-mail-server-init-system-users 99
@@ -104,7 +103,6 @@ event_services('nethserver-mail-server-uninstall',
 event_templates('nethserver-mail-server-save', @saveTemplates);
 
 event_actions('nethserver-mail-server-save',
-	      'nethserver-mail-sieve-compile' => '20',
 	      'nethserver-mail-postmap-update' => '30');
 
 event_services('nethserver-mail-server-save',

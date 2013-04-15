@@ -31,6 +31,7 @@ rm -rf $RPM_BUILD_ROOT
 (cd root; find . -depth -print | cpio -dump $RPM_BUILD_ROOT)
 %{genfilelist} $RPM_BUILD_ROOT \
     --dir /var/lib/nethserver/vmail 'attr(0700,vmail,vmail)' \
+    --dir /var/lib/nethserver/sieve-scripts 'attr(0770,root,vmail)' \
     > %{name}-%{version}-filelist
 echo "%doc COPYING" >> %{name}-%{version}-filelist
 echo "%doc migration/sync_maildirs.sh"  >> %{name}-%{version}-filelist
