@@ -40,7 +40,6 @@ echo "%doc migration/sync_maildirs.sh"  >> %{name}-%{version}-filelist
 rm -rf $RPM_BUILD_ROOT
 
 %pre
-source /etc/nethserver/rpm_hook_functions
 # ensure vmail user exists:
 if ! id vmail >/dev/null 2>&1 ; then
    useradd -c 'Virtual mailboxes owner' -r -M -d /var/lib/nethserver/vmail -s /sbin/nologin vmail
@@ -49,15 +48,7 @@ fi
 # add vmail group to postfix user
 usermod -G vmail -a postfix
 
-
 %post
-source /etc/nethserver/rpm_hook_functions
-event_queue add %{name}-update
-
-%preun
-source /etc/nethserver/rpm_hook_functions
-signal_event %{name}-uninstall
-
 
 %files -f %{name}-%{version}-filelist
 %defattr(-,root,root)
