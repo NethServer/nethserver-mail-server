@@ -11,6 +11,7 @@ protocol lmtp \{
 plugin \{
     sieve_before = /etc/dovecot/sieve-scripts/before.sieve
     sieve_after = /etc/dovecot/sieve-scripts/after.sieve
+    sieve_extensions = +imapflags
 \}
 
 service lmtp \{
