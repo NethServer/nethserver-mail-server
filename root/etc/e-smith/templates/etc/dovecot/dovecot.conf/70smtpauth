@@ -12,5 +12,5 @@ service auth \{
     \}
 \}
 
-auth_mechanisms = plain login gssapi
+auth_mechanisms = plain login { ($smb{ServerRole} || '') eq 'ADS' ? 'gssapi' : '' }
 
