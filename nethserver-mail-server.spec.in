@@ -54,6 +54,29 @@ usermod -G vmail -a postfix
 %defattr(-,root,root)
 
 %changelog
+* Tue Apr 30 2013 Davide Principi <davide.principi@nethesis.it> - 1.3.0-1.ns6
+- Full automatic package install/upgrade/uninstall support #1870 #1872 #1874
+- Group Mail UI plugin: show default group pseudonym in create action #1795
+- Use sieve global script auto-compilation #1877
+- Enabled imapflags obsolete sieve extnsion #1816
+- Allow SMTP/AUTH on port 25 through "legacy" SubmissionPolicyType #1818
+- Forced delivery of messages to an empty group to postmaster account #1822
+- Honoured delivery type "copy" when recipient is group@hostname #1857
+- Migrate user sieve filters #1815
+- Switch submission policy to "authenticated" when mail-server is installed #1856
+- Cleanup empty Maildir/ directory in user's home; reset POSIX acls on destination Maildir/ #1669
+- Fixed removal of duplicated postmaster entry during migration #1841
+- Migrate spam settings #1820
+- Fixed expansion of all pseudonym when a domain is modified #1823
+- Experimental support to Active Directory GSSAPI AUTH #1747
+- Fixed address extension +spam propagated during message forwarding: removed vmail.nh internal domain suffix, using local(8) daemon with /etc/postfix/aliases template #1844
+- Fixed ACL storage path of shared mailboxes #1739
+- Fixed master-users file is world-readable: /etc/dovecot/master-users, set permissions 0640  #1825
+- Fixed user mail forwarding not honoured in group delivery #1840
+- Added migration/sync_maildirs.sh utility: synchronization script for maildirs #1808
+- Migrate pseudonym pointing to another pseudonym #1806
+- Name pseudonym after migrated account name #1805 
+
 * Tue Mar 19 2013 Davide Principi <davide.principi@nethesis.it> - 1.2.0-1.ns6
 - vmail storage moved from /var/lib/vmail into /var/lib/nethserver/vmail, removing user/ subdir. Refs #1739
 - Optionally, create default user's mail addresses during user creation. #1623
