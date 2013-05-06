@@ -9,6 +9,7 @@ BuildArch: noarch
 
 Requires: dovecot >= 2.0.9, dovecot-pigeonhole >= 2.0.9, dovecot-antispam >= 0.0.48
 Requires: nethserver-mail-common >= 1.0.1-2
+Requires: nethserver-directory
 Requires: perl(Text::Unidecode)
 Requires: cyrus-sasl-plain, cyrus-sasl-ldap, cyrus-sasl-ntlm, cyrus-sasl-md5
 
