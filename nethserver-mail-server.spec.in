@@ -55,6 +55,9 @@ usermod -G vmail -a postfix
 %defattr(-,root,root)
 
 %changelog
+* Tue May  7 2013 Davide Principi <davide.principi@nethesis.it> - 1.3.1-1.ns6
+- Require nethserver-directory explicitly #1870
+
 * Tue Apr 30 2013 Davide Principi <davide.principi@nethesis.it> - 1.3.0-1.ns6
 - Full automatic package install/upgrade/uninstall support #1870 #1872 #1874
 - Group Mail UI plugin: show default group pseudonym in create action #1795
