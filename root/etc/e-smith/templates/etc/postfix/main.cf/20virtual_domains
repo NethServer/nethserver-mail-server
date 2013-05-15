@@ -3,11 +3,17 @@
     use NethServer::MailServer;
     @localDomains = NethServer::MailServer->new()->getDeliveryDomains();
     @virtual_mailbox_domains = (@localDomains, @virtual_mailbox_domains);
+    $isAdsEnabled = defined $smb && $smb{ServerRole} && $smb{ServerRole} eq 'ADS';
+
+    @virtual_alias_maps = qw(hash:/etc/postfix/virtual);
+    if($isAdsEnabled) {
+        push @virtual_alias_maps, 'ldap:/etc/postfix/active-directory.cf';	
+    }   
 
     scalar @localDomains ? 'enabled' : 'disabled'; 
 }
 # 
-virtual_alias_maps = { scalar @localDomains ? 'hash:/etc/postfix/virtual' : '' }
+virtual_alias_maps = { scalar @localDomains ? join(' ', @virtual_alias_maps) : '' }
 alias_maps = hash:/etc/aliases, hash:/etc/postfix/aliases
 
 # Message delivery transport that the local(8) 
