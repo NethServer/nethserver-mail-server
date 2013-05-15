@@ -1,8 +1,23 @@
 #
-# Active Directory Dovecot configuration
-#
+# 10base -- Active Directory Dovecot configuration
+# {
+    open(CFG, '-|', '/usr/bin/net ads info');
 
-uris = ldap://{'davidep7.vboxnet1.tld'}
+    my @tokens = ();
+
+    while(<CFG>) {
+        chomp $_;
+	push @tokens, split(/:\s+/, $_, 2);
+    }
+
+    %ads = (@tokens);
+
+    close(CFG);
+
+    '';
+}
+
+uris = ldap://{$ads{'LDAP server'} || 'nxhost'}:{$ads{'LDAP port'} || '389'}
 
 sasl_bind = yes
 sasl_mech = gssapi
