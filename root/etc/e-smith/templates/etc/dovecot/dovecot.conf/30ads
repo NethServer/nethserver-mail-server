@@ -1,29 +1,28 @@
+#
+# 30ads
+# 
 {
-    #
-    # 30ads
-    #
+    if(defined $smb && $smb{ServerRole} && $smb{ServerRole} eq 'ADS') {
 
-    #
-    # FIXME: disabled -- see below
-    #
-    my $IMPLEMENTED = 0;
+	my $hostname = join('.', $SystemName, $DomainName);
+	my $keytab = $dovecot{KrbKeytabPath} || '/var/lib/dovecot/krb5.keytab';
 
-    if($IMPLEMENTED && defined $smb && $smb{ServerRole} && $smb{ServerRole} eq 'ADS') {
-	$OUT = <<'CONF';
-#
-# 30ads -- Active Directory as user database. This will not work until
-# GSSAPI authentication on AD LDAP works. The keytab file must be configured
-# properly to do that: 
-#  - http://hg.dovecot.org/dovecot-2.0/rev/cec7fa92ff48
-#  - http://www.dovecot.org/list/dovecot/2011-February/057122.html
-#
+	$OUT = <<CONF;
+# Samba Active Directory is available:
 userdb {
        driver = ldap
        args = /etc/dovecot/active-directory.conf
 }
 
+# This is available from v2.0.10 2011-03-04
+# import_environment = KRB5CCNAME USER HOME TZ
+
+auth_gssapi_hostname = $hostname
+auth_krb5_keytab = $keytab
 CONF
     } else {
-	$OUT = '';
+	$OUT = '# Samba Active Directory is NOT available';
     }   
 }
+
+
