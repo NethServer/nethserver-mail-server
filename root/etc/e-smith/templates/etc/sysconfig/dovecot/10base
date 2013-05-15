@@ -6,3 +6,7 @@
 #
 OPTIONS="&>/dev/null"
 
+# adjust file descriptors limit:
+ulimit -n {$dovecot{MaxProcesses} * 4}
+
+
