@@ -1,0 +1,36 @@
+#
+# 10base
+# {
+    use NethServer::MailServer;
+
+    $ms = NethServer::MailServer->new();
+
+    open(CFG, '-|', '/usr/bin/net ads info');
+
+    my @tokens = ();
+
+    while(<CFG>) {
+        chomp $_;
+	push @tokens, split(/:\s+/, $_, 2);
+    }
+
+    %ads = (@tokens);
+
+    close(CFG);
+
+    '';
+}
+
+server_host = ldap://{$ads{'LDAP server'} || 'nxhost'}
+server_port = {$ads{'LDAP port'} || '389'}
+search_base = cn=users,{$ads{'Bind Path'} || 'dc=nxdomain,dc=tld' }
+
+bind = sasl
+sasl_mechs = gssapi
+scope = sub
+version = 3
+
+query_filter = (&(|(mail=%s)(userPrincipalName=%s)(otherMailbox=smtp:%s)(proxyAddress=smtp:%s))(!(UserAccountControl:1.2.840.113556.1.4.803:=2)))
+result_attribute = sAMAccountName
+
+domain = {join(', ', $ms->getDeliveryDomains())}
