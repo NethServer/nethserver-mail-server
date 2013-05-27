@@ -7,11 +7,15 @@ URL: %{url_prefix}/%{name}
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
 
-Requires: dovecot >= 2.0.9, dovecot-pigeonhole >= 2.0.9, dovecot-antispam >= 0.0.48
-Requires: nethserver-mail-common >= 1.0.1-2
+Requires: dovecot >= 2.1.16, dovecot-pigeonhole >= 2.1.16, dovecot-antispam >= 0.0.49-1
+Requires: nethserver-mail-common >= 1.2.0
 Requires: nethserver-directory
 Requires: perl(Text::Unidecode)
 Requires: cyrus-sasl-plain, cyrus-sasl-ldap, cyrus-sasl-ntlm, cyrus-sasl-md5
+
+# The GSSAPI ldap client works only if postfix has been compiled with
+# -DUSE_LDAP_SASL flag (refs #1747):
+Requires: postfix >= 2:2.9.6-2.ns6
 
 BuildRequires: perl
 BuildRequires: nethserver-devtools >= 1.0.0
