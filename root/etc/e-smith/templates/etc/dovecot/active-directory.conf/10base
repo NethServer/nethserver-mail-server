@@ -23,7 +23,7 @@ sasl_bind = yes
 sasl_mech = gssapi
 tls = no
 
-base = cn=users,dc=vboxnet1,dc=tld
+base = cn=users,{$ads{'Bind Path'} || 'dc=unknown,dc=bindpath'}
 scope = onelevel
 default_pass_scheme = CRYPT
 
