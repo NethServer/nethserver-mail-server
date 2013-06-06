@@ -159,7 +159,6 @@ foreach (qw(create modify delete)) {
 }
 
 event_actions('group-create',
-	      'nethserver-mail-default-pseudonyms-create' => '03',
 	      'nethserver-mail-account-update' => '30',
 	      'nethserver-mail-group-acl-adjust' => '95');
 
