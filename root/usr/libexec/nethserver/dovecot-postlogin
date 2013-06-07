@@ -1,10 +1,72 @@
-#!/bin/bash
-export MASTER_USER=$USER
+#!/usr/bin/perl
 
-ACL_GROUPS=`groups $USER |  sed 's/^.*: //; y/ /,/'`
-export ACL_GROUPS
-export USERDB_KEYS="$USERDB_KEYS acl_groups master_user"
+#
+# Copyright (C) 2013 Nethesis S.r.l.
+# http://www.nethesis.it - support@nethesis.it
+# 
+# This script is part of NethServer.
+# 
+# NethServer is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License,
+# or any later version.
+# 
+# NethServer is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with NethServer.  If not, see <http://www.gnu.org/licenses/>.
+#
 
-exec "$@"
+use strict;
 
+#
+# Find the shared groups, by parsing doveconf output. We have no
+# access to AccountsDB here.
+#
+my @sharedGroups = ();
+open(CONF, '-|', '/usr/bin/doveconf -n namespace');
+while(<CONF>) {
+    if($_ =~ /^namespace s-(.+) /) {
+	push @sharedGroups, $1;
+    }
+}
+close(CONF);
+
+#
+# Read secondary groups and prepare a CSV list
+#
+my $groups = `groups $ENV{USER}`;
+chomp($groups);
+$groups =~ s/^.*: //; 
+$groups =~ y/ /,/;
+
+$ENV{ACL_GROUPS}=$groups;
+$ENV{MASTER_USER}=$ENV{USER};
+
+#
+# If the actual user is a member of a shared group, enable the shared
+# namespace.
+#
+foreach my $group (split(',', $groups)) {  
+    if( ! grep { $_ eq $group } @sharedGroups) {
+	next;
+    }
+    my $nsKey = "namespace/s-${group}/disabled";
+    $ENV{$nsKey} = "no";
+    $ENV{USERDB_KEYS} .= $nsKey . ' ';
+}
+
+#
+# Export USERDB overrides
+#
+$ENV{USERDB_KEYS} .= 'acl_groups master_user ';
+
+
+#
+# The ENVironment is ready, we are done.
+#
+exec(@ARGV) or die "Unable to exec @ARGV: $!";
 
