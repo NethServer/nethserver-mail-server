@@ -16,6 +16,21 @@ passdb \{
     args = /etc/dovecot/ldap.conf
 \}
 
+# See http://wiki2.dovecot.org/Authentication/MasterUsers
+auth_master_user_separator = *
+passdb \{
+  driver = passwd-file
+  args = /etc/dovecot/master-users
+  master = yes
+  pass = yes
+\}
+
+# User database for admin user:
+passdb \{
+  driver = passwd-file
+  args = /etc/dovecot/system-users
+\}
+
 # Password database for system users (admin): shadow
 passdb \{
   driver = pam
