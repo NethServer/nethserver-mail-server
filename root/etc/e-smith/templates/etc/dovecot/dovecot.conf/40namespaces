@@ -22,6 +22,31 @@ namespace \{
   location = maildir:/var/lib/nethserver/vmail/%%n/Maildir:INDEX=~/Maildir/shared/%%n
   subscriptions = no
   list = children
+
+  # Commonly used folders:
+  mailbox Trash \{
+    special_use = \Trash
+    auto = no
+  \}
+  mailbox Drafts \{
+    special_use = \Drafts
+    auto = no
+  \}
+  mailbox Sent \{
+    special_use = \Sent
+    auto = no
+  \}
+  mailbox "Sent Messages" \{
+    special_use = \Sent
+    auto = no
+  \}
+
+  # Our junkmail folder:
+  mailbox junkmail \{
+    special_use = \Junk
+    auto = create
+  \}  
+
 \}
 
 # Enable acl plugin for shared mailboxes
