@@ -3,8 +3,8 @@
 #
 # nethserver-mail-group-acl-adjust
 #
-# Keep IMAP ACL updated for group accounts. The optional $accountArg
-# limit the operation on the given group account only.
+# Keep IMAP ACLs updated for group accounts. The optional 2nd argument
+# limits the operation on the given group account only.
 #
 
 #
@@ -55,7 +55,9 @@ foreach my $accountRecord (@accounts) {
     my $retval;
 
     if($accountRecord->prop('type') ne 'group') {
-	die("Account `$account` is not a group");
+	warn("[ERROR] Account `$account` is not a group\n");
+	$errors ++;
+	next;
     }
 
     # Skip group if mail is disabled. Fixes #1560
@@ -66,7 +68,9 @@ foreach my $accountRecord (@accounts) {
     my $imap = NethServer::MailServer->connectAclManager($account . '*vmail');
 	    
     if( ! $imap) {
-	die("Could not create connection to IMAP server. Account: `$account`.");
+	warn("[ERROR] Could not create connection to IMAP server. Account: `$account`.\n");
+	$errors ++;
+	next;
     }
         
     my $dovecotSharedPath = NethServer::MailServer::getDovecotSharedPath($account);
@@ -82,12 +86,12 @@ foreach my $accountRecord (@accounts) {
 	$retval = $imap->setAcl('INBOX', '$' . $account, 'lrs');
 	open(T, '>', $dovecotSharedPath) && close(T) && chown $vmailUid, $vmailGid, $dovecotSharedPath;
     } else {
-	warn("Skipping unknown delivery type: $deliveryType\n");
+	warn("[WARNING] Unknown delivery type: $deliveryType\n");
 	$retval = 1;
     }
 
     if( ! $retval) {
-	warn("IMAP error for account $account: " . $imap->getErrorMessage());
+	warn("[ERROR] IMAP error for account $account: " . $imap->getErrorMessage());
 	$errors ++;
     }
 
