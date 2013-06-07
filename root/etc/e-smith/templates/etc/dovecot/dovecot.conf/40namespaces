@@ -13,7 +13,7 @@ namespace \{
 \}
 
 # Shared mailboxes are { $dovecot{SharedMailboxesStatus} }
-mail_shared_explicit_inbox = yes
+mail_shared_explicit_inbox = no
 namespace \{
   type = shared
   disabled = { $dovecot{SharedMailboxesStatus} eq 'enabled' ? 'no' : 'yes' }
