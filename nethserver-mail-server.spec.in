@@ -59,6 +59,10 @@ usermod -G vmail -a postfix
 %defattr(-,root,root)
 
 %changelog
+* Mon Jun 10 2013 Davide Principi <davide.principi@nethesis.it> - 1.4.1-1.ns6
+- Enable dovecot Listescape plugin #2003
+- Automatic subscription of group shared folders #1879
+
 * Wed May 29 2013 Davide Principi <davide.principi@nethesis.it> - 1.4.0-1.ns6
 - IMAP access for Active Directory users #1747
 
