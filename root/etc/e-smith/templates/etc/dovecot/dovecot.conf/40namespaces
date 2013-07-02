@@ -3,25 +3,13 @@
 #
 
 # Private mailboxes
-namespace \{
+namespace ROOT \{
   type = private
   separator = /
   prefix = 
   # location defaults to mail_location.
   inbox = yes
   subscriptions = yes
-\}
-
-# Shared mailboxes are { $dovecot{SharedMailboxesStatus} }
-mail_shared_explicit_inbox = no
-namespace \{
-  type = shared
-  disabled = { $dovecot{SharedMailboxesStatus} eq 'enabled' ? 'no' : 'yes' }
-  separator = /
-  prefix = Shared/%%n/
-  location = maildir:/var/lib/nethserver/vmail/%%n/Maildir:INDEX=~/Maildir/shared/%%n
-  subscriptions = no
-  list = children
 
   # Commonly used folders:
   mailbox Trash \{
@@ -41,12 +29,18 @@ namespace \{
     auto = no
   \}
 
-  # Our junkmail folder:
-  mailbox junkmail \{
-    special_use = \Junk
-    auto = create
-  \}  
+\}
 
+# Shared mailboxes are { $dovecot{SharedMailboxesStatus} }
+mail_shared_explicit_inbox = no
+namespace SHARED_USERS \{
+  type = shared
+  disabled = { $dovecot{SharedMailboxesStatus} eq 'enabled' ? 'no' : 'yes' }
+  separator = /
+  prefix = Shared/%%n/
+  location = maildir:/var/lib/nethserver/vmail/%%n/Maildir:INDEX=~/Maildir/shared/%%n
+  subscriptions = no
+  list = children
 \}
 
 # Enable acl plugin for shared mailboxes, 
