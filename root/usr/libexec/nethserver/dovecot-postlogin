@@ -23,19 +23,6 @@
 use strict;
 
 #
-# Find the shared groups, by parsing doveconf output. We have no
-# access to AccountsDB here.
-#
-my @sharedGroups = ();
-open(CONF, '-|', '/usr/bin/doveconf -n namespace');
-while(<CONF>) {
-    if($_ =~ /^namespace s-(.+) /) {
-	push @sharedGroups, $1;
-    }
-}
-close(CONF);
-
-#
 # Read secondary groups and prepare a CSV list
 #
 my $groups = `groups $ENV{USER}`;
@@ -47,23 +34,9 @@ $ENV{ACL_GROUPS}=$groups;
 $ENV{MASTER_USER}=$ENV{USER};
 
 #
-# If the actual user is a member of a shared group, enable the shared
-# namespace.
-#
-foreach my $group (split(',', $groups)) {  
-    if( ! grep { $_ eq $group } @sharedGroups) {
-	next;
-    }
-    my $nsKey = "namespace/s-${group}/disabled";
-    $ENV{$nsKey} = "no";
-    $ENV{USERDB_KEYS} .= $nsKey . ' ';
-}
-
-#
 # Export USERDB overrides
 #
 $ENV{USERDB_KEYS} .= 'acl_groups master_user ';
-
 
 #
 # The ENVironment is ready, we are done.
