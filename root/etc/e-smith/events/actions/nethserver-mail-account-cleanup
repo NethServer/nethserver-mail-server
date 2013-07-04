@@ -34,7 +34,7 @@ my $account = shift || die("Missing account name argument!");
 my $mailHomeDir = '/var/lib/nethserver/vmail/' . $account;
 
 if ( -d $mailHomeDir ) {
-    exit system('/bin/rm', '-rf', $mailHomeDir);
+    exec('/bin/rm', '-rf', $mailHomeDir);
 } else {
     warn ("Home directory for $account account does not exist; skipped");
 }
