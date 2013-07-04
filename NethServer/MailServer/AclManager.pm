@@ -66,6 +66,12 @@ sub new
     return $self;
 }
 
+sub create($$)
+{
+    my $self = shift;
+    my $mailbox = shift;
+    return $self->_do('OK CREATE', 'CREATE', $mailbox);
+}
 
 sub setAcl($$$$)
 {

@@ -88,6 +88,8 @@ foreach my $accountRecord (@accounts) {
 	$retval = $imap->deleteAcl('INBOX', '$' . $account);
 	unlink($dovecotSharedPath);
     } elsif($deliveryType eq 'shared') {
+	# Be sure INBOX folder exists:
+	$imap->create('INBOX');
 	# Trigger an ACL change that should update shared-mailboxes.db
 	$imap->setAcl('INBOX', '$' . $account, 'l');
 	$retval = $imap->setAcl('INBOX', '$' . $account, 'lrs');
