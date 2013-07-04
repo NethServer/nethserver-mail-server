@@ -59,6 +59,9 @@ usermod -G vmail -a postfix
 %defattr(-,root,root)
 
 %changelog
+* Thu Jul 04 2013 Davide Principi <davide.principi@nethesis.it> - 1.4.2-1.ns6
+- Fixed automatic subscription of group shared folders - Feature #1879 [NethServer]
+
 * Mon Jun 10 2013 Davide Principi <davide.principi@nethesis.it> - 1.4.1-1.ns6
 - Enable dovecot Listescape plugin #2003
 - Automatic subscription of group shared folders #1879
