@@ -159,11 +159,13 @@ foreach (qw(create modify delete)) {
 }
 
 event_actions('group-create', qw(
+              nethserver-mail-group-change-subscriptions 14
 	      nethserver-mail-account-update 30
 	      nethserver-mail-group-acl-adjust 95
 ));
 
 event_actions('group-modify', qw(
+              nethserver-mail-group-change-subscriptions 14
 	      nethserver-mail-account-update 30
 	      nethserver-mail-group-acl-adjust 95
 ));
@@ -171,6 +173,7 @@ event_actions('group-modify', qw(
 event_actions('group-delete', qw(
 	      nethserver-mail-default-pseudonyms-delete 03
 	      nethserver-mail-group-acl-cleanup 03
+	      nethserver-mail-group-delete-subscriptions 16
 	      nethserver-mail-account-cleanup 30
 ));
 

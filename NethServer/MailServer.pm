@@ -32,6 +32,7 @@ use esmith::DomainsDB;
 use Encode;
 use Text::Unidecode;
 use NethServer::MailServer::AclManager;
+use User::grent;
 
 =head1 NethServer::MailServer package
 
@@ -433,6 +434,75 @@ sub getInternalAddresses()
     }
 
     return @internalAddresses;   
+}
+
+=head2 ->changeGroupSubscriptions($group, $reverse)
+
+The function reads the new members of $group from Members prop and the
+old members of $group from getent(). It calculates the differences
+between the two sets, then invokes doveadm to SUBSCRIBE $group INBOX
+for added members, and UNSUBSCRIBE for removed members.
+
+If $reverse is a TRUE value, new members are read from getent() and
+old members from group Members prop.
+
+Return 1 on success, 0 otherwise.
+
+=cut
+
+sub changeGroupSubscriptions($$)
+{
+    my $self = shift;
+    my $groupName = shift;
+    my $reverse = shift;
+
+    my @validUsers = map { $_->key } $self->{AccountsDb}->users();
+    my $groupRecord = $self->{AccountsDb}->get($groupName);
+    my $groupEntry = getgrnam($groupName);
+
+    my @setR = ();
+    my @setE = ();
+
+    if($groupRecord) {
+	@setR = split(',', ($groupRecord->prop('Members') || ''));
+    }
+
+    if($groupEntry) {
+	@setE = @{$groupEntry->members()};
+    }
+
+    #
+    # Calculate the differences between @setR and @setE, considering
+    # only validUsers
+    #
+
+    my %H = ();
+    $H{$_} |= 0x1 foreach @validUsers;
+    $H{$_} |= 0x2 foreach ($reverse ? @setR : @setE); # old members
+    $H{$_} |= 0x4 foreach ($reverse ? @setE : @setR); # new members
+
+    my @unsubscribeList = ();
+    my @subscribeList = ();
+    my $errors = 0;
+
+    foreach my $u (keys %H) {       
+	my $action;
+
+	if($H{$u} == 0x3) {
+	    $action = 'unsubscribe';
+	} elsif($H{$u} == 0x5) {
+	    $action = 'subscribe';
+	} else {
+	    next;
+	}
+
+	system('/usr/bin/doveadm', 'mailbox', $action , '-u', $u, "Shared/$groupName");
+	if($? != 0) {
+	    $errors ++;
+	}
+    }
+    
+    return ($errors > 0 ? 0 : 1);
 }
 
 1;
