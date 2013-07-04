@@ -158,18 +158,21 @@ foreach (qw(create modify delete)) {
     event_services('group-'  . $_, 'postfix' => 'reload');
 }
 
-event_actions('group-create',
-	      'nethserver-mail-account-update' => '30',
-	      'nethserver-mail-group-acl-adjust' => '95');
+event_actions('group-create', qw(
+	      nethserver-mail-account-update 30
+	      nethserver-mail-group-acl-adjust 95
+));
 
-event_actions('group-modify',
-	      'nethserver-mail-account-update' => '30',
-	      'nethserver-mail-group-acl-adjust' => '95');
+event_actions('group-modify', qw(
+	      nethserver-mail-account-update 30
+	      nethserver-mail-group-acl-adjust 95
+));
 
-event_actions('group-delete',
-	      'nethserver-mail-default-pseudonyms-delete' => '03',
-	      'nethserver-mail-group-acl-cleanup' => '03',
-	      'nethserver-mail-account-cleanup' => '30');
+event_actions('group-delete', qw(
+	      nethserver-mail-default-pseudonyms-delete 03
+	      nethserver-mail-group-acl-cleanup 03
+	      nethserver-mail-account-cleanup 30
+));
 
 
 #
