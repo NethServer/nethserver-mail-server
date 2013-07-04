@@ -72,7 +72,12 @@ foreach my $accountRecord (@accounts) {
 	$errors ++;
 	next;
     }
-        
+
+    #
+    # With Maildir a dovecot-shared file controls if the \Seen flags
+    # are shared or private. See
+    # http://wiki2.dovecot.org/SharedMailboxes/Public#Maildir:_Per-user_.2BAFw-Seen_flag
+    # 
     my $dovecotSharedPath = NethServer::MailServer::getDovecotSharedPath($account);
 
     #
@@ -83,6 +88,8 @@ foreach my $accountRecord (@accounts) {
 	$retval = $imap->deleteAcl('INBOX', '$' . $account);
 	unlink($dovecotSharedPath);
     } elsif($deliveryType eq 'shared') {
+	# Trigger an ACL change that should update shared-mailboxes.db
+	$imap->setAcl('INBOX', '$' . $account, 'l');
 	$retval = $imap->setAcl('INBOX', '$' . $account, 'lrs');
 	open(T, '>', $dovecotSharedPath) && close(T) && chown $vmailUid, $vmailGid, $dovecotSharedPath;
     } else {
