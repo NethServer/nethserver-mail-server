@@ -262,3 +262,13 @@ foreach (qw(
         dovecot restart
     ));
 }
+
+#
+# pre-backup-config event (refs #2043)
+#
+event_actions('pre-backup-config', qw(nethserver-mail-backup 30));
+
+#
+# post-restore-config event (refs #2043)
+#
+event_actions('post-restore-config', qw(nethserver-mail-restore 30));
