@@ -59,6 +59,10 @@ usermod -G vmail -a postfix
 %defattr(-,root,root)
 
 %changelog
+* Mon Jul 22 2013 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 1.4.4-1.ns6
+- Make Dovecot accessibile from red interface when server is in gateway mode #2071
+- make Postfix accessibile from red interface when server is in gateway mode #2069
+
 * Fri Jul 12 2013 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 1.4.3-1.ns6
 - Backup: implement and document full restore #2043
 
