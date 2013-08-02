@@ -59,6 +59,9 @@ usermod -G vmail -a postfix
 %defattr(-,root,root)
 
 %changelog
+* Fri Aug 02 2013 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 1.4.5-1.ns6
+- nethserver-mail-backup: handle files and directories with spaces
+
 * Mon Jul 22 2013 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 1.4.4-1.ns6
 - Make Dovecot accessibile from red interface when server is in gateway mode #2071
 - make Postfix accessibile from red interface when server is in gateway mode #2069
