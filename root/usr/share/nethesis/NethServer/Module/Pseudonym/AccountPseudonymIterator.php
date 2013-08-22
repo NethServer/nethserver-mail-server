@@ -71,6 +71,9 @@ class AccountPseudonymIterator implements \IteratorAggregate
             $pseudonymList = new \ArrayObject();
 
             if ($this->account) {
+                // Temporary native array to manipulate
+                $tmpList = array();
+
                 // Find all pseudonyms (mail addresses) that point to this account:
                 foreach ($this->platform->getDatabase('accounts')->getAll('pseudonym') as $pseudonymKey => $pseudonymRecord) {
                     if ( ! isset($pseudonymRecord['Account']) || $pseudonymRecord['Account'] !== $this->account) {
@@ -81,12 +84,15 @@ class AccountPseudonymIterator implements \IteratorAggregate
                     // Expand domain-less pseudonyms, if required:
                     if (preg_match('/@$/', $pseudonymKey)) {
                         foreach ($this->getLocalDomains() as $domain) {
-                            $pseudonymList[] = $pseudonymKey . $domain;
+                            $tmpList[] = $pseudonymKey . $domain;
                         }
                     } else {
-                        $pseudonymList[] = $pseudonymKey;
+                        $tmpList[] = (string) $pseudonymKey;
                     }
+
+                    $pseudonymList->exchangeArray(array_values(array_unique($tmpList)));
                 }
+
             } else {
                 $pseudonymList = new \ArrayObject(array_map(function ($domain) {
                         return '@' . $domain;
