@@ -59,6 +59,9 @@ usermod -G vmail -a postfix
 %defattr(-,root,root)
 
 %changelog
+* Mon Sep 02 2013 Davide Principi <davide.principi@nethesis.it> - 1.4.6-1.ns6
+- Group (User) UI module: opening a group for update fails - Bug #2082 [NethServer]
+
 * Fri Aug 02 2013 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 1.4.5-1.ns6
 - nethserver-mail-backup: handle files and directories with spaces
 
