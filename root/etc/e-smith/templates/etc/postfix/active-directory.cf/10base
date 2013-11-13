@@ -2,26 +2,25 @@
 # 10base
 # {
     use NethServer::MailServer;
-
     $ms = NethServer::MailServer->new();
-
-    open(CFG, '-|', '/usr/bin/net ads info');
 
     my @tokens = ();
 
-    while(<CFG>) {
-        chomp $_;
-	push @tokens, split(/:\s+/, $_, 2);
+    if(($smb{'ServerRole'} || '') eq 'ADS' && -x '/usr/bin/net') {
+	open(CFG, '-|', '/usr/bin/net ads info');
+	while(<CFG>) {
+	    chomp $_;
+	    push @tokens, split(/:\s+/, $_, 2);
+	}
+	close(CFG);
     }
 
     %ads = (@tokens);
 
-    close(CFG);
-
     '';
 }
 
-server_host = ldap://{$ads{'LDAP server'} || 'nxhost'}
+server_host = {sprintf("ldap://%s", $ads{'LDAP server'} || '')}
 server_port = {$ads{'LDAP port'} || '389'}
 search_base = cn=users,{$ads{'Bind Path'} || 'dc=nxdomain,dc=tld' }
 
@@ -34,3 +33,5 @@ query_filter = (&(|(mail=%s)(userPrincipalName=%s)(otherMailbox=smtp:%s)(proxyAd
 result_attribute = sAMAccountName
 
 domain = {join(', ', $ms->getDeliveryDomains())}
+
+

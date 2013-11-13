@@ -1,23 +1,20 @@
 #
 # 10base -- Active Directory Dovecot configuration
 # {
-    open(CFG, '-|', '/usr/bin/net ads info');
-
     my @tokens = ();
-
-    while(<CFG>) {
-        chomp $_;
-	push @tokens, split(/:\s+/, $_, 2);
+    if(($smb{'ServerRole'} || '') eq 'ADS' && -x '/usr/bin/net') {
+	open(CFG, '-|', '/usr/bin/net ads info');	
+	while(<CFG>) {
+	    chomp $_;
+	    push @tokens, split(/:\s+/, $_, 2);
+	}
+	close(CFG);
     }
-
     %ads = (@tokens);
-
-    close(CFG);
-
     '';
 }
 
-uris = ldap://{$ads{'LDAP server'} || 'nxhost'}:{$ads{'LDAP port'} || '389'}
+uris = { sprintf("ldap://%s:%s", $ads{'LDAP server'} || '', $ads{'LDAP port'} || '389') }
 
 sasl_bind = yes
 sasl_mech = gssapi
@@ -32,4 +29,5 @@ user_attrs = sAMAccountName=user, mailQuotaSize=quota_rule=*:bytes=%$M, =home=/v
 
 iterate_attrs =  sAMAccountName=user
 iterate_filter = (&(objectClass=user)(!(UserAccountControl:1.2.840.113556.1.4.803:=2)))
+
 
