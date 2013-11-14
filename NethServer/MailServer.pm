@@ -239,16 +239,11 @@ sub createUserDefaultPseudonyms($)
 	return 1;
     }
 
-    my $firstName = lc(unidecode(decode("UTF-8", $userRecord->prop('FirstName'))));
-    my $lastName = lc(unidecode(decode("UTF-8", $userRecord->prop('LastName'))));
+    my $prefix = lc($username);
+    $prefix =~ s/[^a-z0-9.-]/_/;
+    $prefix =~ s/_+/_/;
 
-    # Trim any whitespace character
-    $firstName =~ s/\s+//;
-    $lastName =~ s/\s+//;
-
-    my $prefix1 = $firstName . '.' . $lastName;
-
-    $self->_createPseudonymRecords($username, $prefix1);
+    $self->_createPseudonymRecords($username, $prefix);
 
     return 1;
 }
