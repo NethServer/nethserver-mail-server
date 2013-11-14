@@ -52,7 +52,7 @@ my $vmailUid = (getpwnam('vmail'))[2] or die('Missing vmail user');
 foreach my $accountRecord (@accounts) {
 
     my $account = $accountRecord->key;
-    my $retval;
+    my $retval = 1;
 
     if($accountRecord->prop('type') ne 'group') {
 	warn("[ERROR] Account `$account` is not a group\n");
@@ -85,7 +85,9 @@ foreach my $accountRecord (@accounts) {
     #
     my $deliveryType = $accountRecord->prop('MailDeliveryType');
     if($deliveryType eq 'copy' || $accountRecord->prop('MailStatus') eq 'disabled') {
-	$retval = $imap->deleteAcl('INBOX', '$' . $account);
+	if( ! $imap->deleteAcl('INBOX', '$' . $account)) {
+	    $retval = $imap->getErrorMessage() =~ /NONEXISTENT/ ? 1 : 0;
+	}
 	unlink($dovecotSharedPath);
     } elsif($deliveryType eq 'shared') {
 	# Be sure INBOX folder exists:
