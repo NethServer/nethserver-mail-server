@@ -463,7 +463,7 @@ sub changeGroupSubscriptions($$)
     my @setR = ();
     my @setE = ();
 
-    if($groupRecord) {
+    if($groupRecord && $groupRecord->prop('type') eq 'group') {
 	@setR = split(',', ($groupRecord->prop('Members') || ''));
     }
 
@@ -481,22 +481,23 @@ sub changeGroupSubscriptions($$)
     $H{$_} |= 0x2 foreach ($reverse ? @setR : @setE); # old members
     $H{$_} |= 0x4 foreach ($reverse ? @setE : @setR); # new members
 
-    my @unsubscribeList = ();
-    my @subscribeList = ();
     my $errors = 0;
 
     foreach my $u (keys %H) {       
 	my $action;
+	my @folders = ();
 
 	if($H{$u} == 0x3) {
 	    $action = 'unsubscribe';
+	    @folders = ("Shared/$groupName/INBOX", "Shared/$groupName");
 	} elsif($H{$u} == 0x5) {
 	    $action = 'subscribe';
+	    @folders = ("Shared/$groupName/INBOX");
 	} else {
 	    next;
 	}
 
-	system('/usr/bin/doveadm', 'mailbox', $action , '-u', $u, "Shared/$groupName");
+	system('/usr/bin/doveadm', 'mailbox', $action , '-u', $u, @folders);
 	if($? != 0) {
 	    $errors ++;
 	}

@@ -32,7 +32,6 @@ namespace ROOT \{
 \}
 
 # Shared mailboxes are { $dovecot{SharedMailboxesStatus} }
-mail_shared_explicit_inbox = no
 namespace SHARED_USERS \{
   type = shared
   disabled = { $dovecot{SharedMailboxesStatus} eq 'enabled' ? 'no' : 'yes' }
