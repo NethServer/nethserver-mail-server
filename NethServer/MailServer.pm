@@ -463,7 +463,9 @@ sub changeGroupSubscriptions($$)
     my @setR = ();
     my @setE = ();
 
-    if($groupRecord && $groupRecord->prop('type') eq 'group') {
+    if($groupRecord 
+       && $groupRecord->prop('type') eq 'group' 
+       && ($groupRecord->prop('MailDeliveryType') || '') eq 'shared') {
 	@setR = split(',', ($groupRecord->prop('Members') || ''));
     }
 
@@ -489,7 +491,7 @@ sub changeGroupSubscriptions($$)
 
 	if($H{$u} == 0x3) {
 	    $action = 'unsubscribe';
-	    @folders = ("Shared/$groupName/INBOX", "Shared/$groupName");
+	    @folders = ("Shared/$groupName/INBOX", "Shared/$groupName", "Shared/$groupName/");
 	} elsif($H{$u} == 0x5) {
 	    $action = 'subscribe';
 	    @folders = ("Shared/$groupName/INBOX");
