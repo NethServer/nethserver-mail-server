@@ -26,7 +26,7 @@ use strict;
 package NethServer::MailServer::AclManager;
 
 use IO::Socket::UNIX;
-use NethServer::Directory;
+use NethServer::Password;
 
 =head1
 
@@ -43,7 +43,7 @@ sub new
     my $self = {
 	login => 'vmail',
 	server => '/var/run/dovecot/imap-ipc',
-	password => NethServer::Directory::getUserPassword('vmail'),
+	password => NethServer::Password->new('vmail')->getAscii(),
 	commandId => 0,
 	debug => 0,
 	error => '',
