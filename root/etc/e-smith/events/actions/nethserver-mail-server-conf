@@ -51,15 +51,22 @@ $ldap->loadLdifSchema('qmail', '/etc/openldap/schema/qmail.ldif') || die("Could 
 # Refs #1516 -- Add vmail user into amavis group, to allow bayes DB
 # updates through sa-learn
 {
-    my $amavisGroup = getgrnam('amavis') or die('Could not find amavis group');
-    
+    my $amavisGroup = getgrnam('amavis') or die('Could not find amavis group');    
     if( ! grep { $_ eq 'vmail'} @{$amavisGroup->members()} ) {
 	system('/usr/sbin/usermod', qw(-a -G amavis vmail));
-	if( $? != 0) {
-	    die;
+	if($? != 0) {
+	    $errors++;
 	}
     }
+}
 
+my $smbads='/usr/libexec/nethserver/smbads';
+if ( -x $smbads && system($smbads, 'test') == 0) {
+    system($smbads, 'initkeytab');
+    if($? != 0) {
+	warn "[ERROR] $smbads initkeytab failed with exit code $?\n";
+	$errors++;
+    }
 }
 
 exit ($errors == 0 ? 0 : 1);
