@@ -59,6 +59,16 @@ usermod -G vmail -a postfix
 %defattr(-,root,root)
 
 %changelog
+* Wed Dec 18 2013 Davide Principi <davide.principi@nethesis.it> - 1.5.0-1.ns6
+- Kerberos keytab file is missing for new services - Bug #2407 [NethServer]
+- Non-spam messages in SpamFolder are retained indefinitely - Enhancement #2290 [NethServer]
+- Group Shared Folder always shown - Bug #2214 [NethServer]
+- Mail-server: avoid warning if Samba is not installed - Enhancement #2153 [NethServer]
+- group-create event fails on nethserver-mail-group-acl-adjust action - Bug #2151 [NethServer]
+- Allow dot in user and group names - Enhancement #2087 [NethServer]
+- Directory: backup service accounts passwords  - Enhancement #2063 [NethServer]
+- Mail-server: automatic subscription of group shared folders - Feature #1879 [NethServer]
+
 * Mon Sep 02 2013 Davide Principi <davide.principi@nethesis.it> - 1.4.6-1.ns6
 - Group (User) UI module: opening a group for update fails - Bug #2082 [NethServer]
 
