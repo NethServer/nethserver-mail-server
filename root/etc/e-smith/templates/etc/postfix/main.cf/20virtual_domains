@@ -14,7 +14,9 @@
 }
 # 
 virtual_alias_maps = { scalar @localDomains ? join(' ', @virtual_alias_maps) : '' }
-alias_maps = hash:/etc/aliases, hash:/etc/postfix/aliases
+
+# Override system default /etc/aliases DB with our template:
+alias_maps = hash:/etc/postfix/aliases, hash:/etc/aliases
 
 # Message delivery transport that the local(8) 
 # delivery agent should use for mailbox delivery:
