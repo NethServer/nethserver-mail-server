@@ -35,10 +35,10 @@ my $errors = 0;
 my $accountsDb = esmith::AccountsDB->open() or die("Could not open destination account db\n");
 
 #
-# Migrate Maildir/ and sieve/ (#1815) subdirs from admin and user home
+# Migrate Maildir/ and sieve/ (#1815) subdirs user home
 # directories
 #
-foreach my $userName ('admin', map { $_->key } $accountsDb->users()) {
+foreach my $userName (map { $_->key } $accountsDb->users()) {
    
     my $srcDirPrefix;
     my $dstDirPrefix = '/var/lib/nethserver/vmail/' . $userName . '/';
