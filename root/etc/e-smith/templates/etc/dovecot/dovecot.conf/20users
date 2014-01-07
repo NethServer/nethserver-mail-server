@@ -25,13 +25,13 @@ passdb \{
   pass = yes
 \}
 
-# User database for admin user:
+# User database for system users:
 passdb \{
   driver = passwd-file
   args = /etc/dovecot/system-users
 \}
 
-# Password database for system users (admin): shadow
+# Password database for system users: shadow
 passdb \{
   driver = pam
   args = max_requests=100 failure_show_msg=yes blocking=yes 
@@ -48,7 +48,7 @@ userdb \{
        args = /etc/dovecot/ldap.conf       
 \}      
 
-# User database for admin user:
+# User database for system users:
 userdb \{
   driver = passwd-file
   args = /etc/dovecot/system-users

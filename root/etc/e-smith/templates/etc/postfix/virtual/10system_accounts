@@ -4,13 +4,11 @@
 {
     #
     # postmaster is required by RFC822 sec 6.3
-    # admin is our default catch-all mailbox (see #1622)
     #
     $OUT = '';
     
     foreach $account (qw(
        postmaster
-       admin
     )) {
 	foreach $domain ($mailServer->getDeliveryDomains()) {
 	    $OUT .= sprintf("%-38s %s\n", $account . '@' . $domain, $account);
