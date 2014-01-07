@@ -1,0 +1,31 @@
+#
+# 20root_alias
+#
+{
+    # Deliver root mail to admin.
+    
+    use esmith::ConfigDB;
+
+    my $configDb = esmith::ConfigDB->open_ro() || die("Could not open Configuration DB");
+
+    my @aliases = ();
+
+    my $externalAddress = $configDb->get_prop('root', 'EmailAddress') || '';
+    my $keepCopy = $configDb->get_prop('root', 'KeepMessageCopy') || '';
+
+    if($externalAddress ne '') {
+	push @aliases, $externalAddress;
+    }
+
+    if($keepCopy eq 'yes') {
+	push @aliases, 'admin';
+    }
+
+    if(@aliases) {
+	$OUT = sprintf("root\t%s", join(", ", @aliases));
+    } else {
+	$OUT = '# see default in /etc/aliases';
+    }
+}
+
+
