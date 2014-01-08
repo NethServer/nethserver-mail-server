@@ -1,0 +1,29 @@
+#
+# 40accounts -- ensure local delivery for our accounts
+#
+{
+    use esmith::AccountsDB;
+
+    my %forwards = $mailServer->getMailboxForwards();
+    my $accountsDb = esmith::AccountsDB->open_ro();
+
+    if( ! $accountsDb) {
+	warn "[ERROR] could not open AccountDB\n";
+	return '';
+    }
+
+    $OUT = '';
+    foreach my $account ($accountsDb->get_all_by_prop('MailStatus' => 'enabled')) {
+	if($account->prop('type') !~ m/^(user|group)$/) {
+	    next;
+	}
+
+	if(defined $forwards{$account->key}) {
+	    next;
+	}
+
+	$OUT .= sprintf("%-16s %s\n", $account->key, $account->key);
+    }   
+}
+
+
