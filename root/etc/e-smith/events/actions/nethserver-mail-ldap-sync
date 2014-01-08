@@ -27,6 +27,7 @@
 #
 
 use esmith::AccountsDB;
+use esmith::ConfigDB;
 use NethServer::Directory;
 use NethServer::MailServer;
 use strict;
@@ -34,7 +35,8 @@ use strict;
 my $event = shift || die("Missing event name argument");
 my $domain = shift;
 
-my $accountsDb = esmith::AccountsDB->open_ro();
+my $accountsDb = esmith::AccountsDB->open_ro() || die("Could not open Accounts DB");
+my $configDb = esmith::ConfigDB->open_ro() || die("Could not open Config DB");
 
 my @accountList = ($accountsDb->users(), $accountsDb->groups());
 
@@ -62,7 +64,7 @@ foreach my $accountRecord (@accountList) {
     if(@addressList) {
 	$ldapEntry->replace(mail => \@addressList);
     } else {
-	$ldapEntry->replace(mail => '');
+	$ldapEntry->replace(mail => [sprintf("%s@%s.%s", $accountRecord->key, $configDb->get_value('SystemName'), $configDb->get_value('DomainName'))]);
     }
     
     $ldapEntry->update($ldap);
