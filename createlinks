@@ -272,3 +272,11 @@ event_actions('pre-backup-config', qw(nethserver-mail-backup 30));
 # post-restore-config event (refs #2043)
 #
 event_actions('post-restore-config', qw(nethserver-mail-restore 30));
+
+
+#
+# FIXME use runlevel-adjust to modify admin default account
+#
+event_actions('runlevel-adjust', qw(
+    nethserver-mail-update-admin 97
+));

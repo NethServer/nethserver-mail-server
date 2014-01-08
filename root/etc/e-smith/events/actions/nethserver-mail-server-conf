@@ -24,6 +24,7 @@ use NethServer::Service;
 use NethServer::Directory;
 use esmith::ConfigDB;
 use User::grent;
+use esmith::event;
 use strict;
 
 my $event = shift;
