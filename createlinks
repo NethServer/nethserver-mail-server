@@ -188,10 +188,10 @@ foreach (qw(create delete modify)) {
                     /etc/postfix/aliases
 		    /etc/postfix/vmailbox
     ));
-    event_actions('domain-'   . $_, 
-                  'nethserver-mail-postmap-update' => '30',
-                  'nethserver-mail-ldap-sync' => 40
-    );
+    event_actions('domain-'   . $_, qw(
+         nethserver-mail-postmap-update 30
+         nethserver-mail-domain-update 40
+    ));
 }
 
 

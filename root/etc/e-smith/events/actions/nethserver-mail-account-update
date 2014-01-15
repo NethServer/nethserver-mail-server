@@ -27,6 +27,7 @@
 #
 
 use esmith::AccountsDB;
+use esmith::ConfigDB;
 use NethServer::Directory;
 use NethServer::MailServer;
 use strict;
@@ -34,7 +35,8 @@ use strict;
 my $event = shift || die("Missing event name argument");
 my $account = shift;
 
-my $accountsDb = esmith::AccountsDB->open_ro();
+my $accountsDb = esmith::AccountsDB->open_ro() || die("Could not open AccountsDB");
+my $configDb = esmith::ConfigDB->open_ro() || die("Could not open ConfigDB");
 
 my @accountList = ();
 
@@ -52,7 +54,7 @@ foreach my $accountRecord (@accountList) {
 
     if($accountRecord->prop('type') ne 'user'
 	&& $accountRecord->prop('type') ne 'group') {
-	warn "Skipping invalid account type:" . $accountRecord->key . "\n";
+	warn "[WARNING] Skipping invalid account type:" . $accountRecord->key . "\n";
 	next;
     }
 
@@ -75,7 +77,7 @@ foreach my $accountRecord (@accountList) {
     if(@addressList) {
 	$ldapEntry->replace(mail => \@addressList);
     } else {
-	$ldapEntry->replace(mail => '');
+	$ldapEntry->replace(mail => [sprintf("%s@%s.%s", $accountRecord->key, $configDb->get_value('SystemName'), $configDb->get_value('DomainName'))]);
     }
     
     my $isEnabledMailStatus = defined $accountRecord->prop('MailStatus')
