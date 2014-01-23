@@ -64,6 +64,7 @@ event_templates($_,
                 /etc/dovecot/active-directory.conf
                 /etc/postfix/active-directory.cf
                 /etc/postfix/chroot-update
+                /etc/sudoers
 )) foreach (qw(nethserver-mail-server-update nethserver-mail-server-uninstall));
 
 
