@@ -98,7 +98,8 @@ foreach my $accountRecord (@accountList) {
     } elsif ($accountRecord->prop('MailQuotaCustom') eq 'unlimited') {
 	$ldapEntry->replace(mailQuotaSize => 0);
     } else {
-	$ldapEntry->replace(mailQuotaSize => $accountRecord->prop('MailQuotaCustom') * 100);
+	my $customQuota = int(($accountRecord->prop('MailQuotaCustom') << 10) / 10.0);
+	$ldapEntry->replace(mailQuotaSize => $customQuota);
     }
 
     $ldapEntry->update($ldap);

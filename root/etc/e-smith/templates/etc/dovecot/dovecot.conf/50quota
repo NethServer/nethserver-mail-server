@@ -6,7 +6,7 @@
         return '';
     }
 
-    my $quotaDefaultSize = $dovecot{QuotaDefaultSize} * 100;
+    my $quotaDefaultSize = int(($dovecot{QuotaDefaultSize} << 10 ) / 10.0);
 
     return <<EOF;
 mail_plugins = \$mail_plugins quota
