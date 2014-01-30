@@ -18,11 +18,11 @@ while ( <OUT> )
     next if /^Username/;
     my @tmp = split("\t", $_);
     if ($tmp[2] eq 'STORAGE') {
-        $results{$tmp[0]}{'size'} = $tmp[3];
-        $results{$tmp[0]}{'max'} = $tmp[4];
-        $results{$tmp[0]}{'perc'} = $tmp[5] =~ s/\s+$//; #rtrim
+        $results{$tmp[0]}{'size'} = int($tmp[3]);
+        $results{$tmp[0]}{'max'} = int($tmp[4]);
+        $results{$tmp[0]}{'perc'} = int($tmp[5]);
     } elsif ($tmp[2] eq 'MESSAGE') {
-        $results{$tmp[0]}{'msg'} = $tmp[3];
+        $results{$tmp[0]}{'msg'} = int($tmp[3]);
     }
 }
 close(OUT);
