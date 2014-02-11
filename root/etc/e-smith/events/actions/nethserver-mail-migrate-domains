@@ -105,6 +105,14 @@ foreach my $srcRecord ($srcAccountsDb->get_all) {
 	warn "[INFO] postmaster@ pseudonyms are defined by the mail server itself and are not migrated.\n";
 	next;
     }
+    
+    #
+    # Skip the creation of 'everyone@' pseudonyms. Refs #2646
+    #
+    if($pseudonym eq 'everyone@') {
+	warn "[INFO] everyone@ pseudonyms are defined by the mail server itself and are not migrated.\n";
+	next;
+    }
 
     # The first time is referenced, configure the account record and
     # save the status to skip this step on the next cycle:
