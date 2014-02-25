@@ -8,7 +8,7 @@
     my $ms = NethServer::MailServer->new();
 
     my @domains = $ms->getDeliveryDomains();
-    my @accounts = map { $_->prop("MailStatus") eq 'enabled' ? $_->key : () } $accountsDb->users();
+    my @accounts = map { ($_->prop("MailStatus") || '') eq 'enabled' ? $_->key : () } $accountsDb->users();
     
     foreach (@domains) {
        $OUT .= sprintf("everyone@%s\t%s\n", $_, join(', ', sort @accounts));
