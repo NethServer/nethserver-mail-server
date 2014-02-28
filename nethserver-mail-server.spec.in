@@ -60,6 +60,9 @@ usermod -G vmail -a postfix
 %defattr(-,root,root)
 
 %changelog
+* Fri Feb 28 2014 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 1.6.2-1.ns6
+- Fix error on pseudonym creation - Bug #2679
+
 * Wed Feb 26 2014 Davide Principi <davide.principi@nethesis.it> - 1.6.1-1.ns6
 - Skip migration of builtin mail aliases - Enhancement #2646 [NethServer]
 
