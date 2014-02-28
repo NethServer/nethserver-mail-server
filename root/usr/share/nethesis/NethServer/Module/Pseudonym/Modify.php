@@ -44,7 +44,8 @@ class Modify extends \Nethgui\Controller\Table\Modify
             array('pseudonym', $keyValidator, Table::KEY),
             array('Description', Validate::ANYTHING, Table::FIELD),
             array('Account', Validate::USERNAME, Table::FIELD),
-            array('Access', $this->createValidator()->memberOf('public', 'private'), Table::FIELD),
+            array('Access', $this->createValidator()->memberOf('public',
+                    'private'), Table::FIELD),
         );
 
         $this->setSchema($parameterSchema);
@@ -68,7 +69,11 @@ class Modify extends \Nethgui\Controller\Table\Modify
         // we must explicitly validate the pseudonym parameter because is not posted with create request
         if ($this->getRequest()->isMutation() && $this->getIdentifier() === 'create') {
             if ($this->getValidator('pseudonym')->evaluate($this->parameters['pseudonym']) !== TRUE) {
-                $report->addValidationErrorMessage($this, 'localAddress', 'valid_email,malformed-localpart');
+                $report->addValidationErrorMessage($this, 'localAddress',
+                    'valid_email,malformed-localpart');
+            } elseif ($this->getIdentifier() === 'create' && $this->getParent()->getAdapter()->offsetExists($this->parameters['pseudonym'])) {
+                $report->addValidationErrorMessage($this, 'localAddress',
+                    'valid_pseudonym_unique');
             }
         }
     }
@@ -84,7 +89,8 @@ class Modify extends \Nethgui\Controller\Table\Modify
         $view->setTemplate($templates[$this->getIdentifier()]);
 
         if ( ! $this->getRequest()->isMutation() && $this->getRequest()->isValidated()) {
-            $view['AccountDatasource'] = new \NethServer\Module\Pseudonym\AccountDatasource($this, $view->getTranslator(), $view['Account']);
+            $view['AccountDatasource'] = new \NethServer\Module\Pseudonym\AccountDatasource($this,
+                $view->getTranslator(), $view['Account']);
             if ($this->getIdentifier() === 'create') {
                 $view['domainAddressDatasource'] = $this->readDomainAddressDatasource($view);
             }
@@ -99,7 +105,8 @@ class Modify extends \Nethgui\Controller\Table\Modify
     {
         $accountDb = $this->getPlatform()->getDatabase('accounts');
         $accountDb->setType($key, 'pseudonym-deleted');
-        $deleteProcess = $this->getPlatform()->signalEvent('pseudonym-delete', array($key));
+        $deleteProcess = $this->getPlatform()->signalEvent('pseudonym-delete',
+            array($key));
         if ($deleteProcess->getExitCode() === 0) {
             parent::processDelete($key);
         }
@@ -115,7 +122,8 @@ class Modify extends \Nethgui\Controller\Table\Modify
         } else {
             $event = $this->getIdentifier();
         }
-        $this->getPlatform()->signalEvent(sprintf('pseudonym-%s@post-process', $event), array($this->parameters['pseudonym']));
+        $this->getPlatform()->signalEvent(sprintf('pseudonym-%s@post-process',
+                $event), array($this->parameters['pseudonym']));
     }
 
     private function readDomainAddressDatasource(\Nethgui\View\ViewInterface $view)

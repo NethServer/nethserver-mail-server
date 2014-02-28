@@ -16,4 +16,5 @@ $L['Users_label'] = 'Users';
 $L['domainAddress_label'] = 'Domain'; 
 $L['localAddress_label'] = 'Email address'; 
 $L['pseudonym_label'] = 'Email address';
+$L['valid_pseudonym_unique'] = 'This address already exists';
 $L['ANY_DOMAIN'] = '[all domains]';
