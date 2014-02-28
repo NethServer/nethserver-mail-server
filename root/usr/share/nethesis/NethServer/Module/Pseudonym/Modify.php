@@ -49,6 +49,8 @@ class Modify extends \Nethgui\Controller\Table\Modify
 
         $this->setSchema($parameterSchema);
 
+        $this->declareParameter('localAddress', Validate::NOTEMPTY);
+        $this->declareParameter('domainAddress', Validate::ANYTHING);
         $this->setDefaultValue('localAddress', '');
         $this->setDefaultValue('domainAddress', '');
 
