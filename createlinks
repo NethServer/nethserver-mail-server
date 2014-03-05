@@ -281,3 +281,13 @@ event_actions('runlevel-adjust', qw(
     nethserver-mail-update-admin 97
     nethserver-mail-server-init-system-users 98
 ));
+
+#
+# profile-modify event (refs #2675)
+#
+event_templates('profile-modify', qw(
+     /etc/postfix/aliases
+));
+event_actions('profile-modify', qw(
+     nethserver-mail-postmap-update 30
+));

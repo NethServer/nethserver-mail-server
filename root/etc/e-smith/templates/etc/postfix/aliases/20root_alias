@@ -16,16 +16,12 @@
     if($externalAddress ne '') {
 	push @aliases, $externalAddress;
     }
-
-    if($keepCopy eq 'yes') {
+   
+    if($keepCopy eq 'yes' || $externalAddress eq '') {
 	push @aliases, 'admin';
     }
 
-    if(@aliases) {
-	$OUT = sprintf("root\t%s", join(", ", @aliases));
-    } else {
-	$OUT = '# see default in /etc/aliases';
-    }
+    $OUT = sprintf("root\t%s", join(", ", @aliases));
 }
 
 
