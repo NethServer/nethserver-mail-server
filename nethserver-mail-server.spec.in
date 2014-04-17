@@ -60,6 +60,9 @@ usermod -G vmail -a postfix
 %defattr(-,root,root)
 
 %changelog
+* Thu Apr 17 2014 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 1.6.4-1.ns6
+- Open POP3s port (995) - Bug #2703
+
 * Mon Mar 10 2014 Davide Principi <davide.principi@nethesis.it> - 1.6.3-1.ns6
 - Backup Notification to System administrator fails by default - Bug #2675 [NethServer]
 
