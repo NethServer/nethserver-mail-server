@@ -1,26 +1,14 @@
 #
 # 10base -- Active Directory Dovecot configuration
-# {
-    my @tokens = ();
-    if(($smb{'ServerRole'} || '') eq 'ADS' && -x '/usr/bin/net') {
-	open(CFG, '-|', '/usr/bin/net ads info');	
-	while(<CFG>) {
-	    chomp $_;
-	    push @tokens, split(/:\s+/, $_, 2);
-	}
-	close(CFG);
-    }
-    %ads = (@tokens);
-    '';
-}
+# 
 
-uris = { sprintf("ldap://%s:%s", $ads{'LDAP server'} || '', $ads{'LDAP port'} || '389') }
+uris = {$uris}
 
 sasl_bind = yes
 sasl_mech = gssapi
 tls = no
 
-base = cn=users,{$ads{'Bind Path'} || 'dc=unknown,dc=bindpath'}
+base = cn=users,{$bindPath}
 scope = onelevel
 default_pass_scheme = CRYPT
 

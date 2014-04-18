@@ -3,26 +3,12 @@
 # {
     use NethServer::MailServer;
     $ms = NethServer::MailServer->new();
-
-    my @tokens = ();
-
-    if(($smb{'ServerRole'} || '') eq 'ADS' && -x '/usr/bin/net') {
-	open(CFG, '-|', '/usr/bin/net ads info');
-	while(<CFG>) {
-	    chomp $_;
-	    push @tokens, split(/:\s+/, $_, 2);
-	}
-	close(CFG);
-    }
-
-    %ads = (@tokens);
-
     '';
 }
 
-server_host = {sprintf("ldap://%s", $ads{'LDAP server'} || '')}
-server_port = {$ads{'LDAP port'} || '389'}
-search_base = cn=users,{$ads{'Bind Path'} || 'dc=nxdomain,dc=tld' }
+server_host = {$ldapHost}
+server_port = {$ldapPort}
+search_base = cn=users,{$bindPath}
 
 bind = sasl
 sasl_mechs = gssapi

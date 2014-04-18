@@ -1,0 +1,10 @@
+{
+    #
+    # 00template_vars
+    #
+
+    $domain = lc($smb{'AdsRealm'}) || $DomainName;
+    $bindPath = join(',', (map { 'dc=' . uc($_) } split('.', $domain)));
+    $uris = 'ldap://' . $domain . ':389';
+    '';
+}
