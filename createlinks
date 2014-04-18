@@ -291,3 +291,13 @@ event_templates('profile-modify', qw(
 event_actions('profile-modify', qw(
      nethserver-mail-postmap-update 30
 ));
+
+
+#
+# hostname-modify event
+#
+event_templates('hostname-modify', qw(
+                /etc/dovecot/active-directory.conf
+                /etc/postfix/active-directory.cf
+));
+
