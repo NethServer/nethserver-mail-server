@@ -8,8 +8,8 @@ sasl_bind = yes
 sasl_mech = gssapi
 tls = no
 
-base = cn=users,{$bindPath}
-scope = onelevel
+base = {$searchBase}
+scope = subtree
 default_pass_scheme = CRYPT
 
 user_filter = (&(sAMAccountName=%n)(!(UserAccountControl:1.2.840.113556.1.4.803:=2)))

@@ -8,7 +8,7 @@
 
 server_host = {$ldapHost}
 server_port = {$ldapPort}
-search_base = cn=users,{$bindPath}
+search_base = {$searchBase}
 
 bind = sasl
 sasl_mechs = gssapi

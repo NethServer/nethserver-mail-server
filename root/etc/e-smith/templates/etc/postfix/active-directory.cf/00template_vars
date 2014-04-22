@@ -7,5 +7,6 @@
     $bindPath = join(',', (map { 'dc=' . uc($_) } split('.', $domain)));
     $ldapHost = $domain
     $ldapPort = 389;
+    $searchBase = join(',', ($smb{'AdsLdapAccountsBranch'} || 'cn=users'), $bindPath);
     '';
 }
