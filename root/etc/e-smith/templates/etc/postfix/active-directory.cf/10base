@@ -15,7 +15,7 @@ sasl_mechs = gssapi
 scope = sub
 version = 3
 
-query_filter = (&(|(mail=%s)(userPrincipalName=%s)(otherMailbox=smtp:%s)(proxyAddress=smtp:%s))(!(UserAccountControl:1.2.840.113556.1.4.803:=2)))
+query_filter = (&(|(mail=%s){ $postfix{'AdsMapUserPrincipalStatus'} eq 'enabled' ? '(userPrincipalName=%s)' : '' }(otherMailbox=smtp:%s)(proxyAddress=smtp:%s))(!(UserAccountControl:1.2.840.113556.1.4.803:=2)))
 result_attribute = sAMAccountName
 
 domain = {join(', ', $ms->getDeliveryDomains())}

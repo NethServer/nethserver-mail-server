@@ -12,7 +12,7 @@ base = {$searchBase}
 scope = subtree
 default_pass_scheme = CRYPT
 
-user_filter = (&(sAMAccountName=%n)(!(UserAccountControl:1.2.840.113556.1.4.803:=2)))
+user_filter = (&(sAMAccountName=%n)(objectClass=user)(!(UserAccountControl:1.2.840.113556.1.4.803:=2)))
 user_attrs = sAMAccountName=user, mailQuotaSize=quota_rule=*:bytes=%$M, =home=/var/lib/nethserver/vmail/%n, =system_groups_user=%n
 
 iterate_attrs =  sAMAccountName=user
