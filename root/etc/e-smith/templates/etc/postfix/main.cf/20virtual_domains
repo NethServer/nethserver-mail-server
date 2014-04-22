@@ -7,7 +7,10 @@
 
     @virtual_alias_maps = qw(hash:/etc/postfix/virtual);
     if($isAdsEnabled) {
-        push @virtual_alias_maps, 'ldap:/etc/postfix/active-directory.cf';	
+        push @virtual_alias_maps, qw(
+            ldap:/etc/postfix/active-directory-users
+            ldap:/etc/postfix/active-directory-groups
+        );	
     }   
 
     scalar @localDomains ? 'enabled' : 'disabled'; 

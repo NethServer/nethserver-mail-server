@@ -62,7 +62,8 @@ event_templates($_,
                 /etc/dovecot/system-users
 		/etc/dovecot/master-users
                 /etc/dovecot/active-directory.conf
-                /etc/postfix/active-directory.cf
+                /etc/postfix/active-directory-users
+                /etc/postfix/active-directory-groups
                 /etc/postfix/chroot-update
                 /etc/sudoers
 )) foreach (qw(nethserver-mail-server-update));
@@ -253,7 +254,8 @@ foreach (qw(
         /etc/dovecot/dovecot.conf
         /etc/dovecot/active-directory.conf
         /etc/postfix/main.cf
-        /etc/postfix/active-directory.cf
+        /etc/postfix/active-directory-users
+        /etc/postfix/active-directory-groups
         /etc/postfix/chroot-update
     ));
 
@@ -298,6 +300,7 @@ event_actions('profile-modify', qw(
 #
 event_templates('hostname-modify', qw(
                 /etc/dovecot/active-directory.conf
-                /etc/postfix/active-directory.cf
+                /etc/postfix/active-directory-users
+                /etc/postfix/active-directory-groups
 ));
 

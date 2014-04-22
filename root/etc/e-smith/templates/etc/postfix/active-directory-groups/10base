@@ -1,0 +1,25 @@
+#
+# 10base
+# {
+    use NethServer::MailServer;
+    $ms = NethServer::MailServer->new();
+    '';
+}
+
+server_host = {$ldapHost}
+server_port = {$ldapPort}
+search_base = {$searchBase}
+
+bind = sasl
+sasl_mechs = gssapi
+scope = sub
+version = 3
+
+query_filter = (&(objectClass=group)(mail=%s))
+result_attribute = sAMAccountName
+special_result_attribute = member
+leaf_result_attribute = sAMAccountName
+
+domain = {join(', ', $ms->getDeliveryDomains())}
+
+
