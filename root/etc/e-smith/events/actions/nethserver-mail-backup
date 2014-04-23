@@ -1,2 +1,0 @@
-#!/bin/bash
-/bin/find /var/lib/nethserver/vmail/ -type d -or -name \*.sieve -print0 | xargs -0 tar -rf /var/lib/nethserver/backup/maildir.tar --no-recursion 2>/dev/null
