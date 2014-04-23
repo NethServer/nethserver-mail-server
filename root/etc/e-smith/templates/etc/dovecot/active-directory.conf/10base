@@ -12,10 +12,11 @@ base = {$searchBase}
 scope = subtree
 default_pass_scheme = CRYPT
 
-user_filter = (&(sAMAccountName=%n)(objectClass=user)(!(UserAccountControl:1.2.840.113556.1.4.803:=2)))
+# This filter accepts only enabled users or standard security groups (thus excludes distribution groups)
+user_filter = (&(sAMAccountName=%n)(|(&(objectClass=group)(sAMAccountType=268435456))(&(objectClass=user)(!(UserAccountControl:1.2.840.113556.1.4.803:=2)))))
 user_attrs = sAMAccountName=user, mailQuotaSize=quota_rule=*:bytes=%$M, =home=/var/lib/nethserver/vmail/%n, =system_groups_user=%n
 
 iterate_attrs =  sAMAccountName=user
-iterate_filter = (&(objectClass=user)(!(UserAccountControl:1.2.840.113556.1.4.803:=2)))
+iterate_filter = (|(&(objectClass=group)(sAMAccountType=268435456))(&(objectClass=user)(!(UserAccountControl:1.2.840.113556.1.4.803:=2))))
 
 
