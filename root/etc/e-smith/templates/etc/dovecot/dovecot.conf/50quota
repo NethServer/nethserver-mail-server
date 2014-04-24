@@ -16,7 +16,7 @@ protocol imap {
 }
 
 plugin {
-  quota = maildir:User quota
+  quota = maildir:Quota
   quota_rule  = *:bytes=${quotaDefaultSize}M
 }
 EOF
