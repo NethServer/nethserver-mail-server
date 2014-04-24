@@ -188,6 +188,8 @@ foreach (qw(create delete modify)) {
 		    /etc/postfix/virtual
                     /etc/postfix/aliases
 		    /etc/postfix/vmailbox
+                    /etc/postfix/active-directory-users
+                    /etc/postfix/active-directory-groups
     ));
     event_actions('domain-'   . $_, qw(
          nethserver-mail-postmap-update 30
