@@ -15,7 +15,15 @@ sasl_mechs = gssapi
 scope = sub
 version = 3
 
-query_filter = (&(objectClass=group)(mail=%s))
+query_filter = (&(objectClass=group)(mail=%s){
+  if($postfix{'AdsGroupsDeliveryType'} eq 'shared') {
+    # include only distribution list groups
+    $OUT = '(sAMAccountType=268435457)';
+  } else {
+    # any type of group objects are included
+    $OUT = '';
+  }
+})
 result_attribute = sAMAccountName
 special_result_attribute = member
 leaf_result_attribute = sAMAccountName
