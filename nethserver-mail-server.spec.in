@@ -60,6 +60,13 @@ usermod -G vmail -a postfix
 %defattr(-,root,root)
 
 %changelog
+* Thu Jun 12 2014 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 1.7.0-1.ns6
+- AD group mail delivery type switch - Feature #2751
+- Use DNS A record to locate AD controllers - Enhancement #2729
+- Configurable AD accounts LDAP subtree - Enhancement #2727
+- SOGo does not display user mail quota - Bug #2722
+- Backup config: minimize creation of new backup - Enhancement #2699
+
 * Thu Apr 17 2014 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 1.6.4-1.ns6
 - Open POP3s port (995) - Bug #2703
 
