@@ -1,7 +1,7 @@
 Summary: Mail server implementation based on postfix and dovecot packages
 Name: nethserver-mail-server
-Version: @@VERSION@@
-Release: @@RELEASE@@
+Version: 1.7.0
+Release: 1%{?dist}
 License: GPL
 URL: %{url_prefix}/%{name} 
 Source0: %{name}-%{version}.tar.gz
