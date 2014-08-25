@@ -58,6 +58,7 @@ usermod -G vmail -a postfix
 
 %files -f %{name}-%{version}-filelist
 %defattr(-,root,root)
+%attr(0644, root, root) %config(noreplace) %{_sysconfdir}/logrotate.d/imap
 
 %changelog
 * Thu Jun 12 2014 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 1.7.0-1.ns6
