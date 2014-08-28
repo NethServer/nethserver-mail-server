@@ -64,10 +64,7 @@ class Mail extends \Nethgui\Controller\Table\RowPluginAction
     {
         parent::prepareView($view);
 
-        $h = array();
-        for ($i = 1; $i <= 50; $i += ($i === 1) ? 4 : 5) {
-            $h[$i * 10] = $i . ' GB';
-        }
+        $h = \NethServer\Module\Mail\Mailbox::getQuotaUiFunction($this->getPlatform()->getDatabase('configuration'));
         $h['unlimited'] = $view->translate('Unlimited_quota');
         $view['MailQuotaCustomDatasource'] = \Nethgui\Renderer\AbstractRenderer::hashToDatasource($h);
 

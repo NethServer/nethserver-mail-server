@@ -4,10 +4,9 @@
     # from public listener
     #
 
-    @smtpd_recipient_restrictions = map { $_ eq 'reject_non_fqdn_recipient' ? 
-					  ('reject_non_fqdn_recipient', 
-					  'check_recipient_access hash:/etc/postfix/internal_access') 
-					  : $_ } @smtpd_recipient_restrictions ;
+    @smtpd_recipient_restrictions = map { $_ eq 'reject_non_fqdn_recipient' 
+					      ? ( $_, 'check_recipient_access hash:/etc/postfix/internal_access') 
+					      : $_ } @smtpd_recipient_restrictions ;
     '';  # Fragment delivers empty string as
 	 # smtpd_recipient_restrictions parameter is expanded by
 	 # nethserver-mail-common package
