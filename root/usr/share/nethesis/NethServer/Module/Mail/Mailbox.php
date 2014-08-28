@@ -1,4 +1,5 @@
 <?php
+
 namespace NethServer\Module\Mail;
 
 /*
@@ -47,10 +48,7 @@ class Mailbox extends \Nethgui\Controller\AbstractController
     public function prepareView(\Nethgui\View\ViewInterface $view)
     {
         parent::prepareView($view);
-        $h = array();
-        for ($i = 1; $i <= 50; $i += ($i === 1) ? 4 : 5) {
-            $h[$i * 10] = $i . ' GB';
-        }
+        $h = self::getQuotaUiFunction($this->getPlatform()->getDatabase('configuration'));
         $view['QuotaDefaultSizeDatasource'] = \Nethgui\Renderer\AbstractRenderer::hashToDatasource($h);
 
         $view['SpamRetentionTimeDatasource'] = \Nethgui\Renderer\AbstractRenderer::hashToDatasource(array(
@@ -64,12 +62,29 @@ class Mailbox extends \Nethgui\Controller\AbstractController
                 '90d' => $view->translate('${0} days', array(90)),
                 '180d' => $view->translate('${0} days', array(180)),
                 'infinite' => $view->translate('ever'),
-            ));
+        ));
     }
 
     protected function onParametersSaved($changedParameters)
     {
         $this->getPlatform()->signalEvent('nethserver-mail-server-save@post-process');
+    }
+
+    public static function getQuotaUiFunction(\Nethgui\System\DatabaseInterface $configDb)
+    {
+        $increments = array_unique(array_filter(explode(',', $configDb->getProp('dovecot', 'QuotaUiFunction')), function ($x) {
+            return is_integer($x) && $x >= 1;
+        }));
+        sort($increments);
+        if ( ! $increments) {
+            // default function:
+            $increments = array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 25, 30, 35, 40, 45, 50, 100, 150, 200, 250, 300, 350, 400, 450, 500, 600, 700, 800, 900, 1000);
+        }
+        $h = array();
+        foreach ($increments as $i) {
+            $h[$i] = $i >= 10 ? (($i / 10.0) . ' GB') : (($i * 100) . ' MB');
+        }
+        return $h;
     }
 
 }
