@@ -82,6 +82,7 @@ event_actions('nethserver-mail-server-update', qw(
 
 event_services('nethserver-mail-server-update',
 	       'dovecot' => 'restart',
+	       'rsyslog' => 'restart',
 	       'postfix' => 'restart');
 
 #
