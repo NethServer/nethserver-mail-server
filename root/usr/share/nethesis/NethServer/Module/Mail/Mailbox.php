@@ -72,14 +72,13 @@ class Mailbox extends \Nethgui\Controller\AbstractController
 
     public static function getQuotaUiFunction(\Nethgui\System\DatabaseInterface $configDb)
     {
-        $increments = array_unique(array_filter(explode(',', $configDb->getProp('dovecot', 'QuotaUiFunction')), function ($x) {
-            return is_integer($x) && $x >= 1;
-        }));
+        $increments = array_unique(array_filter(array(1, 2, 3, 4, 5, 6, 7, 8, 9,
+            10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 25, 30, 35, 40, 45, 50,
+            100, 150, 200, 250, 300, 350, 400, 450, 500, 600, 700, 800, 900, 1000,
+            $configDb->getProp('dovecot', 'QuotaDefaultSize')), function ($x) {
+                return (integer) $x >= 1;
+            }));
         sort($increments);
-        if ( ! $increments) {
-            // default function:
-            $increments = array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 25, 30, 35, 40, 45, 50, 100, 150, 200, 250, 300, 350, 400, 450, 500, 600, 700, 800, 900, 1000);
-        }
         $h = array();
         foreach ($increments as $i) {
             $h[$i] = $i >= 10 ? (($i / 10.0) . ' GB') : (($i * 100) . ' MB');
