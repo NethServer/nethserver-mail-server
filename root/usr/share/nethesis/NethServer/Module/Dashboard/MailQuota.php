@@ -36,9 +36,9 @@ class MailQuota extends \Nethgui\Controller\TableController
 
         $columns = array(
             'Key',
-            'size',
-            'max_size',
-            'percentage',
+            array('name' => 'size', 'columnDefs' => array('type' => 'file-size')),
+            array('name' => 'max_size', 'columnDefs' => array('type' => 'file-size')),
+            array('name' => 'percentage', 'columnDefs' => array('type' => 'percent')),
             'msg_number',
         );
 
