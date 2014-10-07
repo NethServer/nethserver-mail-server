@@ -1,6 +1,6 @@
 Summary: Mail server implementation based on postfix and dovecot packages
 Name: nethserver-mail-server
-Version: 1.7.0
+Version: 1.8.0
 Release: 1%{?dist}
 License: GPL
 URL: %{url_prefix}/%{name} 
@@ -61,6 +61,16 @@ usermod -G vmail -a postfix
 %attr(0644, root, root) %config(noreplace) %{_sysconfdir}/logrotate.d/imap
 
 %changelog
+* Tue Oct 07 2014 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 1.8.0-1.ns6
+- Avoid excessive postfix reload  - Enhancement #2843
+- Dovecot: separate log files for IMAP and LMTP/delivery - Enhancement #2841
+- Relay denied to SMTP clients both in local networks and submission_whitelist - Bug #2814
+- Edit workgroup name when role is Workstation - Enhancement
+- Relax Postix restrictions for whitelisted senders - Enhancement #2768
+- Mail spying / always Bcc - Feature #2750
+- Customizable mail quota increments - Enhancement #2723
+- Dashboard mail quota panel: order by size is wrong - Bug #2698
+
 * Thu Jun 12 2014 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 1.7.0-1.ns6
 - AD group mail delivery type switch - Feature #2751
 - Use DNS A record to locate AD controllers - Enhancement #2729
