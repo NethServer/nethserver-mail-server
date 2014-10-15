@@ -1,6 +1,6 @@
 Summary: Mail server implementation based on postfix and dovecot packages
 Name: nethserver-mail-server
-Version: 1.8.0
+Version: 1.8.1
 Release: 1%{?dist}
 License: GPL
 URL: %{url_prefix}/%{name} 
@@ -61,6 +61,9 @@ usermod -G vmail -a postfix
 %attr(0644, root, root) %config(noreplace) %{_sysconfdir}/logrotate.d/imap
 
 %changelog
+* Wed Oct 15 2014 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 1.8.1-1.ns6
+- Backup config: remove /etc/aliases - Feature #2739
+
 * Tue Oct 07 2014 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 1.8.0-1.ns6
 - Avoid excessive postfix reload  - Enhancement #2843
 - Dovecot: separate log files for IMAP and LMTP/delivery - Enhancement #2841
