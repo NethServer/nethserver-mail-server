@@ -41,6 +41,10 @@ if($accountRecord->prop('type') !~ /^group(-deleted)?$/) {
     die("Account `$account` is not a group");
 }
 
+if(($accountRecord->prop('MailStatus') || '') ne 'enabled') {
+    exit(0);
+}
+
 my $imap = NethServer::MailServer->connectAclManager($account . '*vmail');
 	    
 if( ! $imap) {
