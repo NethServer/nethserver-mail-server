@@ -70,9 +70,10 @@ foreach my $srcDomain ($srcDomainsDb->domains()) {
 }
 
 #
-# loop on pseudonyms:
+# loop on accounts: users, then groups, because groups depends on
+# users.
 #
-foreach my $srcRecord ($srcAccountsDb->get_all) {
+foreach my $srcRecord ($srcAccountsDb->users(), $srcAccountsDb->groups()) {
 
     my $accountName;
     my $pseudonym;
