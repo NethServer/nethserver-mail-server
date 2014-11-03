@@ -1,6 +1,6 @@
 Summary: Mail server implementation based on postfix and dovecot packages
 Name: nethserver-mail-server
-Version: 1.8.1
+Version: 1.8.2
 Release: 1%{?dist}
 License: GPL
 URL: %{url_prefix}/%{name} 
@@ -61,6 +61,10 @@ usermod -G vmail -a postfix
 %attr(0644, root, root) %config(noreplace) %{_sysconfdir}/logrotate.d/imap
 
 %changelog
+* Mon Nov 03 2014 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 1.8.2-1.ns6
+- nethserver-mail-group-acl-cleanup FAILED: group not deleted - Bug #2933 [NethServer]
+- Action nethserver-mail-group-change-subscriptions fails - Bug #2888 [NethServer]
+
 * Wed Oct 15 2014 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 1.8.1-1.ns6
 - Backup config: remove /etc/aliases - Feature #2739
 
