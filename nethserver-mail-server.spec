@@ -8,7 +8,7 @@ Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
 
 Requires: dovecot >= 2.1.16, dovecot-pigeonhole >= 2.1.16, dovecot-antispam >= 0.0.49-1
-Requires: nethserver-mail-common >= 1.2.0
+Requires: nethserver-mail-common > 1.4.1-1
 Requires: nethserver-directory
 Requires: perl(Text::Unidecode)
 Requires: cyrus-sasl-plain, cyrus-sasl-ldap, cyrus-sasl-ntlm, cyrus-sasl-md5
@@ -52,9 +52,13 @@ if ! id vmail >/dev/null 2>&1 ; then
 fi
 
 # add vmail group to postfix user
-usermod -G vmail -a postfix
+usermod -G vmail -a postfix >/dev/null 2>&1
 
-%post
+# Add amavis to vmail group to talk to dovecot LMTP socket:
+usermod -G vmail -a amavis >/dev/null 2>&1
+
+exit 0
+
 
 %files -f %{name}-%{version}-filelist
 %defattr(-,root,root)

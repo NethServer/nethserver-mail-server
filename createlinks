@@ -59,6 +59,8 @@ event_templates($_,
 		/etc/postfix/master.cf
 		/etc/dovecot/ldap.conf
 		/etc/sysconfig/dovecot
+		/etc/sysconfig/amavisd
+		/etc/amavisd.conf
                 /etc/dovecot/system-users
 		/etc/dovecot/master-users
                 /etc/dovecot/active-directory.conf
@@ -80,10 +82,12 @@ event_actions('nethserver-mail-server-update', qw(
 	      nethserver-mail-account-update 40
 ));
 
-event_services('nethserver-mail-server-update',
-	       'dovecot' => 'restart',
-	       'rsyslog' => 'restart',
-	       'postfix' => 'restart');
+event_services('nethserver-mail-server-update', qw(
+	       amavisd restart
+	       dovecot restart
+	       rsyslog restart
+	       postfix restart
+));
 
 #
 # nethserver-mail-server-SAVE event

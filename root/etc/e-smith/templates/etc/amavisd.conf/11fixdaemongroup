@@ -1,0 +1,6 @@
+#
+# 11fixdaemongroup
+#
+$daemon_user = undef;
+$daemon_group = undef;
+
