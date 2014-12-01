@@ -80,6 +80,7 @@ for USER in `/usr/bin/doveadm user \*`; do
     # Synchronize maildir:
     /usr/bin/rsync `[ ${DRYRUN} -gt 0 ] && echo '-n -v'` -r -l -t \
 	-e "ssh -p ${sourcePort} -l root" \
+	--delete \
 	"${sourceHost}:/home/e-smith/files/users/${USER}/Maildir/" \
 	"${destinationMaildir}"
     
