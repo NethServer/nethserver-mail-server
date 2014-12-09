@@ -1,6 +1,6 @@
 Summary: Mail server implementation based on postfix and dovecot packages
 Name: nethserver-mail-server
-Version: 1.8.2
+Version: 1.8.3
 Release: 1%{?dist}
 License: GPL
 URL: %{url_prefix}/%{name} 
@@ -65,6 +65,10 @@ exit 0
 %attr(0644, root, root) %config(noreplace) %{_sysconfdir}/logrotate.d/imap
 
 %changelog
+* Tue Dec 09 2014 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 1.8.3-1.ns6
+- Avoid fetchmail bounces - Enhancement #2954 [NethServer]
+- sync_maildirs.sh delete - Bug #2884 [NethServer]
+
 * Mon Nov 03 2014 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 1.8.2-1.ns6
 - nethserver-mail-group-acl-cleanup FAILED: group not deleted - Bug #2933 [NethServer]
 - Action nethserver-mail-group-change-subscriptions fails - Bug #2888 [NethServer]
