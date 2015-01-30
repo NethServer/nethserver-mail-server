@@ -8,6 +8,7 @@ Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
 
 Requires: dovecot >= 2.1.16, dovecot-pigeonhole >= 2.1.16, dovecot-antispam >= 0.0.49-1
+Requires: dovecot-deleted-to-trash >= 0.6
 Requires: nethserver-mail-common > 1.4.1-1
 Requires: nethserver-directory
 Requires: perl(Text::Unidecode)
