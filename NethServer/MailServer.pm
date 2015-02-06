@@ -6,19 +6,19 @@
 #
 # Copyright (C) 2012 Nethesis S.r.l.
 # http://www.nethesis.it - support@nethesis.it
-# 
+#
 # This script is part of NethServer.
-# 
+#
 # NethServer is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License,
 # or any later version.
-# 
+#
 # NethServer is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with NethServer.  If not, see <http://www.gnu.org/licenses/>.
 #
@@ -45,7 +45,7 @@ Copyright (C) 2012 Nethesis srl
 Create a new MailServer object
 
 =cut
-sub new 
+sub new
 {
     my $class = shift;
 
@@ -61,11 +61,11 @@ sub new
 
 =head2 ->getMailboxForwards()
 
-Return an hash with account forward settings 
+Return an hash with account forward settings
 
 =cut
 
-sub getMailboxForwards() 
+sub getMailboxForwards()
 {
     my $self = shift;
     my %forwards = ();
@@ -79,31 +79,31 @@ sub getMailboxForwards()
 
 	my @destinations = ();
 	my $account = $accountRecord->key;
-	
-	if($accountRecord->prop('type') eq 'user' 
+
+	if($accountRecord->prop('type') eq 'user'
 	   && $accountRecord->prop('MailForwardStatus') eq 'enabled') {
 
 	    push @destinations, $accountRecord->prop('MailForwardAddress');
 
 	    if($accountRecord->prop('MailForwardKeepMessageCopy') eq 'yes') {
 		push @destinations, $account;
-	    }	   
-	    
-	} elsif($accountRecord->prop('type') eq 'group' 
+	    }
+
+	} elsif($accountRecord->prop('type') eq 'group'
 		&& ( ! $accountRecord->prop('MailDeliveryType') # empty === copy
 		     || $accountRecord->prop('MailDeliveryType') eq 'copy')) {
-		
-	    @destinations = map { 
+
+	    @destinations = map {
 		    my $userRecord = $self->{AccountsDb}->get($_);
-		    
-		    # search group members having MailStatus enabled		    
-		    if(defined $userRecord 
+
+		    # search group members having MailStatus enabled
+		    if(defined $userRecord
 		       && ($userRecord->prop('MailStatus') || '') eq 'enabled') {
 			($_);
 		    } else {
 			();
 		    }
-		    
+
 	    } split(',', $accountRecord->prop('Members'));
 
 	    # If the group has no members, forward message to
@@ -111,7 +111,7 @@ sub getMailboxForwards()
 	    if( ! @destinations) {
 		@destinations = 'postmaster';
 	    }
-	    
+
 	}
 
 	if(@destinations) {
@@ -169,7 +169,7 @@ sub getMailboxAliases()
 	    #
 	    @destinations = ($account);
 
-	} 
+	}
 
 	my ($localPart, $domainPart) = split('@', $pseudonym);
 	my @dbKeys;
@@ -186,7 +186,7 @@ sub getMailboxAliases()
 	    }
 	    if(@destinations) {
 		push @{$aliasMap{$_}}, @destinations;
-	    }	    
+	    }
 	}
 
     }
@@ -204,9 +204,9 @@ sub createAccountDefaultPseudonyms($)
 {
     my $self = shift;
     my $account = shift;
-    
+
     my $accountType = $self->{AccountsDb}->get_prop($account, 'type');
-    
+
     if($accountType eq 'user') {
 	return $self->createUserDefaultPseudonyms($account);
     } elsif($accountType eq 'group') {
@@ -214,7 +214,7 @@ sub createAccountDefaultPseudonyms($)
     } else {
 	$self->{debug} && warn("Invalid account type for key `$account`\n");
 	return 1;
-    }       
+    }
 }
 
 =head2 ->createUserDefaultPseudonyms($username)
@@ -222,7 +222,7 @@ sub createAccountDefaultPseudonyms($)
 Create user pseudonyms according to our rules
 
 =cut
-sub createUserDefaultPseudonyms($) 
+sub createUserDefaultPseudonyms($)
 {
     my $self = shift;
     my $username = shift;
@@ -288,7 +288,7 @@ sub _createPseudonymRecords()
     my @prefixList = @_;
 
     my @domainList = $self->getDeliveryDomains();
-    
+
     # Create a domain-less pseudonym for each prefix Refs #1665:
     foreach (@prefixList) {
 	my $address = $_ . '@';
@@ -304,7 +304,7 @@ sub _createPseudonymRecords()
 
 	if( ! $newRecord) {
 	    $self->{debug} && warn ("Pseudonym '${address}' already exists!");
-	}	
+	}
     }
 
 }
@@ -314,11 +314,10 @@ sub _createPseudonymRecords()
 Return a list of email address for the given $account argument
 
 =cut
-sub getAccountMailAddresses($) 
+sub getAccountMailAddresses($)
 {
     my $self = shift;
     my $account = shift;
-
     my @addresses = ();
     foreach ($self->_getAccountPseudonymRecords($account)) {
 	push @addresses, $self->pseudonymToAddresses($_->key);
@@ -354,7 +353,7 @@ sub pseudonymToAddresses($)
 Return a list of pseudonym keys pointing to the given $account argument
 
 =cut
-sub getAccountPseudonyms($) 
+sub getAccountPseudonyms($)
 {
     my $self = shift;
     my $account = shift;
@@ -386,7 +385,7 @@ sub _getAccountPseudonymRecords($)
 Get the list of domains configured for local or remote delivery
 
 =cut
-sub getDeliveryDomains() 
+sub getDeliveryDomains()
 {
     my $self = shift;
     # Fill the list of domains with Local or Remote Delivery type:
@@ -438,13 +437,13 @@ sub getInternalAddresses()
     my @internalAddresses = ();
 
     foreach my $addressRecord ($self->{AccountsDb}->pseudonyms()) {
-	if(defined $addressRecord->prop('Access') 
+	if(defined $addressRecord->prop('Access')
 	   && $addressRecord->prop('Access') eq 'private') {
 	    push @internalAddresses, $addressRecord->key;
 	}
     }
 
-    return @internalAddresses;   
+    return @internalAddresses;
 }
 
 =head2 ->changeGroupSubscriptions($group, $reverse)
@@ -474,8 +473,8 @@ sub changeGroupSubscriptions($$)
     my @setR = ();
     my @setE = ();
 
-    if($groupRecord 
-       && $groupRecord->prop('type') eq 'group' 
+    if($groupRecord
+       && $groupRecord->prop('type') eq 'group'
        && ($groupRecord->prop('MailDeliveryType') || '') eq 'shared') {
 	@setR = split(',', ($groupRecord->prop('Members') || ''));
     }
@@ -496,7 +495,7 @@ sub changeGroupSubscriptions($$)
 
     my $errors = 0;
 
-    foreach my $u (keys %H) {       
+    foreach my $u (keys %H) {
 	my $action;
 	my @folders = ();
 
@@ -515,7 +514,7 @@ sub changeGroupSubscriptions($$)
 	    $errors ++;
 	}
     }
-    
+
     return ($errors > 0 ? 0 : 1);
 }
 
