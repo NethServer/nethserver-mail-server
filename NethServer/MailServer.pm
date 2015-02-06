@@ -320,16 +320,32 @@ sub getAccountMailAddresses($)
     my $account = shift;
 
     my @addresses = ();
-    foreach my $pseudonymRecord ($self->_getAccountPseudonymRecords($account)) {
-	my $key = $pseudonymRecord->key; 
-	if($key =~ /\@$/) {
-	    # Expand domainless pseudonyms, by appending domain names:
-	    push @addresses, map { $key . $_ } $self->getDeliveryDomains();
-	} else {
-	    push @addresses, $key; 
-	}
+    foreach ($self->_getAccountPseudonymRecords($account)) {
+	push @addresses, $self->pseudonymToAddresses($_->key);
     }
     return @addresses;
+}
+
+
+=head2 ->pseudonymToAddresses($pseudonym)
+
+Return the expanded email addresses from a pseudonym key
+
+For instance,
+
+  me@mail.gov => (me@mail.gov)
+  you@ => (you@mail.gov, you@mail.net, ...)
+
+=cut
+sub pseudonymToAddresses($)
+{
+    my $self = shift;
+    my $key = shift;
+    if($key =~ /\@$/) {
+	# Expand domainless pseudonyms, by appending domain names:
+	return map { $key . $_ } $self->getDeliveryDomains();
+    }
+    return ($key);
 }
 
 
