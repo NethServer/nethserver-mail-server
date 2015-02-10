@@ -1,6 +1,6 @@
 Summary: Mail server implementation based on postfix and dovecot packages
 Name: nethserver-mail-server
-Version: 1.8.3
+Version: 1.8.4
 Release: 1%{?dist}
 License: GPL
 URL: %{url_prefix}/%{name} 
@@ -65,6 +65,11 @@ exit 0
 %attr(0644, root, root) %config(noreplace) %{_sysconfdir}/logrotate.d/imap
 
 %changelog
+* Tue Feb 10 2015 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 1.8.4-1.ns6
+- Pseudonyms no longer migrated - Bug #3019 [NethServer]
+- LDAP mail alias not removed - Bug #2996 [NethServer]
+- Delete does not work in IMAP shared folders - Bug #2991 [NethServer]
+
 * Tue Dec 09 2014 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 1.8.3-1.ns6
 - Avoid fetchmail bounces - Enhancement #2954 [NethServer]
 - sync_maildirs.sh delete - Bug #2884 [NethServer]
