@@ -3,7 +3,6 @@
 #
 {
 	if (($dovecot{'LogActions'} || 'disabled') eq 'enabled') {
-	
 		my $string = <<HERE;
 mail_plugins = \$mail_plugins mail_log notify
 plugin {
@@ -14,8 +13,7 @@ HERE
     	$OUT .= $string;
 	}
 	else{
-	    $OUT .= "# Actions loging is disabled\n";
+	    $OUT .= "# Actions logging is disabled\n";
 	}
 }
-
 
