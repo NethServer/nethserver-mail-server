@@ -1,6 +1,6 @@
 Summary: Mail server implementation based on postfix and dovecot packages
 Name: nethserver-mail-server
-Version: 1.8.5
+Version: 1.8.6
 Release: 1%{?dist}
 License: GPL
 URL: %{url_prefix}/%{name} 
@@ -66,6 +66,9 @@ exit 0
 %attr(0644, root, root) %config(noreplace) %{_sysconfdir}/logrotate.d/imap
 
 %changelog
+* Fri Feb 27 2015 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 1.8.6-1
+- Log imap actions - Feature #3042 [NethServer]
+
 * Thu Feb 19 2015 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 1.8.5-1
 - Email not deleted when using Outlook client - Enhancement #2810 [NethServer]
 
