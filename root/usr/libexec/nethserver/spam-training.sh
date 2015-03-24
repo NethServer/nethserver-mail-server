@@ -41,6 +41,10 @@ function log {
     [ -x /usr/bin/logger ] && /usr/bin/logger -i -t "${PROG}/${USER}" -p "mail.${level}" $*;    
 }
 
+if ! [ -x /usr/bin/sa-learn ] || ! getent passwd amavis &>/dev/null; then
+    # Nothing to do if spamassassin is not installed
+    exit 0
+fi
 
 # If defined spamtrainers user group, require that the current user is
 # a member of it before going on.
