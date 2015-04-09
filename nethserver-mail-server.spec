@@ -1,6 +1,6 @@
 Summary: Mail server implementation based on postfix and dovecot packages
 Name: nethserver-mail-server
-Version: 1.8.6
+Version: 1.8.7
 Release: 1%{?dist}
 License: GPL
 URL: %{url_prefix}/%{name} 
@@ -66,6 +66,9 @@ exit 0
 %attr(0644, root, root) %config(noreplace) %{_sysconfdir}/logrotate.d/imap
 
 %changelog
+* Thu Apr 09 2015 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 1.8.7-1
+- Error in /etc/postfix/virtual and /etc/dovecot/dovecot.conf template - Bug #3093 [NethServer]
+
 * Fri Feb 27 2015 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 1.8.6-1
 - Log imap actions - Feature #3042 [NethServer]
 
