@@ -1,0 +1,12 @@
+{
+  #
+  # bug2996.ns6_5 remove safely after 6.6 final release!
+  #
+  use esmith::AccountsDB;
+  my $adb = esmith::AccountsDB->open();
+
+  foreach ($adb->pseudonyms()) {
+     $_->delete_prop('_prevAccount');
+  }
+  '';
+}

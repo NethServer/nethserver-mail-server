@@ -94,7 +94,7 @@ foreach my $accountRecord (@accounts) {
 	$imap->create('INBOX');
 	# Trigger an ACL change that should update shared-mailboxes.db
 	$imap->setAcl('INBOX', '$' . $account, 'l');
-	$retval = $imap->setAcl('INBOX', '$' . $account, 'lrs');
+	$retval = $imap->setAcl('INBOX', '$' . $account, 'lrsd');
 	open(T, '>', $dovecotSharedPath) && close(T) && chown $vmailUid, $vmailGid, $dovecotSharedPath;
     } else {
 	warn("[WARNING] Unknown delivery type: $deliveryType\n");
