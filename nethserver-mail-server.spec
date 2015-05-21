@@ -7,19 +7,15 @@ URL: %{url_prefix}/%{name}
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
 
-Requires: dovecot >= 2.1.16, dovecot-pigeonhole >= 2.1.16, dovecot-antispam >= 0.0.49-1
-Requires: dovecot-deleted-to-trash >= 0.6
-Requires: nethserver-mail-common > 1.4.1-1
+Requires: dovecot, dovecot-pigeonhole, dovecot-antispam
+Requires: dovecot-deleted-to-trash
+Requires: nethserver-mail-common
 Requires: nethserver-directory
 Requires: perl(Text::Unidecode)
 Requires: cyrus-sasl-plain, cyrus-sasl-ldap, cyrus-sasl-ntlm, cyrus-sasl-md5
+Requires: postfix
 
-# The GSSAPI ldap client works only if postfix has been compiled with
-# -DUSE_LDAP_SASL flag (refs #1747):
-Requires: postfix >= 2:2.9.6-2.ns6
-
-BuildRequires: perl
-BuildRequires: nethserver-devtools >= 1.0.0
+BuildRequires: nethserver-devtools
 
 %description
 Mail server implementation based on postfix and dovecot packages.
@@ -34,17 +30,12 @@ mv -v NethServer root%{perl_vendorlib}
 perl createlinks
 
 %install
-rm -rf $RPM_BUILD_ROOT
-(cd root; find . -depth -print | cpio -dump $RPM_BUILD_ROOT)
-%{genfilelist} $RPM_BUILD_ROOT \
+rm -rf %{buildroot}
+(cd root; find . -depth -print | cpio -dump %{buildroot})
+%{genfilelist} %{buildroot} \
     --dir /var/lib/nethserver/vmail 'attr(0700,vmail,vmail)' \
     --dir /var/lib/nethserver/sieve-scripts 'attr(0770,root,vmail)' \
     > %{name}-%{version}-filelist
-echo "%doc COPYING" >> %{name}-%{version}-filelist
-echo "%doc migration/sync_maildirs.sh"  >> %{name}-%{version}-filelist
-
-%clean
-rm -rf $RPM_BUILD_ROOT
 
 %pre
 # ensure vmail user exists:
@@ -58,12 +49,14 @@ usermod -G vmail -a postfix >/dev/null 2>&1
 # Add amavis to vmail group to talk to dovecot LMTP socket:
 usermod -G vmail -a amavis >/dev/null 2>&1
 
-exit 0
 
 
 %files -f %{name}-%{version}-filelist
 %defattr(-,root,root)
+%doc COPYING
+%dir %{_nseventsdir}/%{name}-update
 %attr(0644, root, root) %config(noreplace) %{_sysconfdir}/logrotate.d/imap
+%doc migration/sync_maildirs.sh
 
 %changelog
 * Wed May 20 2015 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 1.8.9-1
