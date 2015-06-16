@@ -25,3 +25,7 @@ Move to Folder *junkmail*
     Email messages identified as spam are moved to each user folder
     *Junkmail* instead of being delivered to the Inbox.
 
+Admin can log in as another user
+    When this option is enabled, *admin* can impersonate *john*
+    providing ``john*admin`` as IMAP user name and the admin's
+    password.
