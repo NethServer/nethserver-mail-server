@@ -42,6 +42,7 @@ class Mailbox extends \Nethgui\Controller\AbstractController
         $this->declareParameter('QuotaDefaultSize', Validate::POSITIVE_INTEGER, array('configuration', 'dovecot', 'QuotaDefaultSize'));
         $this->declareParameter('SpamRetentionTime', '/^(\d+[smhdw]|infinite)$/', array('configuration', 'dovecot', 'SpamRetentionTime'));
         $this->declareParameter('SpamFolder', $this->createValidator()->memberOf('', 'junkmail'), array('configuration', 'dovecot', 'SpamFolder'));
+        $this->declareParameter('AdminIsMaster',  Validate::SERVICESTATUS, array('configuration', 'dovecot', 'AdminIsMaster'));
         parent::initialize();
     }
 

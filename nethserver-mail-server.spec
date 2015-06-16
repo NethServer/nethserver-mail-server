@@ -64,6 +64,7 @@ exit 0
 %files -f %{name}-%{version}-filelist
 %defattr(-,root,root)
 %attr(0644, root, root) %config(noreplace) %{_sysconfdir}/logrotate.d/imap
+%ghost %attr(0644, root, root) %{_sysconfdir}/pam.d/dovecot-master
 
 %changelog
 * Wed May 20 2015 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 1.8.9-1
