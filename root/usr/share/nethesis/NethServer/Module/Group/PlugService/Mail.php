@@ -45,7 +45,7 @@ class Mail extends \Nethgui\Controller\Table\RowPluginAction
             array('MailStatus', Validate::SERVICESTATUS, Table::FIELD),
             array('MailDeliveryType', $this->createValidator()->memberOf('copy', 'shared'), Table::FIELD),
         ));
-        $this->setDefaultValue('MailStatus', 'disabled');
+        $this->setDefaultValue('MailStatus', 'enabled');
         $this->setDefaultValue('MailDeliveryType', 'copy');
         parent::initialize();
     }
