@@ -32,6 +32,10 @@ echo $view->fieldset()->setAttribute('template', $T('Spam messages handling'))
     )
 ;
 
+echo $view->fieldset()->setAttribute('template', $T('Privileged access'))
+    ->insert($view->checkBox('AdminIsMaster', 'enabled')->setAttribute('uncheckedValue', 'disabled'))
+    ;
+
 
 echo $view->buttonList($view::BUTTON_SUBMIT | $view::BUTTON_HELP);
 
