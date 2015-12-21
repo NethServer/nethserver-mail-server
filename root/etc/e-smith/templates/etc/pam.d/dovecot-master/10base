@@ -1,0 +1,14 @@
+
+
+
+#
+# Allow "admin" to log in as "master user". Refs #2990
+# AdminIsMaster is { $dovecot{AdminIsMaster} }
+#
+account requisite { $dovecot{AdminIsMaster} eq 'enabled' ? "pam_succeed_if.so uid = 500 quiet" : "pam_deny.so" }
+account include dovecot
+
+auth    requisite { $dovecot{AdminIsMaster} eq 'enabled' ? "pam_succeed_if.so uid = 500 quiet" : "pam_deny.so" }
+auth    include dovecot
+
+session include dovecot

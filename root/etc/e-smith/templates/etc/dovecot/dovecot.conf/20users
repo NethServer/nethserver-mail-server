@@ -25,6 +25,21 @@ passdb \{
   pass = yes
 \}
 
+{
+    # Implementation of AdminIsMaster. See also /etc/pam.d/dovecot-master template
+
+    if($dovecot{'AdminIsMaster'} ne 'enabled') {
+        return '';
+    }
+
+    $OUT = "passdb {
+  driver = pam
+  master = yes
+  pass = yes
+  args = dovecot-master
+}";
+}
+
 # User database for system users:
 passdb \{
   driver = passwd-file

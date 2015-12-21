@@ -28,5 +28,7 @@ my $group = shift;
 
 my $ms = NethServer::MailServer->new();
 
-exit($ms->changeGroupSubscriptions($group, 0) ? 0 : 1);
+$ms->changeGroupSubscriptions($group, 0);
+
+
 
