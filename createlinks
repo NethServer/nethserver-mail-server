@@ -60,7 +60,6 @@ event_templates($_,
 		/etc/postfix/master.cf
 		/etc/dovecot/ldap.conf
 		/etc/sysconfig/dovecot
-		/etc/sysconfig/amavisd
 		/etc/amavisd.conf
                 /etc/dovecot/system-users
 		/etc/dovecot/master-users

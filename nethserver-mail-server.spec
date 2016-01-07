@@ -46,11 +46,6 @@ fi
 # add vmail group to postfix user
 usermod -G vmail -a postfix >/dev/null 2>&1
 
-# Add amavis to vmail group to talk to dovecot LMTP socket:
-usermod -G vmail -a amavis >/dev/null 2>&1
-
-
-
 %files -f %{name}-%{version}-filelist
 %defattr(-,root,root)
 %doc COPYING
