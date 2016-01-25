@@ -1,7 +1,0 @@
-#
-# 20amavisd_wrapper
-#
-prog="/usr/libexec/nethserver/amavisd-wrapper"
-
-
-
