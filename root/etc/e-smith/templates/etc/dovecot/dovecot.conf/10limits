@@ -9,11 +9,11 @@ protocol imap \{
 \}
 
 service anvil \{
-    client_limit = { $dovecot{MaxProcesses} * 4 }
+    client_limit = { 3 + ($dovecot{MaxProcesses} * 4) }
 \}
 
 service auth \{
-    client_limit = { $dovecot{MaxProcesses} * 4 }
+    client_limit = { $dovecot{MaxProcesses} * 5 }
 \}
 
 
