@@ -20,53 +20,20 @@
 # along with NethServer.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-use NethServer::Service;
-use NethServer::Directory;
-use esmith::ConfigDB;
 use User::grent;
-use esmith::event;
 use strict;
 
 my $event = shift;
 my $errors = 0;
 
-#
-# Remove the LDAP misc schema, because it conflicts with qmail schema
-#
-my @schemas = glob('/etc/openldap/slapd.d/cn\=config/cn\=schema/cn=\{*\}misc.ldif');
-if(@schemas) {
-    NethServer::Service::stop('slapd');
-    unlink @schemas;    
-    if(system("/etc/e-smith/events/actions/nethserver-directory-restart", $event) != 0) {
-	$errors ++;
-    }
-}
-
-#
-# Connect and load the qmail schema:
-#
-my $ldap = NethServer::Directory::connect();
-$ldap->loadLdifSchema('qmail', '/etc/openldap/schema/qmail.ldif') || die("Could not load the qmail LDIF schema for dovecot");
-
-
 # Refs #1516 -- Add vmail user into amavis group, to allow bayes DB
 # updates through sa-learn
-{
-    my $amavisGroup = getgrnam('amavis') or die('Could not find amavis group');    
-    if( ! grep { $_ eq 'vmail'} @{$amavisGroup->members()} ) {
-	system('/usr/sbin/usermod', qw(-a -G amavis vmail));
-	if($? != 0) {
-	    $errors++;
-	}
-    }
-}
 
-my $smbads='/usr/libexec/nethserver/smbads';
-if ( -x $smbads && system($smbads, 'test') == 0) {
-    system($smbads, 'initkeytab');
+my $amavisGroup = getgrnam('amavis') or die('[ERROR] Could not find amavis group');
+if( ! grep { $_ eq 'vmail'} @{$amavisGroup->members()} ) {
+    system('/usr/sbin/usermod', qw(-a -G amavis vmail));
     if($? != 0) {
-	warn "[ERROR] $smbads initkeytab failed with exit code $?\n";
-	$errors++;
+        $errors++;
     }
 }
 

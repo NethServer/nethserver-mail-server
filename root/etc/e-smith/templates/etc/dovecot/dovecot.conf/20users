@@ -52,17 +52,6 @@ passdb \{
   args = max_requests=100 failure_show_msg=yes blocking=yes 
 \}
 
-# Use the password lookup query to prefetch userdb fields (for IMAP)
-userdb \{
-       driver = prefetch
-\}
-
-# User database for standard users:
-userdb \{ 
-       driver = ldap
-       args = /etc/dovecot/ldap.conf       
-\}      
-
 # User database for system users:
 userdb \{
   driver = passwd-file

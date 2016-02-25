@@ -3,16 +3,7 @@
     use NethServer::MailServer;
     @localDomains = NethServer::MailServer->new()->getDeliveryDomains();
     @virtual_mailbox_domains = (@localDomains, @virtual_mailbox_domains);
-    $isAdsEnabled = defined $smb && $smb{ServerRole} && $smb{ServerRole} eq 'ADS';
-
     @virtual_alias_maps = qw(hash:/etc/postfix/virtual);
-    if($isAdsEnabled) {
-        push @virtual_alias_maps, qw(
-            ldap:/etc/postfix/active-directory-users
-            ldap:/etc/postfix/active-directory-groups
-        );	
-    }   
-
     scalar @localDomains ? 'enabled' : 'disabled'; 
 }
 # 
