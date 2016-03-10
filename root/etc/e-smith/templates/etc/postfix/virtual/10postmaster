@@ -1,0 +1,8 @@
+#
+# 10postmaster
+#
+{
+    foreach $domain ($mailServer->getDeliveryDomains()) {
+        $OUT .= "postmaster\@$domain postmaster";
+    }
+}
