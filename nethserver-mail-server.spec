@@ -12,6 +12,7 @@ Requires: dovecot-deleted-to-trash
 Requires: nethserver-mail-common
 Requires: perl(Text::Unidecode)
 Requires: postfix
+Requires: nethserver-sssd
 
 BuildRequires: nethserver-devtools
 
