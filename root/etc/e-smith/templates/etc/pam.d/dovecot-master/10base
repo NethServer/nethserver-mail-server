@@ -1,11 +1,8 @@
-
-
-
 #
-# Allow "admin" to log in as "master user". Refs #2990
+# Allow "root" to log in as "master user". Refs #2990
 # AdminIsMaster is { $dovecot{AdminIsMaster} }
 # { 
-    $adminUid = (getpwnam("admin"))[2]; 
+    $adminUid = (getpwnam("root"))[2];
     if( ! $adminUid ) {
         $adminUid = 0;
     }
