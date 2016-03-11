@@ -72,51 +72,51 @@ sub getMailboxForwards()
 
     foreach my $accountRecord ($self->{AccountsDb}->users(), $self->{AccountsDb}->groups()) {
 
-	# Nothing to do, if MailStatus is disabled
-	if (($accountRecord->prop('MailStatus') || '') ne 'enabled') {
-	    next;
-	}
+        # Nothing to do, if MailStatus is disabled
+        if (($accountRecord->prop('MailStatus') || '') ne 'enabled') {
+            next;
+        }
 
-	my @destinations = ();
-	my $account = $accountRecord->key;
+        my @destinations = ();
+        my $account = $accountRecord->key;
 
-	if($accountRecord->prop('type') eq 'user'
-	   && $accountRecord->prop('MailForwardStatus') eq 'enabled') {
+        if($accountRecord->prop('type') eq 'user'
+           && $accountRecord->prop('MailForwardStatus') eq 'enabled') {
 
-	    push @destinations, $accountRecord->prop('MailForwardAddress');
+            push @destinations, $accountRecord->prop('MailForwardAddress');
 
-	    if($accountRecord->prop('MailForwardKeepMessageCopy') eq 'yes') {
-		push @destinations, $account;
-	    }
+            if($accountRecord->prop('MailForwardKeepMessageCopy') eq 'yes') {
+                push @destinations, $account;
+            }
 
-	} elsif($accountRecord->prop('type') eq 'group'
-		&& ( ! $accountRecord->prop('MailDeliveryType') # empty === copy
-		     || $accountRecord->prop('MailDeliveryType') eq 'copy')) {
+        } elsif($accountRecord->prop('type') eq 'group'
+                && ( ! $accountRecord->prop('MailDeliveryType') # empty === copy
+                     || $accountRecord->prop('MailDeliveryType') eq 'copy')) {
 
-	    @destinations = map {
-		    my $userRecord = $self->{AccountsDb}->get($_);
+            @destinations = map {
+                    my $userRecord = $self->{AccountsDb}->get($_);
 
-		    # search group members having MailStatus enabled
-		    if(defined $userRecord
-		       && ($userRecord->prop('MailStatus') || '') eq 'enabled') {
-			($_);
-		    } else {
-			();
-		    }
+                    # search group members having MailStatus enabled
+                    if(defined $userRecord
+                       && ($userRecord->prop('MailStatus') || '') eq 'enabled') {
+                        ($_);
+                    } else {
+                        ();
+                    }
 
-	    } split(',', $accountRecord->prop('Members'));
+            } split(',', $accountRecord->prop('Members'));
 
-	    # If the group has no members, forward message to
-	    # postmaster (1822).
-	    if( ! @destinations) {
-		@destinations = 'postmaster';
-	    }
+            # If the group has no members, forward message to
+            # postmaster (1822).
+            if( ! @destinations) {
+                @destinations = 'postmaster';
+            }
 
-	}
+        }
 
-	if(@destinations) {
-	    $forwards{$account} = \@destinations;
-	}
+        if(@destinations) {
+            $forwards{$account} = \@destinations;
+        }
 
     }
 
@@ -134,60 +134,60 @@ sub getMailboxAliases()
     my %aliasMap = ();
 
     foreach my $record ($self->{AccountsDb}->pseudonyms()) {
-	my $pseudonym = $record->key;
-	my $account = $record->prop('Account') || '';
-	my $accountRecord = $self->{AccountsDb}->get($account);
+        my $pseudonym = $record->key;
+        my $account = $record->prop('Account') || '';
+        my $accountRecord = $self->{AccountsDb}->get($account);
 
-	my @destinations = ();
+        my @destinations = ();
 
-	if($account eq '') {
-	    # Handling of (null) empty string Account -- see #1726
-	    @destinations = ('postmaster');
+        if($account eq '') {
+            # Handling of (null) empty string Account -- see #1726
+            @destinations = ('postmaster');
 
-	} elsif( ! defined $accountRecord) {
-	    # Skip the pseudonym if the referred account does not
-	    # exist.
-	    $self->{debug} && warn "Account `$account` not found";
-	    next;
+        } elsif( ! defined $accountRecord) {
+            # Skip the pseudonym if the referred account does not
+            # exist.
+            $self->{debug} && warn "Account `$account` not found";
+            next;
 
-	} elsif($accountRecord->prop('type') eq 'user'
-	    &&  $accountRecord->prop('MailStatus') eq 'enabled') {
+        } elsif($accountRecord->prop('type') eq 'user'
+            &&  $accountRecord->prop('MailStatus') eq 'enabled') {
 
-	    #
-	    # user account: check if MailStatus is enabled
-	    #
+            #
+            # user account: check if MailStatus is enabled
+            #
 
-	    if(($accountRecord->prop('MailStatus') || '') eq 'enabled') {
-		@destinations = ($account);
-	    }
+            if(($accountRecord->prop('MailStatus') || '') eq 'enabled') {
+                @destinations = ($account);
+            }
 
-	} elsif($accountRecord->prop('type') eq 'group'
-	    &&  $accountRecord->prop('MailStatus') eq 'enabled') {
+        } elsif($accountRecord->prop('type') eq 'group'
+            &&  $accountRecord->prop('MailStatus') eq 'enabled') {
 
-	    #
-	    # group accounts
-	    #
-	    @destinations = ($account);
+            #
+            # group accounts
+            #
+            @destinations = ($account);
 
-	}
+        }
 
-	my ($localPart, $domainPart) = split('@', $pseudonym);
-	my @dbKeys;
+        my ($localPart, $domainPart) = split('@', $pseudonym);
+        my @dbKeys;
 
-	if($domainPart) {
-	    @dbKeys = $domainPart;
-	} else {
-	    @dbKeys = $self->getDeliveryDomains();
-	}
+        if($domainPart) {
+            @dbKeys = $domainPart;
+        } else {
+            @dbKeys = $self->getDeliveryDomains();
+        }
 
-	foreach (map { $localPart . '@' . $_ } @dbKeys) {
-	    if( ! defined $aliasMap{$_}) {
-		$aliasMap{$_} = [];
-	    }
-	    if(@destinations) {
-		push @{$aliasMap{$_}}, @destinations;
-	    }
-	}
+        foreach (map { $localPart . '@' . $_ } @dbKeys) {
+            if( ! defined $aliasMap{$_}) {
+                $aliasMap{$_} = [];
+            }
+            if(@destinations) {
+                push @{$aliasMap{$_}}, @destinations;
+            }
+        }
 
     }
 
@@ -208,12 +208,12 @@ sub createAccountDefaultPseudonyms($)
     my $accountType = $self->{AccountsDb}->get_prop($account, 'type');
 
     if($accountType eq 'user') {
-	return $self->createUserDefaultPseudonyms($account);
+        return $self->createUserDefaultPseudonyms($account);
     } elsif($accountType eq 'group') {
-	return $self->createGroupDefaultPseudonyms($account);
+        return $self->createGroupDefaultPseudonyms($account);
     } else {
-	$self->{debug} && warn("Invalid account type for key `$account`\n");
-	return 1;
+        $self->{debug} && warn("Invalid account type for key `$account`\n");
+        return 1;
     }
 }
 
@@ -230,13 +230,13 @@ sub createUserDefaultPseudonyms($)
     my $userRecord = $self->{AccountsDb}->get($username);
 
     if( ! $userRecord || $userRecord->prop('type') ne 'user') {
-	$self->{debug} && warn(qq(Given username "$username" is not a user record key));
-	return 0; # failure
+        $self->{debug} && warn(qq(Given username "$username" is not a user record key));
+        return 0; # failure
     }
 
     if($userRecord->prop('MailStatus') ne 'enabled') {
-	$self->{debug} && warn("User mail account `$username` is not enabled, skipped.\n");
-	return 1;
+        $self->{debug} && warn("User mail account `$username` is not enabled, skipped.\n");
+        return 1;
     }
 
     my $prefix = lc($username);
@@ -261,13 +261,13 @@ sub createGroupDefaultPseudonyms($)
     my $groupRecord = $self->{AccountsDb}->get($groupname);
 
     if ( ! $groupRecord || $groupRecord->prop('type') ne 'group') {
-	$self->{debug} && warn(qq(Given group name "$groupname" is not a group record key));
-	return 0; # failure
+        $self->{debug} && warn(qq(Given group name "$groupname" is not a group record key));
+        return 0; # failure
     }
 
     if($groupRecord->prop('MailStatus') ne 'enabled') {
-	$self->{debug} && warn("Group mail account `$groupname` is not enabled, skipped.\n");
-	return 1;
+        $self->{debug} && warn("Group mail account `$groupname` is not enabled, skipped.\n");
+        return 1;
     }
 
     my $prefix = lc($groupname);
@@ -291,20 +291,20 @@ sub _createPseudonymRecords()
 
     # Create a domain-less pseudonym for each prefix Refs #1665:
     foreach (@prefixList) {
-	my $address = $_ . '@';
-	my $props = {
-	    'type' => 'pseudonym',
-	    'Account' => $account,
-	    'ControlledBy' => 'system',
-	    'Access' => 'public',
-	    '_prevAccount' => $account,
-	};
+        my $address = $_ . '@';
+        my $props = {
+            'type' => 'pseudonym',
+            'Account' => $account,
+            'ControlledBy' => 'system',
+            'Access' => 'public',
+            '_prevAccount' => $account,
+        };
 
-	my $newRecord = $self->{AccountsDb}->new_record($address, $props);
+        my $newRecord = $self->{AccountsDb}->new_record($address, $props);
 
-	if( ! $newRecord) {
-	    $self->{debug} && warn ("Pseudonym '${address}' already exists!");
-	}
+        if( ! $newRecord) {
+            $self->{debug} && warn ("Pseudonym '${address}' already exists!");
+        }
     }
 
 }
@@ -320,7 +320,7 @@ sub getAccountMailAddresses($)
     my $account = shift;
     my @addresses = ();
     foreach ($self->_getAccountPseudonymRecords($account)) {
-	push @addresses, $self->pseudonymToAddresses($_->key);
+        push @addresses, $self->pseudonymToAddresses($_->key);
     }
     return @addresses;
 }
@@ -341,8 +341,8 @@ sub pseudonymToAddresses($)
     my $self = shift;
     my $key = shift;
     if($key =~ /\@$/) {
-	# Expand domainless pseudonyms, by appending domain names:
-	return map { $key . $_ } $self->getDeliveryDomains();
+        # Expand domainless pseudonyms, by appending domain names:
+        return map { $key . $_ } $self->getDeliveryDomains();
     }
     return ($key);
 }
@@ -391,11 +391,11 @@ sub getDeliveryDomains()
     # Fill the list of domains with Local or Remote Delivery type:
     my @domainList = ();
     foreach my $domainRecord ($self->{DomainsDb}->get_all_by_prop(type => 'domain')) {
-	my $deliveryType = $domainRecord->prop('TransportType');
-	if($deliveryType eq 'LocalDelivery'
-	    || $deliveryType eq 'RemoteDelivery') {
-	    push @domainList, $domainRecord->key;
-	}
+        my $deliveryType = $domainRecord->prop('TransportType');
+        if($deliveryType eq 'LocalDelivery'
+            || $deliveryType eq 'RemoteDelivery') {
+            push @domainList, $domainRecord->key;
+        }
     }
     return @domainList;
 }
@@ -437,10 +437,10 @@ sub getInternalAddresses()
     my @internalAddresses = ();
 
     foreach my $addressRecord ($self->{AccountsDb}->pseudonyms()) {
-	if(defined $addressRecord->prop('Access')
-	   && $addressRecord->prop('Access') eq 'private') {
-	    push @internalAddresses, $addressRecord->key;
-	}
+        if(defined $addressRecord->prop('Access')
+           && $addressRecord->prop('Access') eq 'private') {
+            push @internalAddresses, $addressRecord->key;
+        }
     }
 
     return @internalAddresses;
@@ -476,11 +476,11 @@ sub changeGroupSubscriptions($$)
     if($groupRecord
        && $groupRecord->prop('type') eq 'group'
        && ($groupRecord->prop('MailDeliveryType') || '') eq 'shared') {
-	@setR = split(',', ($groupRecord->prop('Members') || ''));
+        @setR = split(',', ($groupRecord->prop('Members') || ''));
     }
 
     if($groupEntry) {
-	@setE = @{$groupEntry->members()};
+        @setE = @{$groupEntry->members()};
     }
 
     #
@@ -496,23 +496,23 @@ sub changeGroupSubscriptions($$)
     my $errors = 0;
 
     foreach my $u (keys %H) {
-	my $action;
-	my @folders = ();
+        my $action;
+        my @folders = ();
 
-	if($H{$u} == 0x3) {
-	    $action = 'unsubscribe';
-	    @folders = ("Shared/$groupName/INBOX", "Shared/$groupName", "Shared/$groupName/");
-	} elsif($H{$u} == 0x5) {
-	    $action = 'subscribe';
-	    @folders = ("Shared/$groupName/INBOX");
-	} else {
-	    next;
-	}
+        if($H{$u} == 0x3) {
+            $action = 'unsubscribe';
+            @folders = ("Shared/$groupName/INBOX", "Shared/$groupName", "Shared/$groupName/");
+        } elsif($H{$u} == 0x5) {
+            $action = 'subscribe';
+            @folders = ("Shared/$groupName/INBOX");
+        } else {
+            next;
+        }
 
-	system('/usr/bin/doveadm', 'mailbox', $action , '-u', $u, @folders);
-	if($? != 0) {
-	    $errors ++;
-	}
+        system('/usr/bin/doveadm', 'mailbox', $action , '-u', $u, @folders);
+        if($? != 0) {
+            $errors ++;
+        }
     }
 
     return ($errors > 0 ? 0 : 1);
