@@ -128,7 +128,6 @@ event_actions('user-modify',
               'nethserver-mail-account-update' => '30');
 
 event_actions('user-delete',
-	      'nethserver-mail-default-pseudonyms-delete' => '03',
 	      'nethserver-mail-account-cleanup' => '30');
 
 
@@ -157,7 +156,6 @@ event_actions('group-modify', qw(
 ));
 
 event_actions('group-delete', qw(
-	      nethserver-mail-default-pseudonyms-delete 03
 	      nethserver-mail-group-acl-cleanup 03
 	      nethserver-mail-group-delete-subscriptions 16
 	      nethserver-mail-account-cleanup 30
