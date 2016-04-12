@@ -2,18 +2,18 @@
 # 20pseudonyms -- map to mailboxes:
 #
 {
-    my %aliases = $mailServer->getMailboxAliases();
+    use esmith::AccountsDB;
 
-    if(%aliases) {
-	$OUT = '';
-	foreach my $alias ( sort keys %aliases ) {
-	    my @mailboxes = @{$aliases{$alias}};
-	    if( ! scalar @mailboxes ) {
-		next; # skip alias, if mailbox list is empty
-	    }
-	    $OUT .= sprintf("%-38s %s\n", $alias, join(", ", @mailboxes));
-	}
-    } else {
-	$OUT = "# no virtual address defined\n";
+    $OUT = '';
+
+    foreach my $record ( esmith::AccountsDB->open_ro()->get_all_by_prop('type' => 'pseudonym') ) {
+        my $account = $record->prop('Account') || '';
+        if($account =~ /\@$/) {
+            $OUT .= sprintf("%-38s %s\n",
+                $record->key . $_,
+                $account) foreach (@domains);
+        } else {
+            $OUT .= sprintf("%-38s %s\n", $record->key, $account);
+        }
     }
 }

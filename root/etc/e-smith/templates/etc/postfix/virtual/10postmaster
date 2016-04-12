@@ -2,7 +2,9 @@
 # 10postmaster
 #
 {
-    foreach $domain ($mailServer->getDeliveryDomains()) {
-        $OUT .= "postmaster\@$domain postmaster";
+    foreach $domain (@domains) {
+        $OUT .= sprintf('postmaster@%s postmaster', $domain->key);
     }
 }
+
+
