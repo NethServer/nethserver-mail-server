@@ -58,14 +58,6 @@ class Pseudonym extends \Nethgui\Controller\TableController
     public function prepareViewForColumnFlag(\Nethgui\Controller\Table\Read $action, \Nethgui\View\ViewInterface $view, $key, $values, &$rowMetadata)
     {
         $flag = '';
-
-        if ( ! isset($values['Account']) || in_array($values['Account'], $this->getDisabledAccounts())) {
-            $rowMetadata['rowCssClass'] = trim($rowMetadata['rowCssClass'] . ' user-locked');
-            $flag .= 'L';
-        } else {
-            $flag .= '-';
-        }
-
         if($values['Access'] === 'private') {
             $rowMetadata['rowCssClass'] = trim($rowMetadata['rowCssClass'] . ' user-new');
             $flag .= 'P';
@@ -74,23 +66,6 @@ class Pseudonym extends \Nethgui\Controller\TableController
         }
 
         return $flag;
-    }
-
-    private function getDisabledAccounts()
-    {
-        static $disabledAccounts;
-        if ( ! isset($disabledAccounts)) {
-            $accounts = $this->getPlatform()->getDatabase('accounts')->getAll();
-            $disabledAccounts = array();
-            foreach ($accounts as $key => $prop) {
-                if ($prop['type'] === 'user' || $prop['type'] === 'group') {
-                    if ( ! isset($prop['MailStatus']) || $prop['MailStatus'] !== 'enabled') {
-                        $disabledAccounts[] = $key;
-                    }
-                }
-            }
-        }
-        return $disabledAccounts;
     }
 
 }
