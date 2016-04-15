@@ -59,26 +59,6 @@ sub new
     return $self;
 }
 
-=head2 ->getDeliveryDomains()
-
-Get the list of domains configured for local or remote delivery
-
-=cut
-sub getDeliveryDomains()
-{
-    my $self = shift;
-    # Fill the list of domains with Local or Remote Delivery type:
-    my @domainList = ();
-    foreach my $domainRecord ($self->{DomainsDb}->get_all_by_prop(type => 'domain')) {
-        my $deliveryType = $domainRecord->prop('TransportType');
-        if($deliveryType eq 'LocalDelivery'
-            || $deliveryType eq 'RemoteDelivery') {
-            push @domainList, $domainRecord->key;
-        }
-    }
-    return @domainList;
-}
-
 =head2 ->connectAclManager($account)
 
 Create a connection to the IMAP server, to configure ACLs

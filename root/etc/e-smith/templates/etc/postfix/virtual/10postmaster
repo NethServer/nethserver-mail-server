@@ -3,7 +3,7 @@
 #
 {
     foreach $domain (@domains) {
-        $OUT .= sprintf('postmaster@%s postmaster', $domain->key);
+        $OUT .= sprintf("%-38s %s\n", 'postmaster@' . $domain->key, 'postmaster');
     }
 }
 

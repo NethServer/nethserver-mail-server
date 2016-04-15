@@ -7,10 +7,10 @@
     $OUT = '';
 
     foreach my $record ( esmith::AccountsDB->open_ro()->get_all_by_prop('type' => 'pseudonym') ) {
-        my $account = $record->prop('Account') || '';
-        if($account =~ /\@$/) {
+        my $account = $record->prop('Account') || next;
+        if($record->key =~ /\@$/) {
             $OUT .= sprintf("%-38s %s\n",
-                $record->key . $_,
+                $record->key . $_->key,
                 $account) foreach (@domains);
         } else {
             $OUT .= sprintf("%-38s %s\n", $record->key, $account);

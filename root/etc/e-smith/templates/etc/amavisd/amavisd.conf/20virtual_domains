@@ -2,10 +2,11 @@
     #
     # 20virtual_domains -- add virtual domains to the list of local domains
     #
+    use esmith::DomainsDB;
 
-    use NethServer::MailServer;
-   
-    @domainList = (@domainList, NethServer::MailServer->new()->getDeliveryDomains());
+    push @domainList, map {
+            ($_->prop('TransportType') || '')  eq 'LocalDelivery' ? $_->key : ()
+        } esmith::DomainsDB->open_ro()->get_all_by_prop('type' => 'domain');
 
     '';
 }

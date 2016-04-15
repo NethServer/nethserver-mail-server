@@ -2,16 +2,10 @@
     #
     # 00template_vars
     #
-    use esmith::DomainsDB;    
-    use Sys::Hostname;
-
-    my $fqdn = hostname();
-    my $domainName = (split(/\./, $fqdn, 2))[-1];
+    use esmith::DomainsDB;
 
     @domains = grep {
         ($_->prop('TransportType') || '') eq 'LocalDelivery' 
-        && $_->key ne $domainName
-        && $_->key ne $fqdn
     } esmith::DomainsDB->open_ro()->get_all_by_prop('type' => 'domain');
 
     '';
