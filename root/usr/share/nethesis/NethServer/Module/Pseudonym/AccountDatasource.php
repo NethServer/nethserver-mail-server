@@ -53,8 +53,8 @@ class AccountDatasource implements \IteratorAggregate
 
     public function getDatasource()
     {
-        $users = $this->module->getPlatform()->getDatabase('accounts')->getAll('user');
-        $groups = $this->module->getPlatform()->getDatabase('accounts')->getAll('group');
+        $users = $this->module->getPlatform()->getDatabase('NethServer::Database::Passwd')->getAll('passwd');
+        $groups = $this->module->getPlatform()->getDatabase('NethServer::Database::Group')->getAll('group');
 
         $hash = array();
 
@@ -64,20 +64,14 @@ class AccountDatasource implements \IteratorAggregate
         $groupsLabel = $this->translator->translate($this->module, 'Groups_label');
 
         foreach ($users as $key => $prop) {
-            if ( ! isset($prop['MailStatus']) || $prop['MailStatus'] !== 'enabled') {
-                continue;
-            }
-            $hash[$usersLabel][$key] = $prop['FirstName'] . ' ' . $prop['LastName'] . ' (' . $key . ')';
+            $hash[$usersLabel][$key] = $prop['gecos'] . ' (' . $key . ')';
             if ($this->current === $key) {
                 $keyFound = TRUE;
             }
         }
 
         foreach ($groups as $key => $prop) {
-            if ( ! isset($prop['MailStatus']) || $prop['MailStatus'] !== 'enabled') {
-                continue;
-            }
-            $hash[$groupsLabel][$key] = $prop['Description'] . ' (' . $key . ')';
+            $hash[$groupsLabel][$key] = $prop['name'];
             if ($this->current === $key) {
                 $keyFound = TRUE;
             }
