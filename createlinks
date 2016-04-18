@@ -52,7 +52,6 @@ event_templates($_,
 		@certificates, qw(
 		/etc/postfix/master.cf
 		/etc/amavisd/amavisd.conf
-        /etc/dovecot/system-users
 		/etc/dovecot/master-users
                 /etc/sudoers
                 /etc/hosts
