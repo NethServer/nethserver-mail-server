@@ -1,0 +1,10 @@
+#
+# 10postmaster
+#
+{
+    foreach $domain (@domains) {
+        $OUT .= sprintf("%-38s %s\n", 'postmaster@' . $domain->key, 'postmaster');
+    }
+}
+
+

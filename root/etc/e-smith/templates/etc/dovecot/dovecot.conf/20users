@@ -10,12 +10,6 @@ last_valid_uid = { $uid; }
 mail_uid = vmail
 mail_gid = vmail
 
-# Password database for standard users: ldap
-passdb \{
-    driver = ldap
-    args = /etc/dovecot/ldap.conf
-\}
-
 # See http://wiki2.dovecot.org/Authentication/MasterUsers
 auth_master_user_separator = *
 passdb \{
@@ -46,22 +40,16 @@ passdb \{
   args = /etc/dovecot/system-users
 \}
 
-# Password database for system users: shadow
+# Database for system users
 passdb \{
   driver = pam
   args = max_requests=100 failure_show_msg=yes blocking=yes 
 \}
 
-# Use the password lookup query to prefetch userdb fields (for IMAP)
 userdb \{
-       driver = prefetch
+  driver = passwd
+  override_fields = uid={$uid} gid={$gid} home=/var/lib/nethserver/vmail/%u
 \}
-
-# User database for standard users:
-userdb \{ 
-       driver = ldap
-       args = /etc/dovecot/ldap.conf       
-\}      
 
 # User database for system users:
 userdb \{
@@ -73,5 +61,5 @@ userdb \{
 mail_location = maildir:~/Maildir
 
 # Username formatting before it's looked up from databases
-auth_username_format = %n
+auth_username_format = %u
 

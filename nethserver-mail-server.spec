@@ -10,10 +10,9 @@ BuildArch: noarch
 Requires: dovecot, dovecot-pigeonhole, dovecot-antispam
 Requires: dovecot-deleted-to-trash
 Requires: nethserver-mail-common
-Requires: nethserver-directory
 Requires: perl(Text::Unidecode)
-Requires: cyrus-sasl-plain, cyrus-sasl-ldap, cyrus-sasl-ntlm, cyrus-sasl-md5
 Requires: postfix
+Requires: nethserver-sssd
 
 BuildRequires: nethserver-devtools
 
@@ -32,10 +31,12 @@ perl createlinks
 %install
 rm -rf %{buildroot}
 (cd root; find . -depth -print | cpio -dump %{buildroot})
-%{genfilelist} %{buildroot} \
-    --dir /var/lib/nethserver/vmail 'attr(0700,vmail,vmail)' \
-    --dir /var/lib/nethserver/sieve-scripts 'attr(0770,root,vmail)' \
-    > %{name}-%{version}-filelist
+%{genfilelist} %{buildroot} > %{name}-%{version}-filelist
+
+mkdir -p %{buildroot}/%{_nsstatedir}/vmail
+mkdir -p %{buildroot}/%{_nsstatedir}/sieve-scripts
+mkdir -p %{buildroot}/%{_sysconfdir}/dovecot/sieve-scripts
+mkdir -p %{buildroot}/%{_sysconfdir}/dovecot/sievc/Maildir
 
 %pre
 # ensure vmail user exists:
@@ -53,6 +54,10 @@ usermod -G vmail -a postfix >/dev/null 2>&1
 %attr(0644, root, root) %config(noreplace) %{_sysconfdir}/logrotate.d/imap
 %doc migration/sync_maildirs.sh
 %ghost %attr(0644, root, root) %{_sysconfdir}/pam.d/dovecot-master
+%dir %attr(0700,vmail,vmail) %{_nsstatedir}/vmail
+%dir %attr(0770,root,vmail) %{_nsstatedir}/sieve-scripts
+%dir %attr(0775,root,root) %{_sysconfdir}/dovecot/sieve-scripts
+%dir %attr(0775,root,root) %{_sysconfdir}/dovecot/sievc/Maildir
 
 %changelog
 * Wed Oct 28 2015 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 1.9.1-1

@@ -38,7 +38,6 @@ my @saveTemplates = qw(
     /etc/postfix/main.cf
     /etc/postfix/transport
     /etc/postfix/virtual
-    /etc/postfix/vmailbox
     /etc/postfix/aliases
     /etc/postfix/internal_access
     /etc/postfix/recipient_bcc
@@ -47,38 +46,26 @@ my @saveTemplates = qw(
     /var/lib/nethserver/sieve-scripts/before.sieve
 );
 
-# When updating nethserver-directory, dovecot LDAP user acl must be set
-# again, otherwise we are locked out:
-event_actions('nethserver-directory-update', qw(
-	      nethserver-mail-server-ldapsetup 30
-));
-
-# UPDATE, UNINSTALL templates
+# UPDATE templates
 event_templates($_,
 		@saveTemplates, 
 		@certificates, qw(
 		/etc/postfix/master.cf
-		/etc/dovecot/ldap.conf
-		/etc/sysconfig/dovecot
 		/etc/amavisd/amavisd.conf
-                /etc/dovecot/system-users
+        /etc/dovecot/system-users
 		/etc/dovecot/master-users
-                /etc/dovecot/active-directory.conf
-                /etc/postfix/active-directory-users
-                /etc/postfix/active-directory-groups
-                /etc/postfix/chroot-update
                 /etc/sudoers
+                /etc/hosts
+                /etc/dnsmasq.conf
 )) foreach (qw(nethserver-mail-server-update));
 
 
 # UPDATE actions/services:
 event_actions('nethserver-mail-server-update', qw(
 	      initialize-default-databases 00
-              nethserver-mail-default-domain-create 01
-	      nethserver-mail-server-conf 20
-	      nethserver-mail-server-ldapsetup 21
+          nethserver-mail-server-conf 20
+          nethserver-mail-default-domain-create 01
 	      nethserver-mail-postmap-update 30
-	      nethserver-mail-account-update 40
 ));
 
 event_services('nethserver-mail-server-update', qw(
@@ -86,6 +73,7 @@ event_services('nethserver-mail-server-update', qw(
 	       dovecot restart
 	       rsyslog restart
 	       postfix restart
+           dnsmasq restart
 ));
 
 #
@@ -109,7 +97,6 @@ event_services('nethserver-mail-server-save',
 
 my @pseudonymTemplates = qw(
     /etc/postfix/virtual
-    /etc/postfix/vmailbox
     /etc/postfix/internal_access
 );
 
@@ -117,7 +104,6 @@ foreach (qw(create modify delete)) {
     event_templates('pseudonym-' . $_, @pseudonymTemplates);
     event_actions('pseudonym-'   . $_, 
 		  'nethserver-mail-postmap-update' => '30',
-		  'nethserver-mail-pseudonym-update' => '30',
 	);
 }
 
@@ -142,7 +128,6 @@ event_actions('user-modify',
               'nethserver-mail-account-update' => '30');
 
 event_actions('user-delete',
-	      'nethserver-mail-default-pseudonyms-delete' => '03',
 	      'nethserver-mail-account-cleanup' => '30');
 
 
@@ -171,7 +156,6 @@ event_actions('group-modify', qw(
 ));
 
 event_actions('group-delete', qw(
-	      nethserver-mail-default-pseudonyms-delete 03
 	      nethserver-mail-group-acl-cleanup 03
 	      nethserver-mail-group-delete-subscriptions 16
 	      nethserver-mail-account-cleanup 30
@@ -186,9 +170,6 @@ foreach (qw(create delete modify)) {
 		    /etc/postfix/recipient_bcc
 		    /etc/postfix/virtual
                     /etc/postfix/aliases
-		    /etc/postfix/vmailbox
-                    /etc/postfix/active-directory-users
-                    /etc/postfix/active-directory-groups
     ));
     event_actions('domain-'   . $_, qw(
          nethserver-mail-postmap-update 30
@@ -222,7 +203,6 @@ event_actions('migration-import', qw(
 #
 event_templates('user-create-pseudonyms', @pseudonymTemplates);
 event_actions('user-create-pseudonyms', qw(
-    nethserver-mail-default-pseudonyms-create 00
     nethserver-mail-postmap-update 30
 ));
 
@@ -231,40 +211,14 @@ event_actions('user-create-pseudonyms', qw(
 #
 event_templates('group-create-pseudonyms', @pseudonymTemplates);
 event_actions('group-create-pseudonyms', qw(
-    nethserver-mail-default-pseudonyms-create 00
     nethserver-mail-postmap-update 30
 ));
 
 
 #
-# nethserver-samba-save/update/adsjoin: expand our templates for AD integration
-#
-foreach (qw(
-    nethserver-samba-save 
-    nethserver-samba-update 
-    nethserver-samba-adsjoin
-)) {
-    event_templates($_, qw(
-        /etc/sysconfig/dovecot
-        /etc/dovecot/dovecot.conf
-        /etc/dovecot/active-directory.conf
-        /etc/postfix/main.cf
-        /etc/postfix/active-directory-users
-        /etc/postfix/active-directory-groups
-        /etc/postfix/chroot-update
-    ));
-
-    event_services($_, qw(
-        postfix restart
-        dovecot restart
-    ));
-}
-
-#
 # FIXME use runlevel-adjust to modify admin default account
 #
 event_actions('runlevel-adjust', qw(
-    nethserver-mail-update-admin 97
     nethserver-mail-server-init-system-users 98
 ));
 
@@ -278,13 +232,4 @@ event_actions('profile-modify', qw(
      nethserver-mail-postmap-update 30
 ));
 
-
-#
-# hostname-modify event
-#
-event_templates('hostname-modify', qw(
-                /etc/dovecot/active-directory.conf
-                /etc/postfix/active-directory-users
-                /etc/postfix/active-directory-groups
-));
 

@@ -41,16 +41,9 @@ TMP_MAILDIR=`mktemp -d /var/tmp/nethserver-mail-server-init-system-users.XXXXXXX
 trap "rm -rf ${TMP_MAILDIR}" EXIT
 chown vmail.vmail ${TMP_MAILDIR}
 
-for USER_SRC in root admin `cut -d : -f 1 /etc/dovecot/system-users`; do
+for USER in root `cut -d : -f 1 /etc/dovecot/system-users`; do
 
-    MBOX_SRC="/var/mail/${USER_SRC}"
-
-    # Copy root's mailbox to admin
-    if [ "${USER_SRC}" = "root" ]; then
-	USER="admin"
-    else 
-	USER="${USER_SRC}"
-    fi
+    MBOX_SRC="/var/mail/${USER}"
 
     # skip unknown users
     id "${USER}" &>/dev/null || continue
@@ -61,7 +54,7 @@ for USER_SRC in root admin `cut -d : -f 1 /etc/dovecot/system-users`; do
     # skip empty files
     [ -s "${MBOX_SRC}" ] || continue
 
-    echo "[INFO] Migrating ${USER_SRC} mailbox from ${MBOX_SRC} to IMAP:${USER}";
+    echo "[INFO] Migrating ${USER} mailbox from ${MBOX_SRC} to IMAP:${USER}";
 
     # Copy to the temporary dir and fix permissions:
     cp "${MBOX_SRC}" "${TMP_MAILDIR}/INBOX" && chown vmail.vmail "${TMP_MAILDIR}/INBOX"

@@ -2,7 +2,11 @@
     #
     # 00template_vars
     #
-    use NethServer::MailServer;
-    $mailServer = NethServer::MailServer->new();
+    use esmith::DomainsDB;
+
+    @domains = grep {
+        ($_->prop('TransportType') || '') eq 'LocalDelivery' 
+    } esmith::DomainsDB->open_ro()->get_all_by_prop('type' => 'domain');
+
     '';
 }

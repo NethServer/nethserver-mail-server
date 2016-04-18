@@ -26,13 +26,6 @@ db=/sbin/e-smith/db
 # The default retention time period length:
 DefaultRetentionTime=`$db configuration getprop dovecot SpamRetentionTime`
 SpamFolder=`$db configuration getprop dovecot SpamFolder`
-ServerRole=`$db configuration getprop smb ServerRole`
-
-
-# Export kerberos environment settings for dovecot:
-if [ "${ServerRole}" = "ADS" ]; then
-  eval `/usr/libexec/nethserver/smbads env dovecot`
-fi
 
 for USER in `$doveadm user '*'`; do
 
