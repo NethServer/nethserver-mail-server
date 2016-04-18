@@ -1,6 +1,7 @@
 #!/usr/bin/perl -w
 use strict;
 use JSON;
+use File::Glob ':bsd_glob';
 
 sub exit_error() {
     my $json = JSON->new;
@@ -11,21 +12,28 @@ sub exit_error() {
 
 my %results;
 
-open(OUT,"/usr/bin/doveadm -f tab quota get -A |") || exit_error();
-while ( <OUT> )
-{
-    # Username	Quota name	Type	Value	Limit	%
-    next if /^Username/;
-    my @tmp = split("\t", $_);
-    if ($tmp[2] eq 'STORAGE') {
-        $results{$tmp[0]}{'size'} = int($tmp[3]);
-        $results{$tmp[0]}{'max'} = int($tmp[4]);
-        $results{$tmp[0]}{'perc'} = int($tmp[5]);
-    } elsif ($tmp[2] eq 'MESSAGE') {
-        $results{$tmp[0]}{'msg'} = int($tmp[3]);
+my $maildirs = '/var/lib/nethserver/vmail';
+my @list = bsd_glob($maildirs.'/*/Maildir/maildirsize');
+foreach (@list) {
+    my $user = (split(/\//, $_))[5];
+    my $tot_size = 0;
+    my $tot_msg = 0;
+    open(my $fh, '<', $_) or next;
+    while (my $row = <$fh>) {
+        chomp $row;
+        if ($row =~ /(\d+)S/) {
+            $results{$user}{'max'} = int($1/1024);
+        } else {
+            my ($size, $msg) = split(/\s/, $row);
+            $tot_size += int($size);
+            $tot_msg += int($msg);
+        }
     }
+    close($fh);
+    $results{$user}{'msg'} = $tot_msg;
+    $results{$user}{'size'} = int($tot_size / 1024);
+    $results{$user}{'perc'} = int($tot_size / 1024 / $results{$user}{'max'} * 100);
 }
-close(OUT);
 
 my $json = JSON->new;
 my $json_text   = $json->encode( \%results );
