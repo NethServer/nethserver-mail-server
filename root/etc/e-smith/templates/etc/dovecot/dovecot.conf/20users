@@ -34,12 +34,6 @@ passdb \{
 }";
 }
 
-# User database for system users:
-passdb \{
-  driver = passwd-file
-  args = /etc/dovecot/system-users
-\}
-
 # Database for system users
 passdb \{
   driver = pam
@@ -49,12 +43,6 @@ passdb \{
 userdb \{
   driver = passwd
   override_fields = uid={$uid} gid={$gid} home=/var/lib/nethserver/vmail/%u
-\}
-
-# User database for system users:
-userdb \{
-  driver = passwd-file
-  args = /etc/dovecot/system-users
 \}
 
 # Location of mailboxes:

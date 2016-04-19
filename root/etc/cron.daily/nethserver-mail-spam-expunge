@@ -20,6 +20,7 @@
 # along with NethServer.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+mail_dirs=/var/lib/nethserver/vmail/
 doveadm=/usr/bin/doveadm
 db=/sbin/e-smith/db
 
@@ -27,7 +28,8 @@ db=/sbin/e-smith/db
 DefaultRetentionTime=`$db configuration getprop dovecot SpamRetentionTime`
 SpamFolder=`$db configuration getprop dovecot SpamFolder`
 
-for USER in `$doveadm user '*'`; do
+for dir in `/usr/bin/find $mail_dirs -maxdepth 1 -type d`; do
+    USER=`basename $dir`
 
     # Cleanup prop values:
     unset MailSpamRetentionStatus MailSpamRetentionTime MailStatus
@@ -35,7 +37,7 @@ for USER in `$doveadm user '*'`; do
     # Extract customized values from accounts database:
     eval `$db accounts printprop ${USER} MailSpamRetentionStatus MailSpamRetentionTime MailStatus`
 
-    if [ "${MailStatus}" != "enabled" ]; then
+    if [ "${MailStatus}" == "disabled" ]; then
 	continue;
     fi
 

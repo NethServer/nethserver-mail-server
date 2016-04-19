@@ -1,5 +1,5 @@
 <?php
-namespace NethServer\Module\Dashboard;
+namespace NethServer\Module;
 
 /*
  * Copyright (C) 2013 Nethesis S.r.l.
@@ -29,7 +29,14 @@ namespace NethServer\Module\Dashboard;
 class MailQuota extends \Nethgui\Controller\TableController
 {
 
-    public $sortId = 30;
+    protected function initializeAttributes(\Nethgui\Module\ModuleAttributesInterface $attributes)
+    {
+        return new \NethServer\Tool\CustomModuleAttributesProvider($attributes, array(
+            'languageCatalog' => array('NethServer_Module_Dashboard_MailQuota'),
+            'category' => 'Status')
+        );
+    }
+
     
     public function initialize()
     {
