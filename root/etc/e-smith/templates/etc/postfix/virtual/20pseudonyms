@@ -8,6 +8,7 @@
 
     foreach my $record ( esmith::AccountsDB->open_ro()->get_all_by_prop('type' => 'pseudonym') ) {
         my $account = $record->prop('Account') || next;
+        $account = address_sanitize($account);
         if($record->key =~ /\@$/) {
             $OUT .= sprintf("%-38s %s\n",
                 $record->key . $_->key,
