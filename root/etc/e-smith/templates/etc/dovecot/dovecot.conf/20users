@@ -32,20 +32,26 @@ passdb \{
 }";
 }
 
-# Database for system users
+# Authenticate users against PAM
 passdb \{
   driver = pam
   args = max_requests=100 failure_show_msg=yes blocking=yes 
 \}
 
+# LDA/IMAP access for users in /etc/passwd without @domain in username
 userdb \{
+  driver = passwd-file
+  args = username_format=%Ln /etc/dovecot/imap.passwd
+  override_fields = uid={$uid} gid={$gid} home=/var/lib/nethserver/vmail/%Ln
+\}
+
+# LDA/IMAP access for users from SSSD/NSS
+userdb \{
+  skip = found
   driver = passwd
   override_fields = uid={$uid} gid={$gid} home=/var/lib/nethserver/vmail/%u
 \}
 
 # Location of mailboxes:
 mail_location = maildir:~/Maildir
-
-# Username formatting before it's looked up from databases
-auth_username_format = %u
 
