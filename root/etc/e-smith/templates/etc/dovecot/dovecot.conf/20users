@@ -16,7 +16,6 @@ passdb \{
   driver = passwd-file
   args = /etc/dovecot/master-users
   master = yes
-  pass = yes
 \}
 
 {
@@ -29,7 +28,6 @@ passdb \{
     $OUT = "passdb {
   driver = pam
   master = yes
-  pass = yes
   args = dovecot-master
 }";
 }
