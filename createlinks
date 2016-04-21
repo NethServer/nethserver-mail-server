@@ -119,13 +119,6 @@ foreach (qw(create modify delete)) {
     event_actions('user-'   . $_, 'nethserver-mail-postmap-update' => '30');
 }
 
-event_actions('user-create', qw(
-              nethserver-mail-account-update 30
-));
-
-event_actions('user-modify',
-              'nethserver-mail-account-update' => '30');
-
 event_actions('user-delete',
 	      'nethserver-mail-account-cleanup' => '30');
 
@@ -144,13 +137,11 @@ foreach (qw(create modify delete)) {
 
 event_actions('group-create', qw(
               nethserver-mail-group-change-subscriptions 14
-	      nethserver-mail-account-update 30
 	      nethserver-mail-group-acl-adjust 95
 ));
 
 event_actions('group-modify', qw(
               nethserver-mail-group-change-subscriptions 14
-	      nethserver-mail-account-update 30
 	      nethserver-mail-group-acl-adjust 95
 ));
 
@@ -172,7 +163,6 @@ foreach (qw(create delete modify)) {
     ));
     event_actions('domain-'   . $_, qw(
          nethserver-mail-postmap-update 30
-         nethserver-mail-domain-update 40
     ));
 }
 
