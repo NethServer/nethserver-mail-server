@@ -4,17 +4,12 @@
 #
 
 {
-    use NethServer::MailServer;
-    my $ms = NethServer::MailServer->new();
-    my @addresses = $ms->getInternalAddresses();
-
-    if(@addresses) {
-	$OUT = '';
-	foreach my $address (@addresses) {
-	    $OUT .= $address . "\t\t\t" . 'reject' . "\n";
-	}
-    } else {
-	$OUT = "# no internal address defined\n";
+    use esmith::AccountsDB;
+    $OUT = '';
+    foreach (esmith::AccountsDB->open_ro()->get_all_by_prop("type" => "pseudonym")) {
+        if(($_->prop('Access') || '') eq 'private') {
+            $OUT .= sprintf("%-38s reject", $_->key);
+        }
     }
 }
 

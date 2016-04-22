@@ -25,7 +25,6 @@ Mail server implementation based on postfix and dovecot packages.
 %build
 %{makedocs}
 mkdir -p root%{perl_vendorlib}
-mv -v NethServer root%{perl_vendorlib}
 perl createlinks
 
 %install

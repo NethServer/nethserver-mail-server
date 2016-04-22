@@ -22,15 +22,9 @@
 
 use strict;
 
-#
 # Read secondary groups and prepare a CSV list
-#
-my $groups = `groups $ENV{USER}`;
-chomp($groups);
-$groups =~ s/^.*: //; 
-$groups =~ y/ /,/;
-
-$ENV{ACL_GROUPS}=$groups;
+my @groups = map { sprintf('%s', (getgrgid($_))[0]) } split(/ /, qx(id -G \$USER));
+$ENV{ACL_GROUPS}=join(',', @groups);
 $ENV{MASTER_USER}=$ENV{USER};
 
 #

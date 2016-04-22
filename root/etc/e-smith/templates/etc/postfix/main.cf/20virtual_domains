@@ -9,8 +9,7 @@
 #
 virtual_mailbox_domains = { join("\n  ", @virtual_mailbox_domains) }
 virtual_mailbox_maps = {
-    scalar @virtual_mailbox_domains ?
-        'proxy:unix:passwd.byname hash:/etc/postfix/vmailbox' : ''
+    scalar @virtual_mailbox_domains ? 'proxy:unix:passwd.byname' : ''
 }
 virtual_alias_maps = {
     scalar @virtual_mailbox_domains ? 'hash:/etc/postfix/virtual' : ''
@@ -18,6 +17,10 @@ virtual_alias_maps = {
 
 # Override system default /etc/aliases DB with our template:
 alias_maps = hash:/etc/postfix/aliases, hash:/etc/aliases
+
+# Message delivery transport that the local(8)
+# delivery agent should use for mailbox delivery:
+mailbox_transport = lmtp:unix:/var/run/dovecot/lmtp
 
 # The default mail delivery transport and next-hop destination
 # for final delivery to domains listed with $virtual_mailbox_domains:
