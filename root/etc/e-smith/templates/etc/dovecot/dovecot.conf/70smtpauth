@@ -12,5 +12,6 @@ service auth \{
     \}
 \}
 
-auth_mechanisms = plain login gssapi
+auth_mechanisms = plain login { $sssd{'Provider'} eq 'ad' ? 'gssapi' : '' }
+auth_krb5_keytab = { $dovecot{KrbKeytabPath} || '/var/lib/dovecot/krb5.keytab' }
 
