@@ -144,7 +144,9 @@ event_actions('user-modify',
 
 event_actions('user-delete',
 	      'nethserver-mail-default-pseudonyms-delete' => '03',
-	      'nethserver-mail-account-cleanup' => '30');
+	      'nethserver-mail-account-cleanup' => '30',
+	      'nethserver-mail-expand-aliases' => '76',
+	      'nethserver-mail-postmap-update' => '77');
 
 
 #

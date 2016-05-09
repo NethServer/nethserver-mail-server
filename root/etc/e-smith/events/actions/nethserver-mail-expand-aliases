@@ -1,0 +1,2 @@
+#!/bin/bash
+exec /sbin/e-smith/expand-template /etc/postfix/aliases
