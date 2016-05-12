@@ -1,5 +1,5 @@
 <?php
-namespace NethServer\Module;
+namespace NethServer\Module\MailAccount;
 
 /*
  * Copyright (C) 2012 Nethesis S.r.l.
@@ -28,11 +28,6 @@ namespace NethServer\Module;
  */
 class Pseudonym extends \Nethgui\Controller\TableController
 {
-
-    protected function initializeAttributes(\Nethgui\Module\ModuleAttributesInterface $base)
-    {
-        return \Nethgui\Module\SimpleModuleAttributesProvider::extendModuleAttributes($base, 'Management', 25);
-    }
 
     public function initialize()
     {

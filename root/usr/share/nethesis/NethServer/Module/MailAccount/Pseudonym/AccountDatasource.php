@@ -1,5 +1,5 @@
 <?php
-namespace NethServer\Module\Pseudonym;
+namespace NethServer\Module\MailAccount\Pseudonym;
 
 /*
  * Copyright (C) 2012 Nethesis S.r.l.
@@ -53,32 +53,23 @@ class AccountDatasource implements \IteratorAggregate
 
     public function getDatasource()
     {
-        $users = $this->module->getPlatform()->getDatabase('NethServer::Database::Passwd')->getAll('passwd');
-        $groups = $this->module->getPlatform()->getDatabase('NethServer::Database::Group')->getAll('group');
+        $userProvider = new \NethServer\Tool\UserProvider($this->module->getPlatform());
 
+        $users = $userProvider->getUsers();
+        
         $hash = array();
 
         $keyFound = FALSE;
 
-        $usersLabel = $this->translator->translate($this->module, 'Users_label');
-        $groupsLabel = $this->translator->translate($this->module, 'Groups_label');
-
         foreach ($users as $key => $prop) {
-            $hash[$usersLabel][$key] = $prop['gecos'] . ' (' . $key . ')';
-            if ($this->current === $key) {
-                $keyFound = TRUE;
-            }
-        }
-
-        foreach ($groups as $key => $prop) {
-            $hash[$groupsLabel][$key] = $prop['name'];
+            $hash[$key] = $key;
             if ($this->current === $key) {
                 $keyFound = TRUE;
             }
         }
 
         if ( $keyFound === FALSE && ! is_null($this->current)) {
-            $hash[$this->translator->translate($this->module, 'Current_label')][$this->current] = $this->current;
+            $hash[$this->current] = $this->current;
         }
 
         return \Nethgui\Renderer\AbstractRenderer::hashToDatasource($hash, TRUE);

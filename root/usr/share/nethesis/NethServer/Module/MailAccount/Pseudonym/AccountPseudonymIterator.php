@@ -1,5 +1,5 @@
 <?php
-namespace NethServer\Module\Pseudonym;
+namespace NethServer\Module\MailAccount\Pseudonym;
 
 /*
  * Copyright (C) 2013 Nethesis S.r.l.

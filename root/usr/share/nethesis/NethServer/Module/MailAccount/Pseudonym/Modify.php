@@ -1,5 +1,5 @@
 <?php
-namespace NethServer\Module\Pseudonym;
+namespace NethServer\Module\MailAccount\Pseudonym;
 
 /*
  * Copyright (C) 2012 Nethesis S.r.l.
@@ -89,7 +89,7 @@ class Modify extends \Nethgui\Controller\Table\Modify
         $view->setTemplate($templates[$this->getIdentifier()]);
 
         if ( ! $this->getRequest()->isMutation() && $this->getRequest()->isValidated()) {
-            $view['AccountDatasource'] = new \NethServer\Module\Pseudonym\AccountDatasource($this,
+            $view['AccountDatasource'] = new \NethServer\Module\MailAccount\Pseudonym\AccountDatasource($this,
                 $view->getTranslator(), $view['Account']);
             if ($this->getIdentifier() === 'create') {
                 $view['domainAddressDatasource'] = $this->readDomainAddressDatasource($view);
