@@ -54,6 +54,7 @@ class AccountDatasource implements \IteratorAggregate
     public function getDatasource()
     {
         $userProvider = new \NethServer\Tool\UserProvider($this->module->getPlatform());
+        $mbxProvider = new \NethServer\Module\MailAccount\SharedMailbox\SharedMailboxAdapter($this->module->getPlatform());
 
         $users = $userProvider->getUsers();
         
@@ -66,6 +67,10 @@ class AccountDatasource implements \IteratorAggregate
             if ($this->current === $key) {
                 $keyFound = TRUE;
             }
+        }
+
+        foreach($mbxProvider->getSharedMailboxList() as $mbx) {
+            $hash['vmail+' . $mbx['name']] = $mbx['name'];
         }
 
         if ( $keyFound === FALSE && ! is_null($this->current)) {

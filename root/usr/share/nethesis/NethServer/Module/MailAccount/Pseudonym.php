@@ -1,4 +1,5 @@
 <?php
+
 namespace NethServer\Module\MailAccount;
 
 /*
@@ -29,6 +30,13 @@ namespace NethServer\Module\MailAccount;
 class Pseudonym extends \Nethgui\Controller\TableController
 {
 
+    protected function initializeAttributes(\Nethgui\Module\ModuleAttributesInterface $base)
+    {
+        return new \NethServer\Tool\CustomModuleAttributesProvider($base, array(
+            'languageCatalog' => array('NethServer_Module_Pseudonym'),
+        ));
+    }
+
     public function initialize()
     {
         $columns = array(
@@ -39,21 +47,20 @@ class Pseudonym extends \Nethgui\Controller\TableController
         );
 
         $this
-            ->setTableAdapter($this->getPlatform()->getTableAdapter('accounts', 'pseudonym'))
-            ->setColumns($columns)
-            ->addTableAction(new Pseudonym\Modify('create'))
-            ->addTableAction(new \Nethgui\Controller\Table\Help('Help'))
-            ->addRowAction(new Pseudonym\Modify('update'))
-            ->addRowAction(new Pseudonym\Modify('delete'))
+                ->setTableAdapter($this->getPlatform()->getTableAdapter('accounts', 'pseudonym'))
+                ->setColumns($columns)
+                ->addTableAction(new Pseudonym\Modify('create'))
+                ->addTableAction(new \Nethgui\Controller\Table\Help('Help'))
+                ->addRowAction(new Pseudonym\Modify('update'))
+                ->addRowAction(new Pseudonym\Modify('delete'))
         ;
         parent::initialize();
     }
 
-
     public function prepareViewForColumnFlag(\Nethgui\Controller\Table\Read $action, \Nethgui\View\ViewInterface $view, $key, $values, &$rowMetadata)
     {
         $flag = '';
-        if($values['Access'] === 'private') {
+        if ($values['Access'] === 'private') {
             $rowMetadata['rowCssClass'] = trim($rowMetadata['rowCssClass'] . ' user-new');
             $flag .= 'P';
         } else {
