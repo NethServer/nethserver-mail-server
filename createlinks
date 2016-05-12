@@ -53,7 +53,6 @@ event_templates($_,
 		/etc/postfix/master.cf
 		/etc/amavisd/amavisd.conf
 		/etc/dovecot/master-users
-                /etc/sudoers
                 /etc/hosts
                 /etc/dnsmasq.conf
 )) foreach (qw(nethserver-mail-server-update));

@@ -1,0 +1,4 @@
+#
+# 20_nethserver_mail_server
+#
+%adm ALL=NOPASSWD: /usr/libexec/nethserver/mail-quota
