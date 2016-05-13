@@ -37,8 +37,13 @@ if( ! grep { $_ eq 'vmail'} @{$amavisGroup->members()} ) {
     }
 }
 
+if( ! -d '/var/lib/nethserver/vmail/vmail') {
+    warn "[NOTICE] Initialize vmail Public IMAP namespace\n";
+    system('doveadm acl set -u vmail INBOX authenticated lookup');
+    if($? != 0) {
+        $errors++;
+    }
+}
+
 exit ($errors == 0 ? 0 : 1);
-
-
-
 

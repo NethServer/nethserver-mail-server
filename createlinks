@@ -53,7 +53,6 @@ event_templates($_,
 		/etc/postfix/master.cf
 		/etc/amavisd/amavisd.conf
 		/etc/dovecot/master-users
-                /etc/sudoers
                 /etc/hosts
                 /etc/dnsmasq.conf
 )) foreach (qw(nethserver-mail-server-update));
@@ -221,4 +220,24 @@ event_actions('profile-modify', qw(
      nethserver-mail-postmap-update 30
 ));
 
+#
+# Event sharedmailbox-create
+#
+event_actions('sharedmailbox-create', qw(
+  nethserver-mail-shrmbx-create 20
+  nethserver-mail-shrmbx-modify 30
+));
 
+#
+# Event sharedmailbox-modify
+#
+event_actions('sharedmailbox-modify', qw(
+  nethserver-mail-shrmbx-modify 20
+));
+
+#
+# Event sharedmailbox-delete
+#
+event_actions('sharedmailbox-delete', qw(
+  nethserver-mail-shrmbx-delete 20
+));

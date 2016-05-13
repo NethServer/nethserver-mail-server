@@ -30,7 +30,8 @@ perl createlinks
 %install
 rm -rf %{buildroot}
 (cd root; find . -depth -print | cpio -dump %{buildroot})
-%{genfilelist} %{buildroot} > %{name}-%{version}-filelist
+%{genfilelist} %{buildroot} | \
+  sed '\:^/etc/suoders.d/: d' > %{name}-%{version}-filelist
 
 mkdir -p %{buildroot}/%{_nsstatedir}/vmail
 mkdir -p %{buildroot}/%{_nsstatedir}/sieve-scripts
@@ -57,6 +58,7 @@ usermod -G vmail -a postfix >/dev/null 2>&1
 %dir %attr(0770,root,vmail) %{_nsstatedir}/sieve-scripts
 %dir %attr(0775,root,root) %{_sysconfdir}/dovecot/sieve-scripts
 %dir %attr(0775,root,root) %{_sysconfdir}/dovecot/sievc/Maildir
+%config %attr (0440,root,root) %{_sysconfdir}/sudoers.d/20_nethserver_mail_server
 
 %changelog
 * Wed Oct 28 2015 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 1.9.1-1

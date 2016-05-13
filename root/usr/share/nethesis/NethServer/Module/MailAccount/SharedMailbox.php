@@ -26,9 +26,18 @@ namespace NethServer\Module\MailAccount;
  */
 class SharedMailbox extends \Nethgui\Controller\TableController
 {
+
     public function initialize()
     {
-        $this->setTableAdapter($this->getPlatform()->getTableAdapter('accounts', 'user'));
-        parent::initialize();        
+        $this->setTableAdapter(new \NethServer\Module\MailAccount\SharedMailbox\SharedMailboxAdapter($this->getPlatform()));
+        $this->setColumns(array(
+            'Key',
+            'Actions'
+        ));
+        $this->addTableAction(new \NethServer\Module\MailAccount\SharedMailbox\Edit('create'));
+        $this->addRowAction(new \NethServer\Module\MailAccount\SharedMailbox\Edit('update'));
+        $this->addRowAction(new \NethServer\Module\MailAccount\SharedMailbox\Edit('delete'));
+        parent::initialize();
     }
+
 }

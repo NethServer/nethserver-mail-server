@@ -28,8 +28,7 @@ class MailAccount extends \Nethgui\Controller\TabsController
 {
     protected function initializeAttributes(\Nethgui\Module\ModuleAttributesInterface $base)
     {
-        return new \NethServer\Tool\CustomModuleAttributesProvider($base, array(
-            'languageCatalog' => array('NethServer_Module_MailAccount', 'NethServer_Module_Pseudonym'),
+        return new \NethServer\Tool\CustomModuleAttributesProvider($base, array(            
             'category' => 'Management')
         );
     }
