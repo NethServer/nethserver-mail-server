@@ -61,13 +61,25 @@ class Pseudonym extends \Nethgui\Controller\TableController
     {
         $flag = '';
         if ($values['Access'] === 'private') {
-            $rowMetadata['rowCssClass'] = trim($rowMetadata['rowCssClass'] . ' user-new');
+            $rowMetadata['rowCssClass'] = trim($rowMetadata['rowCssClass'] . '');
             $flag .= 'P';
         } else {
             $flag .= '-';
         }
 
         return $flag;
+    }
+
+    public function prepareViewForColumnAccount(\Nethgui\Controller\Table\Read $action, \Nethgui\View\ViewInterface $view, $key, $values, &$rowMetadata)
+    {
+        $destinations = explode(',', $values['Account']);
+
+        if(count($destinations) > 4) {
+            array_splice($destinations, 0, 4);
+            $destinations[] = '...';
+        }
+
+        return implode(', ', $destinations);
     }
 
 }
