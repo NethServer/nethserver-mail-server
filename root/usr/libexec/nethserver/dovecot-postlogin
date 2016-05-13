@@ -21,6 +21,8 @@
 #
 
 use strict;
+use esmith::AccountsDB;
+use esmith::ConfigDB;
 
 # Read secondary groups and prepare a CSV list
 my @groups = map { sprintf('%s', (getgrgid($_))[0]) } split(/ /, qx(id -G \$USER));
@@ -31,6 +33,31 @@ $ENV{MASTER_USER}=$ENV{USER};
 # Export USERDB overrides
 #
 $ENV{USERDB_KEYS} .= 'acl_groups master_user ';
+
+#
+# Export quota
+#
+#
+my $db = esmith::ConfigDB->open_ro();
+
+if ( ($db->get_prop('dovecot', 'QuotaStatus') || 'disabled') eq 'enabled' ) {
+    $ENV{USERDB_KEYS} .= 'quota_rule ';
+    my $quota = $db->get_prop('dovecot', 'QuotaDefaultSize') || 20;
+    my $user = esmith::AccountsDB->open_ro()->get($ENV{USER});
+    if ($user) {
+        my $qt = $user->prop('MailQuotaType') || 'default';
+        if ($qt eq 'custom') {
+            $quota = $user->prop('MailQuotaCustom') || 'unlimited';
+            if ($quota eq 'unlimited') {
+                $quota = 0;
+            } else {
+                $quota = ($quota * 100) ."M";
+            }
+        }
+    }
+        
+    $ENV{QUOTA_RULE}="*:storage=$quota";
+}
 
 #
 # The ENVironment is ready, we are done.
