@@ -1,4 +1,5 @@
 <?php
+
 namespace NethServer\Module\MailAccount\Pseudonym;
 
 /*
@@ -35,15 +36,15 @@ class Modify extends \Nethgui\Controller\Table\Modify
     public function initialize()
     {
         $keyValidator = $this->createValidator()
-                ->orValidator(
+                        ->orValidator(
                     $this->createValidator()->regexp('/^[A-Za-z0-9_-](\.?[A-Za-z0-9_-]+)*@$/i'),
                     $this->createValidator()->email()
-                )->maxLength(196);
+                        )->maxLength(196);
 
         $parameterSchema = array(
             array('pseudonym', $keyValidator, Table::KEY),
             array('Description', Validate::ANYTHING, Table::FIELD),
-            array('Account', Validate::ANYTHING, Table::FIELD),
+            array('Account', Validate::ANYTHING, Table::FIELD, 'Account', ','),
             array('Access', $this->createValidator()->memberOf('public',
                     'private'), Table::FIELD),
         );
@@ -52,6 +53,7 @@ class Modify extends \Nethgui\Controller\Table\Modify
 
         $this->declareParameter('localAddress', Validate::NOTEMPTY);
         $this->declareParameter('domainAddress', Validate::ANYTHING);
+        $this->declareParameter('ExtAddresses', '/^[^\|]*$/');
         $this->setDefaultValue('localAddress', '');
         $this->setDefaultValue('domainAddress', '');
 
@@ -61,6 +63,15 @@ class Modify extends \Nethgui\Controller\Table\Modify
     protected function calculateKeyFromRequest(\Nethgui\Controller\RequestInterface $request)
     {
         return trim($request->getParameter('localAddress')) . '@' . $request->getParameter('domainAddress');
+    }
+
+    public function bind(\Nethgui\Controller\RequestInterface $request)
+    {
+        parent::bind($request);
+        $extAddresses = $this->getExtAddresses();
+        if(count($extAddresses) > 0) {
+            $this->parameters['Account'] = array_merge($this->parameters['Account']->getArrayCopy(), $extAddresses);
+        }
     }
 
     public function validate(\Nethgui\Controller\ValidationReportInterface $report)
@@ -78,6 +89,68 @@ class Modify extends \Nethgui\Controller\Table\Modify
         }
     }
 
+    public function process()
+    {
+        if($this->getRequest()->isMutation()) {
+            // Expand the member list of each group
+            $groupProvider = new \NethServer\Tool\GroupProvider($this->getPlatform());
+            $groupList = $groupProvider->getGroups();
+            $destinations = array();
+            foreach($this->parameters['Account'] as $destination) {
+                if(in_array($destination, array_keys($groupList))) {
+                    $destinations = array_merge($destinations, $groupList[$destination]['members']);
+                } else {
+                    $destinations[] = $destination;
+                }
+            }
+            $this->parameters['Account'] = array_unique($destinations);
+        }
+        parent::process();
+    }
+
+    public function getExtAddresses()
+    {
+        $addresses = array();
+        foreach (preg_split("/[,;\s]+/", $this->parameters['ExtAddresses']) as $line) {
+            $address = trim($line);
+            if($address) {
+                $addresses[] = $address;
+            }
+        }
+        return $addresses;
+    }
+
+    public function getAccountDatasource()
+    {
+        $userProvider = new \NethServer\Tool\UserProvider($this->getPlatform());
+        $groupProvider = new \NethServer\Tool\GroupProvider($this->getPlatform());
+        $mbxProvider = new \NethServer\Module\MailAccount\SharedMailbox\SharedMailboxAdapter($this->getPlatform());
+
+        $users = $userProvider->getUsers();
+
+        $hash = array();
+
+        if ($this->parameters['Account'] instanceof \Traversable) {
+            foreach ($this->parameters['Account'] as $a) {
+                $hash[$a] = $a;
+            }
+        }
+
+        foreach ($users as $key => $prop) {
+            $hash[$key] = $key;
+        }
+
+        foreach ($groupProvider->getGroups() as $key => $prop) {
+            $hash[$key] = $key;
+        }
+
+        foreach ($mbxProvider->getSharedMailboxList() as $mbx) {
+            $hash['vmail+' . $mbx['name']] = $mbx['name'];
+        }
+
+        return \Nethgui\Renderer\AbstractRenderer::hashToDatasource($hash, TRUE);
+    }
+
     public function prepareView(\Nethgui\View\ViewInterface $view)
     {
         parent::prepareView($view);
@@ -89,8 +162,7 @@ class Modify extends \Nethgui\Controller\Table\Modify
         $view->setTemplate($templates[$this->getIdentifier()]);
 
         if ( ! $this->getRequest()->isMutation() && $this->getRequest()->isValidated()) {
-            $view['AccountDatasource'] = new \NethServer\Module\MailAccount\Pseudonym\AccountDatasource($this,
-                $view->getTranslator(), $view['Account']);
+            $view['AccountDatasource'] = $this->getAccountDatasource();
             if ($this->getIdentifier() === 'create') {
                 $view['domainAddressDatasource'] = $this->readDomainAddressDatasource($view);
             }
