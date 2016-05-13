@@ -8,7 +8,7 @@
     $OUT = '';
     foreach (esmith::AccountsDB->open_ro()->get_all_by_prop("type" => "pseudonym")) {
         if(($_->prop('Access') || '') eq 'private') {
-            $OUT .= sprintf("%-38s reject", $_->key);
+            $OUT .= sprintf("%-38s reject\n", $_->key);
         }
     }
 }
