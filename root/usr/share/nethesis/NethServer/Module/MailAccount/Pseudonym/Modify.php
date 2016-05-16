@@ -148,7 +148,7 @@ class Modify extends \Nethgui\Controller\Table\Modify
             $hash['vmail+' . $mbx['name']] = $mbx['name'];
         }
 
-        return \Nethgui\Renderer\AbstractRenderer::hashToDatasource($hash, TRUE);
+        return \Nethgui\Widget\XhtmlWidget::hashToDatasource($hash, TRUE);
     }
 
     public function prepareView(\Nethgui\View\ViewInterface $view)
