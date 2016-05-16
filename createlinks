@@ -119,7 +119,10 @@ foreach (qw(create modify delete)) {
 }
 
 event_actions('user-delete',
-	      'nethserver-mail-account-cleanup' => '30');
+	      'nethserver-mail-default-pseudonyms-delete' => '03',
+	      'nethserver-mail-account-cleanup' => '30',
+	      'nethserver-mail-expand-aliases' => '76',
+	      'nethserver-mail-postmap-update' => '77');
 
 
 #
@@ -240,4 +243,12 @@ event_actions('sharedmailbox-modify', qw(
 #
 event_actions('sharedmailbox-delete', qw(
   nethserver-mail-shrmbx-delete 20
+));
+
+#
+# mailbox-save event
+#
+event_templates('mailbox-save', qw(
+      /etc/postfix/internal_access
+      /etc/dovecot/user-quota
 ));

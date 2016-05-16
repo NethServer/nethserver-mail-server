@@ -26,9 +26,71 @@ namespace NethServer\Module\MailAccount;
  */
 class User extends \Nethgui\Controller\TableController
 {
+    protected function initializeAttributes(\Nethgui\Module\ModuleAttributesInterface $base)
+    {
+        return new \NethServer\Tool\CustomModuleAttributesProvider($base, array(
+            'languageCatalog' => array('NethServer_Module_MailAccount_User'))
+        );
+    }
+
     public function initialize()
     {
-        $this->setTableAdapter($this->getPlatform()->getTableAdapter('accounts', 'user'));
+        $columns = array(
+            'Key',
+            'MailQuotaCustom',
+            'MailSpamRetentionTime',
+            'MailForwardAddress',
+            'Actions'
+        );
+
+        $this
+            ->setTableAdapter(new User\MailboxAdapter($this->getPlatform()))
+            ->setColumns($columns)
+            ->addRowAction(new User\Modify('update'))
+            ->addTableAction(new \Nethgui\Controller\Table\Help('Help'))
+
+        ;
         parent::initialize();
     }
+
+    public function prepareViewForColumnKey(\Nethgui\Controller\Table\Read $action, \Nethgui\View\ViewInterface $view, $key, $values, &$rowMetadata)
+    {
+        if ($values['MailStatus'] == 'disabled' ) {
+            $rowMetadata['rowCssClass'] = trim($rowMetadata['rowCssClass'] . ' user-locked');
+        }
+        return strval($key);
+    }
+
+   public function prepareViewForColumnMailForwardAddress(\Nethgui\Controller\Table\Read $action, \Nethgui\View\ViewInterface $view, $key, $values, &$rowMetadata)
+    {
+        if ($values['MailForwardStatus'] == 'enabled' ) {
+            return $values['MailForwardAddress'];
+        }
+        return '-';
+    }
+
+    public function prepareViewForColumnMailQuotaCustom(\Nethgui\Controller\Table\Read $action, \Nethgui\View\ViewInterface $view, $key, $values, &$rowMetadata)
+    {
+        if ($values['MailQuotaType'] == 'custom') {
+             $i = $values['MailQuotaCustom'];
+             if ($i == 0) {
+                 return $view->translate('Unlimited_quota');
+             }
+             return $i >= 10 ? (($i / 10.0) . ' GB') : (($i * 100) . ' MB');
+        }
+        return '-';
+    }
+
+    public function prepareViewForColumnMailSpamRetentionTime(\Nethgui\Controller\Table\Read $action, \Nethgui\View\ViewInterface $view, $key, $values, &$rowMetadata)
+    {
+        if ($values['MailSpamRetentionStatus'] == 'enabled') {
+             if ($values['MailSpamRetentionTime'] == 'infinite') {
+                 return $view->translate('ever');
+             } else {
+                 return $view->translate('${0} days', array(substr($values['MailSpamRetentionTime'],0,-1)));
+             }
+        }
+        return '-';
+    }
+
 }

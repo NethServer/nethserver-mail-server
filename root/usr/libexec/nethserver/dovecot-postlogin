@@ -33,6 +33,28 @@ $ENV{MASTER_USER}=$ENV{USER};
 $ENV{USERDB_KEYS} .= 'acl_groups master_user ';
 
 #
+# Export quota
+#
+#
+
+my $quota = -1;
+if ( -e "/etc/dovecot/user-quota") {
+    open(FILE, "/etc/dovecot/user-quota");
+    while (<FILE>) {
+        if ($_ =~ /$ENV{USER},/) {
+            $quota = (split(/,/,$_))[1];
+            $quota = ($quota * 100) ."M";
+            last;
+        }
+    }
+    close(FILE);
+    if ($quota >= 0) {
+        $ENV{USERDB_KEYS} .= 'quota_rule ';
+        $ENV{QUOTA_RULE}="*:storage=$quota";
+    }
+}
+
+#
 # The ENVironment is ready, we are done.
 #
 exec(@ARGV) or die "Unable to exec @ARGV: $!";

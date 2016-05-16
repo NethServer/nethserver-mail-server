@@ -6,4 +6,4 @@ $L['MailAccount_Title'] = 'Email addresses';
 
 $L['Pseudonym_Title'] = 'Mail aliases';
 $L['SharedMailbox_Title'] = 'Shared mailboxes';
-$L['User_Title'] = 'User preferences';
+$L['User_Title'] = 'User mailboxes';
