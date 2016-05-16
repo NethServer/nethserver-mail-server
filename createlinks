@@ -236,6 +236,7 @@ event_actions('sharedmailbox-create', qw(
 #
 event_actions('sharedmailbox-modify', qw(
   nethserver-mail-shrmbx-modify 20
+  nethserver-mail-shrmbx-rename-aliases 30
 ));
 
 #
