@@ -55,7 +55,7 @@ if( ! $spamassassinRecord) {
 	my %dstProps = $dovecotRecord->props;
 	my %srcProps = $spamassassinRecord->props;
 	
-	$dstProps{SpamFolder} = defined $srcProps{SortSpam} && $srcProps{SortSpam} eq 'enabled' ? 'junkmail' : '';
+	$dstProps{SpamFolder} = defined $srcProps{SortSpam} && $srcProps{SortSpam} eq 'enabled' ? 'Junk' : '';
 	$dstProps{SpamRetentionTime} = int($srcProps{MessageRetentionTime}) == 0 ? 'infinite' : translateFromDays($srcProps{MessageRetentionTime});
 	
 	$dovecotRecord->merge_props(%dstProps);
