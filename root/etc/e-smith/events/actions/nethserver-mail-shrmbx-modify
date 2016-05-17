@@ -36,6 +36,8 @@ while [[ $# > 0 ]]; do
     perms="$2"
     if [[ "${perms}" == 'ADMIN' ]]; then
         doveadm acl set -u vmail "${newname}" "${subject}" admin create delete expunge insert lookup post read write write-deleted write-seen || :
+    elif [[ "${perms}" == 'OWNER' ]]; then
+        doveadm acl set -u vmail "${newname}" "${subject}" create expunge insert lookup read write write-deleted write-seen || :
     elif [[ "${perms}" == "CLEAR" ]]; then
         doveadm acl delete -u vmail "${newname}" "${subject}" || :
     else
