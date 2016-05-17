@@ -71,10 +71,10 @@ class Edit extends \Nethgui\Controller\Table\AbstractAction
 
     public function bind(\Nethgui\Controller\RequestInterface $request)
     {
+        parent::bind($request);
         if ($this->getIdentifier() !== 'create') {
             $this->parameters['Name'] = \Nethgui\array_end($request->getPath());
         }
-        parent::bind($request);
         if ($this->getRequest()->isMutation()) {
             $this->parameters['NewName'] = $this->getRequest()->getParameter('Name');
         }
@@ -115,9 +115,6 @@ class Edit extends \Nethgui\Controller\Table\AbstractAction
 
     private function getOwnersDatasource(\Nethgui\View\ViewInterface $view)
     {
-        if ( ! $this->getRequest()->isValidated()) {
-            return array();
-        }
         $gp = new \NethServer\Tool\GroupProvider($this->getPlatform());
         return array_map(function ($x) {
             return array($x, $x);
