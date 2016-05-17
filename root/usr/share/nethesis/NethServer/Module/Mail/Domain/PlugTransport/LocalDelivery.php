@@ -36,7 +36,7 @@ class LocalDelivery extends \Nethgui\Controller\Table\RowPluginAction
     {
         $this->setSchemaAddition(array(
             array('UnknownRecipientsActionType', $this->createValidator()->memberOf('bounce', 'deliver'), Table::FIELD),
-            array('UnknownRecipientsActionDeliverMailbox', Validate::ANYTHING, Table::FIELD),
+            array('UnknownRecipientsActionDeliverMailbox', Validate::EMAIL, Table::FIELD),
             array('AlwaysBccStatus', Validate::SERVICESTATUS, Table::FIELD),
             array('AlwaysBccAddress', Validate::EMAIL, Table::FIELD),
         ));
@@ -45,14 +45,6 @@ class LocalDelivery extends \Nethgui\Controller\Table\RowPluginAction
         $this->setDefaultValue('AlwaysBccStatus', 'disabled');
 
         parent::initialize();
-    }
-
-    public function prepareView(\Nethgui\View\ViewInterface $view)
-    {
-        parent::prepareView($view);
-        if ( ! $this->getRequest()->isMutation() && $this->getRequest()->isValidated()) {
-            $view['AccountDatasource'] = new \NethServer\Module\Pseudonym\AccountDatasource($this, $view->getTranslator(), $view['UnknownRecipientsActionDeliverMailbox']);
-        }
     }
 
 }
