@@ -38,7 +38,6 @@ my @saveTemplates = qw(
     /etc/postfix/main.cf
     /etc/postfix/transport
     /etc/postfix/virtual
-    /etc/postfix/aliases
     /etc/postfix/internal_access
     /etc/postfix/recipient_bcc
     /etc/dovecot/dovecot.conf
@@ -111,7 +110,7 @@ foreach (qw(create modify delete)) {
 # user-* events expand and reload postfix table templates
 #
 
-my @userTemplates = (@pseudonymTemplates, '/etc/postfix/aliases');
+my @userTemplates = (@pseudonymTemplates);
 
 foreach (qw(create modify delete)) {
     event_templates('user-' . $_, @userTemplates);
@@ -129,7 +128,7 @@ event_actions('user-delete',
 # group-* events expand and reload postfix table templates
 #
 
-my @groupTemplates = (@pseudonymTemplates, '/etc/postfix/aliases');
+my @groupTemplates = (@pseudonymTemplates);
 
 foreach (qw(create modify delete)) {
     event_templates('group-' . $_, @groupTemplates);
@@ -161,7 +160,6 @@ foreach (qw(create delete modify)) {
     event_templates('domain-' . $_, qw(
 		    /etc/postfix/recipient_bcc
 		    /etc/postfix/virtual
-                    /etc/postfix/aliases
     ));
     event_actions('domain-'   . $_, qw(
          nethserver-mail-postmap-update 30
@@ -217,7 +215,7 @@ event_actions('runlevel-adjust', qw(
 # profile-modify event (refs #2675)
 #
 event_templates('profile-modify', qw(
-     /etc/postfix/aliases
+     /etc/postfix/virtual
 ));
 event_actions('profile-modify', qw(
      nethserver-mail-postmap-update 30
@@ -251,7 +249,7 @@ event_actions('sharedmailbox-delete', qw(
 #
 event_templates('mailbox-save', qw(
       /etc/postfix/internal_access
-      /etc/postfix/aliases
+      /etc/postfix/virtual
       /etc/dovecot/user-quota
 ));
 
