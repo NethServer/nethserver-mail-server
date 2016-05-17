@@ -37,7 +37,8 @@ class MailAccount extends \Nethgui\Controller\TabsController
     {
         parent::initialize();
         $this->addChild(new \NethServer\Module\MailAccount\User());
-        $this->addChild(new \NethServer\Module\MailAccount\Pseudonym());
         $this->addChild(new \NethServer\Module\MailAccount\SharedMailbox());
+        $this->addChild(new \NethServer\Module\MailAccount\Pseudonym());
     }
+
 }
