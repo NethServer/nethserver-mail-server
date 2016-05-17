@@ -13,5 +13,5 @@ $L['Spam messages handling'] = 'Spam messages handling';
 $L['SpamFolder_label'] = 'Move to "junkmail" folder"'; 
 $L['TlsSecurity_label'] = 'Allow unencrypted connections';
 $L['Privileged access'] = 'Privileged access';
-$L['AdminIsMaster_label'] = 'Admin can log in as another user';
+$L['AdminIsMaster_label'] = 'Root can log in as another user';
 $L['ever'] = 'ever'; 
