@@ -15,5 +15,5 @@ $L['localAddress_label'] = 'Email address';
 $L['pseudonym_label'] = 'Email address';
 $L['valid_pseudonym_unique'] = 'This address already exists';
 $L['ANY_DOMAIN'] = '[all domains]';
-$L['ExtAddresses_label'] = 'External mail destinations';
+$L['ExtAddresses_label'] = 'External email destinations';
 $L['Destinations_label'] = 'Destinations';
