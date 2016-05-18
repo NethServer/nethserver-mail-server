@@ -35,6 +35,7 @@ class SharedMailbox extends \Nethgui\Controller\TableController
             'Actions'
         ));
         $this->addTableAction(new \NethServer\Module\MailAccount\SharedMailbox\Edit('create'));
+        $this->addTableAction(new \Nethgui\Controller\Table\Help('Help'));
         $this->addRowAction(new \NethServer\Module\MailAccount\SharedMailbox\Edit('update'));
         $this->addRowAction(new \NethServer\Module\MailAccount\SharedMailbox\Edit('delete'));
         parent::initialize();
