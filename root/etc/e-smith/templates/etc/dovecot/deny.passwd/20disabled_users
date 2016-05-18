@@ -1,13 +1,12 @@
 #
 # 20disabled_users -- disabled user mailboxes
 #
-
 {
     use esmith::AccountsDB;
     $OUT = '';
     foreach (esmith::AccountsDB->open_ro()->get_all_by_prop("type" => "user")) {
         if(($_->prop('MailStatus') || 'enabled') eq 'disabled') {
-            $OUT .= sprintf("%-38s reject", $_->key);
+            $OUT .= $_->key . "\n";
         }
     }
 }

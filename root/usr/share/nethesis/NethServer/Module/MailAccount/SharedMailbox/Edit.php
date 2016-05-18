@@ -59,7 +59,7 @@ class Edit extends \Nethgui\Controller\Table\AbstractAction
         $others = array();
         foreach (\Nethgui\array_rest($proc->getOutputArray()) as $line) {
             list($id, $global, $rights) = explode("\t", $line);
-            if ($rights === 'admin create delete expunge insert lookup post read write write-deleted write-seen') {
+            if ($rights === 'create expunge insert lookup read write write-deleted write-seen') {
                 $owners[] = str_replace('group=', '', $id);
             } else {
                 $this->others[] = preg_replace('/^(group=|user=)/', '', $id) . sprintf(' (%s)', $rights);
@@ -71,10 +71,10 @@ class Edit extends \Nethgui\Controller\Table\AbstractAction
 
     public function bind(\Nethgui\Controller\RequestInterface $request)
     {
+        parent::bind($request);
         if ($this->getIdentifier() !== 'create') {
             $this->parameters['Name'] = \Nethgui\array_end($request->getPath());
         }
-        parent::bind($request);
         if ($this->getRequest()->isMutation()) {
             $this->parameters['NewName'] = $this->getRequest()->getParameter('Name');
         }
@@ -88,7 +88,7 @@ class Edit extends \Nethgui\Controller\Table\AbstractAction
 
         foreach ($this->parameters['Owners'] as $o) {
             $args[] = 'group=' . $o;
-            $args[] = 'ADMIN';
+            $args[] = 'OWNER';
         }
 
         foreach (array_diff($owners, $this->parameters['Owners']) as $o) {
@@ -115,9 +115,6 @@ class Edit extends \Nethgui\Controller\Table\AbstractAction
 
     private function getOwnersDatasource(\Nethgui\View\ViewInterface $view)
     {
-        if ( ! $this->getRequest()->isValidated()) {
-            return array();
-        }
         $gp = new \NethServer\Tool\GroupProvider($this->getPlatform());
         return array_map(function ($x) {
             return array($x, $x);

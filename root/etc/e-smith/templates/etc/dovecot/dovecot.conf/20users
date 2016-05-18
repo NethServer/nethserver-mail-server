@@ -32,6 +32,13 @@ passdb \{
 }";
 }
 
+# The list of disabled user accounts
+passdb \{
+  driver = passwd-file
+  args = /etc/dovecot/deny.passwd
+  deny = yes
+\}
+
 # Authenticate users against PAM
 passdb \{
   driver = pam

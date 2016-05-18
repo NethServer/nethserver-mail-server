@@ -23,16 +23,11 @@ $spamRetentionPanel = $view->fieldsetSwitch('MailSpamRetentionStatus', 'enabled'
 
 
 
-$panel = $view->fieldsetSwitch('MailStatus', 'enabled', $view::FIELDSETSWITCH_CHECKBOX | $view::FIELDSETSWITCH_EXPANDABLE)
-    ->setAttribute('uncheckedValue', 'disabled')
-    ->insert($forwardPanel);
+echo $view->panel()
+    ->insert($view->checkBox('MailStatus', 'enabled')->setAttribute('uncheckedValue', 'disabled'))
+    ->insert($forwardPanel)
+    ->insert($quotaPanel)
+    ->insert($spamRetentionPanel)
+;
 
-$panel->insert($quotaPanel);
-$panel->insert($spamRetentionPanel);
-
-echo $panel;
-
-$buttons = $view->buttonList($view::BUTTON_SUBMIT | $view::BUTTON_CANCEL | $view::BUTTON_HELP);
-
-echo $buttons;
-
+echo $view->buttonList($view::BUTTON_SUBMIT | $view::BUTTON_CANCEL | $view::BUTTON_HELP);
