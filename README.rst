@@ -144,7 +144,26 @@ User: ::
      Account=jdoe
      ControlledBy=operators
      Access=private
-   
+
+Mail quota
+----------
+
+The default mail quota is configured in ``dovecot.conf``. Custom user mail quota
+is set by the ``dovecot-postlogin`` script, by reading
+``/etc/dovecot/user-quota`` (which is a template). If a custom mail quota is set
+the UI interface does not show the updated value until the user performs an IMAP
+login.
+
+Disabled users
+--------------
+
+By default all system users are also Dovecot users. To disable a user we
+configure a blacklist in ``dovecot.conf``: ``/etc/dovecot/deny.passwd``.
+
+As Dovecot is configured as authentication backend for Postfix, a disabled user
+loses also SMTP AUTH access.
+
+
 Testing Dovecot with Mutt
 -------------------------
 
