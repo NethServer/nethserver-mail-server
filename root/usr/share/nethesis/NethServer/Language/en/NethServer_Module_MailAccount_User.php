@@ -1,5 +1,6 @@
 <?php
 
+$L['Modify_header'] = 'Edit preferences for `${0}`';
 $L['${0} day'] = 'one day'; 
 $L['${0} days'] = '${0} days'; 
 $L['Hold for ${0}'] = 'Hold for ${0}'; 

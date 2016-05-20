@@ -1,6 +1,7 @@
 <?php
 
 /* @var $view \Nethgui\Renderer\Xhtml */
+echo $view->header('username')->setAttribute('template', $T('Modify_header'));
 
 $quotaPanel = $view->fieldsetSwitch('MailQuotaType', 'custom', $view::FIELDSETSWITCH_EXPANDABLE
             | $view::FIELDSETSWITCH_CHECKBOX)->setAttribute('uncheckedValue', 'default')
