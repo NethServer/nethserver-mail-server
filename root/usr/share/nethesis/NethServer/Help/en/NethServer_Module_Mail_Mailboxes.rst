@@ -21,11 +21,11 @@ Disk space
     * Apply quota: limit maximum space of email for each user to the value
       indicated (email quota).
 
-Move to Folder *junkmail*
+Move to "Junk" folder
     Email messages identified as spam are moved to each user folder
     *Junkmail* instead of being delivered to the Inbox.
 
-Admin can log in as another user
-    When this option is enabled, *admin* can impersonate *john*
-    providing ``john*admin`` as IMAP user name and the admin's
+Root can log in as another user
+    When this option is enabled, *root* can impersonate *john*
+    providing ``john*root`` as IMAP user name and the root's
     password.
