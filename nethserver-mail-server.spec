@@ -1,6 +1,6 @@
 Summary: Mail server implementation based on postfix and dovecot packages
 Name: nethserver-mail-server
-Version: 1.9.1
+Version: 1.9.2
 Release: 1%{?dist}
 License: GPL
 URL: %{url_prefix}/%{name} 
@@ -67,6 +67,9 @@ exit 0
 %ghost %attr(0644, root, root) %{_sysconfdir}/pam.d/dovecot-master
 
 %changelog
+* Fri May 20 2016 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 1.9.2-1
+- Mail bounces from old group member - Bug #3384 [NethServer]
+
 * Wed Oct 28 2015 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 1.9.1-1
 - Automatic group email addresses creation - Enhancement #3267 [NethServer]
 
