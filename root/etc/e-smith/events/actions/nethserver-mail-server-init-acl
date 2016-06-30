@@ -20,22 +20,17 @@
 # along with NethServer.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-use User::grent;
 use strict;
 
 my $event = shift;
 my $errors = 0;
 
-# Refs #1516 -- Add vmail user into amavis group, to allow bayes DB
-# updates through sa-learn
-
-my $amavisGroup = getgrnam('amavis') or die('[ERROR] Could not find amavis group');
-if( ! grep { $_ eq 'vmail'} @{$amavisGroup->members()} ) {
-    system('/usr/sbin/usermod', qw(-a -G amavis vmail));
+if( ! -d '/var/lib/nethserver/vmail/vmail') {
+    warn "[NOTICE] Initialize vmail Public IMAP namespace\n";
+    system('doveadm acl set -u vmail INBOX authenticated lookup');
     if($? != 0) {
         $errors++;
     }
 }
 
 exit ($errors == 0 ? 0 : 1);
-
