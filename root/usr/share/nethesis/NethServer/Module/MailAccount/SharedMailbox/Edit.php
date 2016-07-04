@@ -33,12 +33,26 @@ class Edit extends \Nethgui\Controller\Table\AbstractAction
     public function initialize()
     {
         parent::initialize();
+        $keyValidator = $this->createValidator()
+                        ->orValidator(
+                    $this->createValidator()->regexp('/^[A-Za-z0-9_-](\.?[A-Za-z0-9_-]+)*@$/i'),
+                    $this->createValidator()->email()
+                        )->maxLength(196);
 
         $ownersAdapter = $this->getPlatform()->getMapAdapter(array($this, 'readOwners'), NULL, array());
 
         $this->declareParameter('Name', Validate::NOTEMPTY);
         $this->declareParameter('NewName', FALSE);
+        $this->declareParameter('CreateAlias', Validate::SERVICESTATUS);
+        $this->declareParameter('localAddress', Validate::ANYTHING);
+        $this->declareParameter('domainAddress', Validate::ANYTHING);
+        $this->declareParameter('pseudonym',$keyValidator);
         $this->declareParameter('Owners', $this->createValidator()->collectionValidator($this->createValidator(Validate::NOTEMPTY)), $ownersAdapter);
+    }
+
+    protected function calculateKeyFromRequest(\Nethgui\Controller\RequestInterface $request)
+    {
+        return trim($request->getParameter('localAddress')) . '@' . $request->getParameter('domainAddress');
     }
 
     public function readOwners()
@@ -77,6 +91,7 @@ class Edit extends \Nethgui\Controller\Table\AbstractAction
         }
         if ($this->getRequest()->isMutation()) {
             $this->parameters['NewName'] = $this->getRequest()->getParameter('Name');
+            $this->parameters['pseudonym'] = trim($this->getRequest()->getParameter('localAddress')) . '@' . $this->getRequest()->getParameter('domainAddress');
         }
     }
 
@@ -99,6 +114,21 @@ class Edit extends \Nethgui\Controller\Table\AbstractAction
         return $args;
     }
 
+    public function validate(\Nethgui\Controller\ValidationReportInterface $report)
+    {
+        parent::validate($report);
+        // we must explicitly validate the pseudonym parameter because is not posted with create request
+        if ($this->getRequest()->isMutation() && $this->getIdentifier() === 'create' && $this->parameters['CreateAlias'] === 'enabled') {
+            if ($this->getValidator('pseudonym')->evaluate($this->parameters['pseudonym']) !== TRUE) {
+                $report->addValidationErrorMessage($this, 'localAddress',
+                    'valid_email,malformed-localpart');
+            } elseif ($this->getIdentifier() === 'create' && $this->getParent()->getAdapter()->offsetExists($this->parameters['pseudonym'])) {
+                $report->addValidationErrorMessage($this, 'localAddress',
+                    'valid_pseudonym_unique');
+            }
+        }
+    }
+
     public function process()
     {
         if ( ! $this->getRequest()->isMutation()) {
@@ -106,6 +136,16 @@ class Edit extends \Nethgui\Controller\Table\AbstractAction
         }
         if ($this->getIdentifier() === 'create') {
             $this->getPlatform()->signalEvent('sharedmailbox-create', $this->getChangeEventArgs());
+            /*Create Alias*/
+            if ($this->parameters['CreateAlias']==='enabled')
+            {
+                $this->getPlatform()->getDatabase('accounts')->setKey($this->parameters['pseudonym'],'pseudonym',array(
+                   'Access' => 'public',
+                   'Account' => 'vmail+'.$this->parameters['Name'],
+                   'Description' => 'Shared mailbox'
+               ));
+               $this->getPlatform()->signalEvent('pseudonym-create', array($this->parameters['pseudonym']));
+            }
         } elseif ($this->getIdentifier() === 'update') {
             $this->getPlatform()->signalEvent('sharedmailbox-modify', $this->getChangeEventArgs());
         } elseif ($this->getIdentifier() === 'delete') {
@@ -121,12 +161,24 @@ class Edit extends \Nethgui\Controller\Table\AbstractAction
         }, array_keys($gp->getGroups()));
     }
 
+    private function readDomainAddressDatasource(\Nethgui\View\ViewInterface $view)
+    {
+        $domains = array(array('', $view->translate('ANY_DOMAIN')));
+
+        foreach ($this->getPlatform()->getDatabase('domains')->getAll('domain') as $key => $prop) {
+            $domains[] = array($key, $key);
+        }
+
+        return $domains;
+    }
+
     public function prepareView(\Nethgui\View\ViewInterface $view)
     {
         parent::prepareView($view);
         if ($this->getIdentifier() === 'create') {
             $view['OwnersDatasource'] = $this->getOwnersDatasource($view);
             $view->setTemplate('NethServer\Template\MailAccount\SharedMailbox\Edit');
+            $view['domainAddressDatasource'] = $this->readDomainAddressDatasource($view);
         } elseif ($this->getIdentifier() === 'delete') {
             $view['__key'] = 'Name';  // tell what is the key parameter
             $view->setTemplate('Nethgui\Template\Table\Delete');
@@ -135,6 +187,8 @@ class Edit extends \Nethgui\Controller\Table\AbstractAction
             $view['Others'] = $this->others;
             $view->setTemplate('NethServer\Template\MailAccount\SharedMailbox\Edit');
         }
+        if (! $this->getRequest()->isMutation()){
+            $this->parameters['CreateAlias']='enabled';
+        }
     }
-
 }
