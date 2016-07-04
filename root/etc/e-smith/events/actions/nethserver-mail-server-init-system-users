@@ -46,13 +46,13 @@ USER=root
 MBOX_SRC="/var/mail/${USER}"
 
 # skip unknown users
-id "${USER}" &>/dev/null || exit
+id "${USER}" &>/dev/null || exit 0
 
 # skip non-existing
-[ -a "${MBOX_SRC}" ] || exit
+[ -a "${MBOX_SRC}" ] || exit 0
 
 # skip empty files
-[ -s "${MBOX_SRC}" ] || exit
+[ -s "${MBOX_SRC}" ] || exit 0
 
 echo "[INFO] Migrating ${USER} mailbox from ${MBOX_SRC} to IMAP:${USER}";
 
