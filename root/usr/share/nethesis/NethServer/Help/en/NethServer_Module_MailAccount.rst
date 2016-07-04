@@ -38,9 +38,12 @@ Name
     The name should be a descriptive string and will be shown by IMAP clients and
     mail web applications
 
-Owners
+Owner groups
     Select one or more owning groups of users that will be granted read and write
     privileges on the shared mailbox
+
+Create Alias
+    Create automatically a public alias for this shared mailbox
 
 Special access
     IMAP ACLs set from other email clients will be listed here
