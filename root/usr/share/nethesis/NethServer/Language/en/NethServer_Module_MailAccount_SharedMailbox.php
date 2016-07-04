@@ -12,4 +12,4 @@ $L['alias_label'] = 'Alias';
 $L['ExtraFields_label'] = 'Additional actions';
 $L['ANY_DOMAIN'] = '[all domains]';
 $L['localAddress_label'] = 'Local address';
-$L['valid_email,malformed-localpart'] = 'Invalid email alias'
+$L['valid_email,malformed-localpart'] = 'Invalid email alias';

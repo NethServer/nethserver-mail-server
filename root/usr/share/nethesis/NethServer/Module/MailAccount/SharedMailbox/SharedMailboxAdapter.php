@@ -51,4 +51,10 @@ class SharedMailboxAdapter extends \Nethgui\Adapter\LazyLoaderAdapter
         ksort($mailboxes);
         return new \ArrayObject($mailboxes);
     }
+
+    public function flush()
+    {
+        $this->data = NULL;
+        return $this;
+    }
 }

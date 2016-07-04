@@ -28,6 +28,7 @@ use Nethgui\System\PlatformInterface as Validate;
  */
 class Edit extends \Nethgui\Controller\Table\AbstractAction
 {
+
     private $others = array();
 
     public function initialize()
@@ -151,6 +152,9 @@ class Edit extends \Nethgui\Controller\Table\AbstractAction
         } elseif ($this->getIdentifier() === 'delete') {
             $this->getPlatform()->signalEvent('sharedmailbox-delete', array($this->parameters['Name']));
         }
+
+        // re-read the shared mailbox list:
+        $this->getParent()->getAdapter()->flush();
     }
 
     private function getOwnersDatasource(\Nethgui\View\ViewInterface $view)
@@ -187,8 +191,13 @@ class Edit extends \Nethgui\Controller\Table\AbstractAction
             $view['Others'] = $this->others;
             $view->setTemplate('NethServer\Template\MailAccount\SharedMailbox\Edit');
         }
-        if (! $this->getRequest()->isMutation()){
-            $this->parameters['CreateAlias']='enabled';
+        if ($this->getRequest()->isMutation()) {
+            if ($this->getRequest()->isValidated() && $this->getIdentifier() === 'create' && $this->parameters['CreateAlias'] === 'enabled') {
+                $view->getCommandList()->sendQuery($view->getModuleUrl('/MailAccount/Pseudonym'));
+            }
+        } else {
+            $this->parameters['CreateAlias'] = 'enabled';
         }
     }
+
 }
