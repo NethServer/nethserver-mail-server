@@ -1,43 +1,43 @@
 [main]
 host = https://www.transifex.com
 
-[nethserver.User_Plugin_Mail]
+[nethserver-v6.User_Plugin_Mail]
 source_file = root/usr/share/nethesis/NethServer/Language/en/NethServer_Module_User_Plugin_Mail.php
 source_lang = en
 type = PHP_ALT_ARRAY
 
 
-[nethserver.Group_PlugService_Mail]
+[nethserver-v6.Group_PlugService_Mail]
 source_file = root/usr/share/nethesis/NethServer/Language/en/NethServer_Module_Group_PlugService_Mail.php
 source_lang = en
 type = PHP_ALT_ARRAY
 
 
-[nethserver.Dashboard_MailQuota]
+[nethserver-v6.Dashboard_MailQuota]
 source_file = root/usr/share/nethesis/NethServer/Language/en/NethServer_Module_Dashboard_MailQuota.php
 source_lang = en
 type = PHP_ALT_ARRAY
 
 
-[nethserver.Pseudonym]
+[nethserver-v6.Pseudonym]
 source_file = root/usr/share/nethesis/NethServer/Language/en/NethServer_Module_Pseudonym.php
 source_lang = en
 type = PHP_ALT_ARRAY
 
 
-[nethserver.Mail_Mailbox]
+[nethserver-v6.Mail_Mailbox]
 source_file = root/usr/share/nethesis/NethServer/Language/en/NethServer_Module_Mail_Mailbox.php
 source_lang = en
 type = PHP_ALT_ARRAY
 
 
-[nethserver.Mail_Domain_PlugTransport_LocalDelivery]
+[nethserver-v6.Mail_Domain_PlugTransport_LocalDelivery]
 source_file = root/usr/share/nethesis/NethServer/Language/en/NethServer_Module_Mail_Domain_PlugTransport_LocalDelivery.php
 source_lang = en
 type = PHP_ALT_ARRAY
 
 
-[nethserver.Dashboard_SystemStatus_Mail]
+[nethserver-v6.Dashboard_SystemStatus_Mail]
 source_file = root/usr/share/nethesis/NethServer/Language/en/NethServer_Module_Dashboard_SystemStatus_Mail.php
 source_lang = en
 type = PHP_ALT_ARRAY
