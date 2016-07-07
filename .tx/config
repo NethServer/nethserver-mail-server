@@ -1,12 +1,6 @@
 [main]
 host = https://www.transifex.com
 
-[nethserver.User_Plugin_Mail]
-source_file = root/usr/share/nethesis/NethServer/Language/en/NethServer_Module_User_Plugin_Mail.php
-source_lang = en
-type = PHP_ALT_ARRAY
-
-
 [nethserver.Group_PlugService_Mail]
 source_file = root/usr/share/nethesis/NethServer/Language/en/NethServer_Module_Group_PlugService_Mail.php
 source_lang = en
