@@ -1,6 +1,6 @@
 Summary: Mail server implementation based on postfix and dovecot packages
 Name: nethserver-mail-server
-Version: 1.9.1
+Version: 1.10.0
 Release: 1%{?dist}
 License: GPL
 URL: %{url_prefix}/%{name} 
@@ -62,6 +62,9 @@ usermod -G vmail -a postfix >/dev/null 2>&1
 %config %attr (0440,root,root) %{_sysconfdir}/sudoers.d/20_nethserver_mail_server
 
 %changelog
+* Thu Jul 07 2016 Stefano Fancello <stefano.fancello@nethesis.it> - 1.10.0-1
+- First NS7 release
+
 * Wed Oct 28 2015 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 1.9.1-1
 - Automatic group email addresses creation - Enhancement #3267 [NethServer]
 
