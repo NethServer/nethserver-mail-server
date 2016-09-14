@@ -54,7 +54,12 @@ namespace PUBLIC \{
 
 # Enable acl plugin for shared mailboxes, 
 # and listescape to extend allowable characters in mailbox names
-mail_plugins = $mail_plugins acl listescape
+mail_plugins = $mail_plugins acl listescape {
+    $OUT = '';
+    if(($dovecot{'FtsLuceneStatus'} || '') eq 'enabled') {
+        $OUT = 'fts fts_lucene';
+    }
+}
 protocol imap \{
   mail_plugins = $mail_plugins imap_acl
 \}
@@ -62,6 +67,12 @@ protocol imap \{
 plugin \{
   acl = vfile
   acl_shared_dict = file:/var/lib/nethserver/vmail/shared-mailboxes.db
+  {
+    $OUT = '';
+    if(($dovecot{'FtsLuceneStatus'} || '') eq 'enabled') {
+        $OUT = "fts = lucene\n  fts_lucene = whitespace_chars=@.";
+    }
+  }
 \}
 
 service dict \{
