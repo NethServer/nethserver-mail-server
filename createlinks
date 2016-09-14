@@ -55,6 +55,7 @@ event_templates($_,
 		/etc/dovecot/master-users
                 /etc/hosts
                 /etc/dnsmasq.conf
+                /etc/systemd/system/dovecot.service.d/limits.conf
 )) foreach (qw(nethserver-mail-server-update));
 
 
