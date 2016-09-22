@@ -1,6 +1,6 @@
 Summary: Mail server implementation based on postfix and dovecot packages
 Name: nethserver-mail-server
-Version: 1.10.1
+Version: 1.10.2
 Release: 1%{?dist}
 License: GPL
 URL: %{url_prefix}/%{name} 
@@ -63,6 +63,9 @@ usermod -G vmail -a postfix >/dev/null 2>&1
 %attr(0644,root,root) %config %ghost %{_sysconfdir}/systemd/system/dovecot.service.d/limits.conf
 
 %changelog
+* Thu Sep 22 2016 Davide Principi <davide.principi@nethesis.it> - 1.10.2-1
+- Lucene IMAP Full Text Search - NethServer/dev#5106
+
 * Thu Jul 21 2016 Davide Principi <davide.principi@nethesis.it> - 1.10.1-1
 - Web UI: missing labels - Bug NethServer/dev#5061
 
