@@ -44,7 +44,7 @@ class SharedMailboxAdapter extends \Nethgui\Adapter\LazyLoaderAdapter
         if($proc->getExitCode() !== 0 || $proc->getOutput() === NULL) {
             return new \ArrayObject();
         }
-        foreach($proc->getOutputArray() as $mb) {
+        foreach(array_filter($proc->getOutputArray()) as $mb) {
             $key = substr($mb, 7); // trim Public/ prefix
             $mailboxes[$key] = array('name' => $key);
         }
