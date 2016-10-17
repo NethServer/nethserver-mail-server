@@ -1,6 +1,6 @@
 Summary: Mail server implementation based on postfix and dovecot packages
 Name: nethserver-mail-server
-Version: 1.10.2
+Version: 1.10.3
 Release: 1%{?dist}
 License: GPL
 URL: %{url_prefix}/%{name} 
@@ -63,6 +63,9 @@ usermod -G vmail -a postfix >/dev/null 2>&1
 %attr(0644,root,root) %config %ghost %{_sysconfdir}/systemd/system/dovecot.service.d/limits.conf
 
 %changelog
+* Mon Oct 17 2016 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 1.10.3-1
+- Shared mailboxes default "0" element - Bug NethServer/dev#5132
+
 * Thu Sep 22 2016 Davide Principi <davide.principi@nethesis.it> - 1.10.2-1
 - Lucene IMAP Full Text Search - NethServer/dev#5106
 
