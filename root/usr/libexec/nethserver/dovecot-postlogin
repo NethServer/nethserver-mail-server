@@ -21,6 +21,17 @@
 #
 
 use strict;
+use Sys::Hostname;
+
+my ($system_name, $domain_name) = split(/\./, hostname(), 2);
+
+my $user = $ENV{USER};
+if($user !~ /\@/) {
+    $user = $user . '@' . $domain_name;
+    $ENV{HOME} = '/var/lib/nethserver/vmail/' . $user;
+    $ENV{USERDB_KEYS} .= 'home ';
+}
+$ENV{USER} = $user;
 
 # Read secondary groups and prepare a CSV list
 my @groups = map { sprintf('%s', (getgrgid($_))[0]) } split(/ /, qx(id -G \$USER));
@@ -30,7 +41,7 @@ $ENV{MASTER_USER}=$ENV{USER};
 #
 # Export USERDB overrides
 #
-$ENV{USERDB_KEYS} .= 'acl_groups master_user ';
+$ENV{USERDB_KEYS} .= 'user acl_groups master_user ';
 
 #
 # Export quota
