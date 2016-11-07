@@ -36,8 +36,8 @@ namespace SHARED_USERS \{
   type = shared
   disabled = { $dovecot{SharedMailboxesStatus} eq 'enabled' ? 'no' : 'yes' }
   separator = /
-  prefix = Shared/%%u/
-  location = maildir:/var/lib/nethserver/vmail/%%u/Maildir:INDEXPVT=~/Maildir/shared/%%u
+  prefix = Shared/%%{$hl}.h/
+  location = maildir:/var/lib/nethserver/vmail/%%{$hl}.h/Maildir:INDEXPVT={$maildir_prefix}/Maildir/shared/%%{$hl}.h
   subscriptions = no
   list = children
 \}
@@ -49,7 +49,7 @@ namespace PUBLIC \{
   prefix = Public/
   subscriptions = no
   list = children
-  location = maildir:/var/lib/nethserver/vmail/vmail/Maildir:INDEXPVT=~/Maildir/public
+  location = maildir:/var/lib/nethserver/vmail/vmail/Maildir:INDEXPVT={$maildir_prefix}/Maildir/public
 \}
 
 # Enable acl plugin for shared mailboxes, 

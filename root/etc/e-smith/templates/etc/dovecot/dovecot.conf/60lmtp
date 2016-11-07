@@ -14,6 +14,7 @@ plugin \{
     sieve_before = /var/lib/nethserver/sieve-scripts/before.sieve
     sieve_after = /var/lib/nethserver/sieve-scripts/after.sieve
     sieve_extensions = +imapflags
+    sieve = file:{$maildir_prefix}/sieve;active:{$maildir_prefix}/.dovecot.sieve
 \}
 
 service lmtp \{
