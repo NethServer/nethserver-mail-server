@@ -49,16 +49,16 @@ passdb \{
 userdb \{
   driver = passwd-file
   args = username_format=%Ln /etc/dovecot/imap.passwd
-  override_fields = uid={$uid} gid={$gid} home=/var/lib/nethserver/vmail/%Ln
+  override_fields = uid={$uid} gid={$gid} home={$homedir_prefix}/%Ln
 \}
 
 # LDA/IMAP access for users from SSSD/NSS
 userdb \{
   skip = found
   driver = passwd
-  override_fields = uid={$uid} gid={$gid} home=/var/lib/nethserver/vmail/%u
+  override_fields = uid={$uid} gid={$gid}
 \}
 
 # Location of mailboxes:
-mail_location = maildir:~/Maildir
+mail_location = maildir:{$maildir_prefix}/Maildir
 

@@ -1,0 +1,9 @@
+{
+    #
+    # 00template_vars
+    #
+    our $homedir_prefix = '/var/lib/nethserver/home';
+    our $hl = length($homedir_prefix) + 1;
+    our $maildir_prefix = "/var/lib/nethserver/vmail/%$hl.h";
+    '';
+}
