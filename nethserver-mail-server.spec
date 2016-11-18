@@ -51,6 +51,7 @@ usermod -G vmail -a postfix >/dev/null 2>&1
 %defattr(-,root,root)
 %doc COPYING
 %doc README.rst
+%doc bats/
 %dir %{_nseventsdir}/%{name}-update
 %attr(0644, root, root) %config(noreplace) %{_sysconfdir}/logrotate.d/imap
 %doc migration/sync_maildirs.sh
