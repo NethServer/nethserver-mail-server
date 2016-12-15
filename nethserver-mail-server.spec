@@ -1,6 +1,6 @@
 Summary: Mail server implementation based on postfix and dovecot packages
 Name: nethserver-mail-server
-Version: 1.10.4
+Version: 1.10.5
 Release: 1%{?dist}
 License: GPL
 URL: %{url_prefix}/%{name} 
@@ -63,6 +63,9 @@ usermod -G vmail -a postfix >/dev/null 2>&1
 %attr(0644,root,root) %config %ghost %{_sysconfdir}/systemd/system/dovecot.service.d/limits.conf
 
 %changelog
+* Thu Dec 15 2016 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 1.10.5-1
+- Sieve filters duplicate user maildirs with legacy short format - Bug NethServer/dev#5150
+
 * Mon Nov 07 2016 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 1.10.4-1
 - Legacy short user name support - NethServer/dev#5144
 
