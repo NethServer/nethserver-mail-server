@@ -4,6 +4,8 @@
 if ($view->getModule()->getIdentifier() === 'create') {
     $headerText = $T('SharedMailbox_create_header');
 } else {
+    $special_access = $view->fieldset()->setAttribute('template', $T('Others_label'))
+        ->insert($view->textList('Others'));
     $headerText = $T('SharedMailbox_modify_header');
 }
 
@@ -24,8 +26,8 @@ echo	$view->fieldset()->setAttribute('template', $T('ExtraFields_label'))
     ;
 }
 
-echo $view->fieldset()->setAttribute('template', $T('Others_label'))
-        ->insert($view->textList('Others'));
-;
+if ($view->getModule()->getIdentifier() === 'update') {
+    echo $special_access;
+}
 
 echo $view->buttonList($view::BUTTON_SUBMIT | $view::BUTTON_CANCEL | $view::BUTTON_HELP);

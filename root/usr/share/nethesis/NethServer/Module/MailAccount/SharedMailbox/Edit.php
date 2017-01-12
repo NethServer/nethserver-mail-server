@@ -188,7 +188,7 @@ class Edit extends \Nethgui\Controller\Table\AbstractAction
             $view->setTemplate('Nethgui\Template\Table\Delete');
         } elseif ($this->getIdentifier() === 'update') {
             $view['OwnersDatasource'] = $this->getOwnersDatasource($view);
-            $view['Others'] = $this->others;
+            $view['Others'] = $this->others ? $this->others : $view->translate("no_special_access_label");
             $view->setTemplate('NethServer\Template\MailAccount\SharedMailbox\Edit');
         }
         if ($this->getRequest()->isMutation()) {
