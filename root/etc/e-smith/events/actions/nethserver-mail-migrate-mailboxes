@@ -25,6 +25,7 @@ use strict;
 use NethServer::Migrate 'migrateDir';
 use User::pwent;
 use esmith::AccountsDB;
+use esmith::ConfigDB;
 use File::Path;
 use File::Temp;
 
@@ -33,6 +34,9 @@ my $migrationRootDir = shift;
 my $errors = 0;
 
 my $accountsDb = esmith::AccountsDB->open() or die("Could not open destination account db\n");
+my $configDb = esmith::ConfigDB->open_ro() or die("Could not open destination config db\n");
+
+my $domainName = $configDb->get_value('DomainName');
 
 #
 # Migrate Maildir/ and sieve/ (#1815) subdirs user home
@@ -41,7 +45,7 @@ my $accountsDb = esmith::AccountsDB->open() or die("Could not open destination a
 foreach my $userName (map { $_->key } $accountsDb->users()) {
    
     my $srcDirPrefix;
-    my $dstDirPrefix = '/var/lib/nethserver/vmail/' . $userName . '/';
+    my $dstDirPrefix = '/var/lib/nethserver/vmail/' . $userName . '@' . $domainName . '/';
     my $accountRecord;
     
     if($userName eq 'admin') {

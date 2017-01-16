@@ -1,28 +1,29 @@
 #!/usr/bin/perl
 
 #
-# Copyright (C) 2013 Nethesis S.r.l.
-# http://www.nethesis.it - support@nethesis.it
-# 
+# Copyright (C) 2017 Nethesis S.r.l.
+# http://www.nethesis.it - nethserver@nethesis.it
+#
 # This script is part of NethServer.
-# 
+#
 # NethServer is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License,
 # or any later version.
-# 
+#
 # NethServer is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
-# along with NethServer.  If not, see <http://www.gnu.org/licenses/>.
+# along with NethServer.  If not, see COPYING.
 #
 
 use strict;
 use esmith::AccountsDB;
 use esmith::DomainsDB;
+use esmith::ConfigDB;
 use esmith::event;
 
 my $event = shift;
@@ -40,32 +41,28 @@ my $dstAccountsDb = esmith::AccountsDB->open() or die("Could not open destinatio
 my $srcDomainsDb = esmith::DomainsDB->open_ro(join('', $sourceDir, $esmithDbDir, '/domains')) or die("Could not open source domains database in $sourceDir \n");
 my $dstDomainsDb = esmith::DomainsDB->open() or die("Could not open destination domains db\n");
 
-# Save the state of account records (see usage below):
-my %accountStatus = ();
+my $configDb = esmith::ConfigDB->open_ro() or die("Could not open destination config db\n");
+my $domainName = $configDb->get_value('DomainName');
 
+my $srcDomain = undef;
 #
 # loop on domains
 #
-foreach my $srcDomain ($srcDomainsDb->domains()) {
+foreach $srcDomain ($srcDomainsDb->domains()) {
     if($dstDomainsDb->get($srcDomain->key)) {
-	warn "[WARNING] skip existing domain " . $srcDomain->key . "\n";
-	next;
+        warn "[WARNING] skip existing domain " . $srcDomain->key . "\n";
+        next;
     }
 
     $dstDomainsDb->new_record($srcDomain->key, {
-			      'type' => 'domain',
-			      'AlwaysBccStatus' => 'disabled',
-			      'Description' => $srcDomain->prop('Description') || '',
-			      'DisclaimerStatus' => 'disabled',
-			      'TransportType' => 'LocalDelivery',
-			      'UnknownRecipientsActionDeliverMailbox' => '',
-			      'UnknownRecipientsActionType' => 'bounce'
+        'type' => 'domain',
+        'AlwaysBccStatus' => 'disabled',
+        'Description' => $srcDomain->prop('Description') || '',
+        'DisclaimerStatus' => 'disabled',
+        'TransportType' => 'LocalDelivery',
+        'UnknownRecipientsActionDeliverMailbox' => '',
+        'UnknownRecipientsActionType' => 'bounce'
     });
-
-    if( ! esmith::event::event_signal('domain-create', $srcDomain->key)) {
-	warn("[ERROR] domain-create " . $srcDomain->key . " event failed\n");
-	$errors++;
-    }
 
 }
 
@@ -75,7 +72,6 @@ foreach my $srcDomain ($srcDomainsDb->domains()) {
 #
 foreach my $srcRecord ($srcAccountsDb->users(), $srcAccountsDb->groups(), $srcAccountsDb->pseudonyms()) {
 
-    my $accountName;
     my $pseudonym;
     my $accessType;
     my $Account;
@@ -83,71 +79,49 @@ foreach my $srcRecord ($srcAccountsDb->users(), $srcAccountsDb->groups(), $srcAc
     my $srcRecordType = $srcRecord->prop('type');
 
     if($srcRecordType eq 'pseudonym') {
-	$accountName = $srcRecord->prop('Account');
-	$pseudonym = $srcRecord->key;
-	$accessType = $srcRecord->prop('Visible') eq 'internal' ? 'private' : 'public';
-    } elsif ($srcRecordType eq 'group' || $srcRecordType eq 'user') {
-	$accountName = $srcRecord->key;
-	$pseudonym = $accountName . '@';
-	$accessType = 'public';
+        $Account = expandSrcAccount($srcRecord->prop('Account'));
+        $pseudonym = $srcRecord->key;
+        $accessType = $srcRecord->prop('Visible') eq 'internal' ? 'private' : 'public';
+    } elsif ($srcRecordType eq 'user') {
+        $Account = $srcRecord->key . '@' . $domainName;
+        $pseudonym = $srcRecord->key . '@';
+        $accessType = 'public';
+        migrateForwardProps($srcRecord, $Account);
+    } elsif ($srcRecordType eq 'group') {
+        $Account = join(',', map { $_ . '@' . $domainName } split(/,/, $srcRecord->prop('Members')));
+        $pseudonym = $srcRecord->key . '@' . $domainName;
+        $accessType = 'public';
     } else {
-	next;
+        next;
     }
 
     # Add @-suffix for domainless pseudonyms
     if($pseudonym !~ m'@') {
-	$pseudonym .= '@';
+        $pseudonym .= '@';
     }
 
     #
     # Skip the creation of 'postmaster@' pseudonyms. Refs #1841
     #
     if($pseudonym eq 'postmaster@') {
-	warn "[INFO] postmaster@ pseudonyms are defined by the mail server itself and are not migrated.\n";
-	next;
-    }
-
-    # The first time is referenced, configure the account record and
-    # save the status to skip this step on the next cycle:
-    if( ! defined $accountStatus{$accountName}) {
-	$accountStatus{$accountName} = configureAccount($accountName);
-        # '' => error, 
-	# resolved $accountName => configured correctly, 
-	# 'NULL' => map to NULL Account. Refs #1726
-	if($accountStatus{$accountName} eq '') {
-	    $errors++;
-	}
-    }
-
-    #
-    # Unmap $accountStatus value/error code #1805
-    #
-    if($accountStatus{$accountName} eq 'NULL') {
-	$Account = '';
-    } elsif($accountStatus{$accountName} eq '') {
-	$Account = $accountName;
-    } else {
-	$Account = $accountStatus{$accountName};
-	if($Account ne $accountName) {
-	    warn "[INFO] pseudonym account $accountName mapped to $Account\n";
-	}
+        warn "[INFO] postmaster@ pseudonyms are defined by the mail server itself and are not migrated.\n";
+        next;
     }
 
     $dstAccountsDb->new_record($pseudonym, {
-			       'type' => 'pseudonym',
-			       'Account' => $Account,
-			       'Access' => $accessType,
-			       'Description' => ''
-			       });
-
-
-    if( ! esmith::event::event_signal('pseudonym-create', $pseudonym)) {
-	warn("[ERROR] pseudonym-create $pseudonym event failed\n");
-	$errors++;
-    }
+                               'type' => 'pseudonym',
+                               'Account' => $Account,
+                               'Access' => $accessType,
+                               'Description' => ''
+                               });
 
 }
-   
+
+if( ! esmith::event::event_signal('nethserver-mail-server-update')) {
+    warn("[ERROR] nethserver-mail-server-update event failed\n");
+    $errors++;
+}
+
 if($errors > 0) {
     warn "[WARNING] $errors error(s) occurred in $0 action\n";
     exit(1);
@@ -158,99 +132,73 @@ exit(0);
 
 
 
-
-#
-# configureAccount -- enable Mail* props on the given account (group
-# or user). Returns a string:
-#
-# - the account name, resolved by flattening recursive pseudonyms
-# - 'NULL' string, if the account was not found
-# - '' empty string, if an error occurred
-#
-sub configureAccount
+sub migrateForwardProps
 {
-    my $accountName = @_[0];
-    my $watchDog = @_[1] || 0;
 
-    my $accountRecord = $dstAccountsDb->get($accountName);
-    my $sourceAccountRecord = $srcAccountsDb->get($accountName);
+    my $sourceAccountRecord = $_[0];
+    my $accountRecordKey = $_[1];
+    my $accountRecord = $dstAccountsDb->get($accountRecordKey);
     my %mailForwardProps = ();
 
-    if( ! $sourceAccountRecord ) {
-	warn "[ERROR] source account record not found: $accountName\n";
-	return '';
+    #
+    # configure mail forward props:
+    #
+    if( ! $sourceAccountRecord->prop('EmailForward')
+        || $sourceAccountRecord->prop('EmailForward') eq 'local') {
+        %mailForwardProps = ();
+    } elsif($sourceAccountRecord->prop('EmailForward') eq 'forward') {
+        %mailForwardProps = (
+            MailForwardStatus => 'enabled',
+            MailForwardKeepMessageCopy => 'no',
+            MailForwardAddress => $sourceAccountRecord->prop('ForwardAddress'),
+        );
+    } elsif($sourceAccountRecord->prop('EmailForward') eq 'both') {
+        %mailForwardProps = (
+            MailForwardStatus => 'enabled',
+            MailForwardKeepMessageCopy => 'yes',
+            MailForwardAddress => $sourceAccountRecord->prop('ForwardAddress'),
+        );
     }
 
-    if($sourceAccountRecord->prop('type') eq 'user') {
+    if( ! %mailForwardProps ) {
+        return;
+    }
 
-	if( ! $accountRecord ) {
-	    warn "[WARNING] destination user record not found: $accountName\n";
-	    return 'NULL'; # MISSING ACCOUNT RECORD! Map to null-account. See #1726
-	}
+    #
+    # merge also some default values:
+    #
+    %mailForwardProps = (qw(
+        MailSpamRetentionStatus  disabled
+        MailStatus       enabled
+        MailQuotaType    default
+        MailQuotaCustom  15
+    ), %mailForwardProps);
 
-	#
-	# configure mail forward props:
-	#
-	if( ! $sourceAccountRecord->prop('EmailForward') 
-	    || $sourceAccountRecord->prop('EmailForward') eq 'local') {
-	    %mailForwardProps = (
-		MailForwardStatus => 'disabled',
-		MailForwardKeepMessageCopy => 'no',
-		);
-	} elsif($sourceAccountRecord->prop('EmailForward') eq 'forward') {
-	    %mailForwardProps = (
-		MailForwardStatus => 'enabled',
-		MailForwardKeepMessageCopy => 'no',
-		);
-	} elsif($sourceAccountRecord->prop('EmailForward') eq 'both') {
-	    %mailForwardProps = (
-		MailForwardStatus => 'enabled',
-		MailForwardKeepMessageCopy => 'yes',
-		);
-	}
-
-	$mailForwardProps{MailForwardAddress} = $sourceAccountRecord->prop('ForwardAddress');
-	
-	#
-	# merge also some default values:
-	#
-	$accountRecord->merge_props(qw(
-            MailSpamRetentionStatus  disabled
-            MailStatus       enabled
-            MailQuotaType    default
-            MailQuotaCustom  15
-        ), %mailForwardProps);
-
-	if( ! esmith::event::event_signal('user-modify', $accountName)) {
-	    warn("[ERROR] user-modify $accountName event failed\n");
-	    return '';
-	}
-
-    } elsif($sourceAccountRecord->prop('type') eq 'group') {
-
-	if( ! $accountRecord ) {
-	    warn "[WARNING] destination group record not found: $accountName\n";
-	    return 'NULL'; # MISSING ACCOUNT RECORD! Map to null-account. See #1726
-	}
-
-	$accountRecord->merge_props(qw(        
-             MailStatus       enabled
-             MailDeliveryType copy
-        ));
-
-	if( ! esmith::event::event_signal('group-modify', $accountName)) {
-	    warn("[ERROR] group-modify $accountName event failed\n");
-	    return '';
-	}
-
-    } elsif($sourceAccountRecord->prop('type') eq 'pseudonym' && $watchDog < 3) {
-	# Flatten pseudonym pointing to another pseudonym
-	return configureAccount($sourceAccountRecord->prop('Account'), $watchDog + 1);
-
+    if(defined $accountRecord) {
+        $accountRecord->merge_props(%mailForwardProps);
     } else {
-	warn "[WARNING] invalid account record type: $accountName\n";
-	return 'NULL';
+        $dstAccountsDb->new_record($accountRecordKey, { 'type' => 'user', %mailForwardProps });
     }
 
-    return $accountName; # SUCCESS!
 }
+
+sub expandSrcAccount
+{
+    my $srcAccountName = shift;
+    my $srcAccountRecord = $srcAccountsDb->get($srcAccountName);
+
+    if( ! defined $srcAccountRecord ) {
+        warn "[ERROR] could not map to $srcAccountName, fall back to postmaster";
+        $errors ++;
+        return 'postmaster@' . $domainName;
+    } elsif($srcAccountRecord->prop('type') eq 'user') {
+        return $srcAccountName . '@' . $domainName;
+    } elsif($srcAccountRecord->prop('type') eq 'group') {
+        return join(',', map { $_ . '@' . $domainName } split(/,/, $srcAccountRecord->prop('Members')));
+    } elsif($srcAccountName !~ /@/) {
+        return $srcAccountName . '@' . $domainName;
+    }
+
+    return $srcAccountName;
+}
+
