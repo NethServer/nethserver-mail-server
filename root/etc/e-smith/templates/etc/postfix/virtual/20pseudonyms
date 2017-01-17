@@ -1,20 +1,30 @@
 #
-# 20pseudonyms -- map to mailboxes:
+# 20pseudonyms
 #
 {
     use esmith::AccountsDB;
 
     $OUT = '';
 
-    foreach my $record ( esmith::AccountsDB->open_ro()->get_all_by_prop('type' => 'pseudonym') ) {
-        my $account = $record->prop('Account') || next;
-        $account = address_sanitize($account);
-        if($record->key =~ /\@$/) {
-            $OUT .= sprintf("%-38s %s\n",
-                $record->key . $_->key,
-                $account) foreach (@domains);
-        } else {
+    my @records = esmith::AccountsDB->open_ro()->get_all_by_prop('type' => 'pseudonym');
+    my $account = '';
+
+    $OUT .= "\n# fully qualified aliases (address\@domain)\n";
+
+    foreach my $record ( grep { $_->key !~ /\@$/} @records ) {
+        $account = address_sanitize($record->prop('Account'));
+        if($account) {
             $OUT .= sprintf("%-38s %s\n", $record->key, $account);
         }
+    }
+
+    $OUT .= "\n# generic aliases expansion (address@)\n";
+
+    foreach my $record ( grep { $_->key =~ /\@$/} @records ) {
+        $account = address_sanitize($record->prop('Account'));
+        if($account) {
+            $OUT .= sprintf("%-38s %s\n", $record->key . $_->key, $account) foreach (@domains);
+        }
+
     }
 }
