@@ -3,19 +3,19 @@
 #
 # Copyright (C) 2013 Nethesis S.r.l.
 # http://www.nethesis.it - support@nethesis.it
-# 
+#
 # This script is part of NethServer.
-# 
+#
 # NethServer is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License,
 # or any later version.
-# 
+#
 # NethServer is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with NethServer.  If not, see <http://www.gnu.org/licenses/>.
 #
@@ -25,98 +25,107 @@ use strict;
 use NethServer::Migrate 'migrateDir';
 use User::pwent;
 use esmith::AccountsDB;
+use esmith::ConfigDB;
 use File::Path;
 use File::Temp;
 
 my $event = shift;
-my $migrationRootDir = shift;
+my $sourceDir = shift;
+my $esmithDbDir = '/home/e-smith/db';
+my $migrationRootDir = $sourceDir;
 my $errors = 0;
 
+my $srcAccountsDb = esmith::AccountsDB->open_ro(join('', $sourceDir, $esmithDbDir, '/accounts')) or die("Could not open source accounts database in $sourceDir \n");
 my $accountsDb = esmith::AccountsDB->open() or die("Could not open destination account db\n");
+my $configDb = esmith::ConfigDB->open_ro() or die("Could not open destination config db\n");
+
+my $domainName = $configDb->get_value('DomainName');
 
 #
 # Migrate Maildir/ and sieve/ (#1815) subdirs user home
 # directories
 #
-foreach my $userName (map { $_->key } $accountsDb->users()) {
-   
+foreach my $userName (map { $_->key } $srcAccountsDb->users()) {
+
     my $srcDirPrefix;
-    my $dstDirPrefix = '/var/lib/nethserver/vmail/' . $userName . '/';
+    my $dstDirPrefix = '/var/lib/nethserver/vmail/' . $userName . '@' . $domainName . '/';
     my $accountRecord;
-    
+
     if($userName eq 'admin') {
-	$srcDirPrefix = $migrationRootDir . '/home/e-smith/';
+        $srcDirPrefix = $migrationRootDir . '/home/e-smith/';
     } else {
-	my $pwuser = getpwnam($userName);
-	
-	if( ! $pwuser) {
-	    warn "[ERROR] $userName skipped: not found in passwd database\n";
-	    $errors ++;
-	    next;
-	}
-	
-	$srcDirPrefix = $pwuser->dir . '/';
-	$accountRecord = $accountsDb->get($userName);
+       my $pwuser = getpwnam($userName);
+
+       if( ! $pwuser) {
+           warn "[ERROR] $userName skipped: not found in passwd database\n";
+           $errors ++;
+           next;
+       }
+
+       #$srcDirPrefix = $pwuser->dir . '/';
+       $srcDirPrefix = $migrationRootDir . '/home/e-smith/files/users/' . $userName . '/';
     }
 
-    if ( -l ($srcDirPrefix . '.dovecot.sieve')) {	
-	# Create the link to the active sieve script (Refs #1815):
-	symlink(readlink($srcDirPrefix . '.dovecot.sieve'), $dstDirPrefix . '.dovecot.sieve');
-    }
-    
     foreach my $tgtDir (qw(Maildir sieve)) {
-    
-	my $srcDir = $srcDirPrefix . $tgtDir;
-	my $dstDir = $dstDirPrefix . $tgtDir;
-    
-	if( ! -d $srcDir) {
-	    warn "[WARNING] User $userName/$tgtDir skipped: could not find source directory $srcDir\n";
-	    next;
-	}
 
-	if( ! -d $dstDir) {
-	    File::Path::make_path($dstDir, {mode => 0700, user => 'vmail', group => 'vmail'});
-	}
+        my $srcDir = $srcDirPrefix . $tgtDir;
+        my $dstDir = $dstDirPrefix . $tgtDir;
 
-	#
-	# Migrate maildir only if MailStatus is enabled or the user is "admin":
-	#
-	if($userName eq 'admin' || (defined $accountRecord->prop('MailStatus') 
-	   && $accountRecord->prop('MailStatus') eq 'enabled')) {
-	    migrateDir($srcDir, $dstDir);
+        if( ! -d $srcDir) {
+            warn "[WARNING] User $userName/$tgtDir skipped: could not find source directory $srcDir\n";
+            next;
+        }
 
-	    #
-	    # Set vmail ownership:
-	    #
-	    system(qw(chown -R vmail.vmail), $dstDir);
-	    if($? != 0) {
-		warn "[ERROR] Failed to change ownership of files in $dstDir\n";
-		$errors ++
-	    }
+        if( -d $dstDir) {
+            warn "[WARNING] User $userName/$tgtDir skipped: destination already exists $dstDir\n";
+            next;
+        }
 
-	    #
-	    # Fix permissions
-	    #
-	    system(qw(chmod -R g-rwxXst,o=g), $dstDir);
-	    if($? != 0) {
-		warn "[WARNING] Failed to clean up permissions of files in $dstDir\n";
-	    }
+        File::Path::make_path($dstDir, {mode => 0700, user => 'vmail', group => 'vmail'});
 
-	    #
-	    # Cleanup POSIX acls in destination Maildir/
-	    #
-	    system(qw(/usr/bin/setfacl --remove-all --recursive), $dstDir);
-	    if($? != 0) {
-		warn "[WARNING] Failed to clean up POSIX acls of files in $dstDir\n";
-	    }
+        migrateDir($srcDir, $dstDir);
+        if($? != 0) {
+            warn "[ERROR] Failed to migrate $srcDir to $dstDir\n";
+            $errors ++
+        }
 
-	    #
-	    # Remove empty Maildir/ in user's home directory 
-	    #
-	    rmdir $srcDir;
-	}
+        #
+        # Set vmail ownership:
+        #
+        system(qw(chown -R vmail.vmail), $dstDir);
+        if($? != 0) {
+            warn "[ERROR] Failed to change ownership of files in $dstDir\n";
+            $errors ++
+        }
+
+        #
+        # Fix permissions
+        #
+        system(qw(chmod -R g-rwxXst,o=g), $dstDir);
+        if($? != 0) {
+            warn "[WARNING] Failed to clean up permissions of files in $dstDir\n";
+        }
+
+        #
+        # Cleanup POSIX acls in destination Maildir/
+        #
+        system(qw(/usr/bin/setfacl --remove-all --recursive), $dstDir);
+        if($? != 0) {
+            warn "[WARNING] Failed to clean up POSIX acls of files in $dstDir\n";
+        }
+
+        #
+        # Remove empty Maildir/ in user's home directory
+        #
+        rmdir $srcDir;
 
     } # end foreach tgtDir
+
+    if ( -l ($srcDirPrefix . '.dovecot.sieve')) {
+        # Create the link to the active sieve script (Refs #1815):
+        symlink(readlink($srcDirPrefix . '.dovecot.sieve'), $dstDirPrefix . '.dovecot.sieve');
+    }
+
 } # end foreach userName
 
 
