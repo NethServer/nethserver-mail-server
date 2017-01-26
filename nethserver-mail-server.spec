@@ -1,6 +1,6 @@
 Summary: Mail server implementation based on postfix and dovecot packages
 Name: nethserver-mail-server
-Version: 1.10.6
+Version: 1.10.7
 Release: 1%{?dist}
 License: GPL
 URL: %{url_prefix}/%{name} 
@@ -64,6 +64,9 @@ usermod -G vmail -a postfix >/dev/null 2>&1
 %attr(0644,root,root) %config %ghost %{_sysconfdir}/systemd/system/dovecot.service.d/limits.conf
 
 %changelog
+* Thu Jan 26 2017 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 1.10.7-1
+- Email alias does not expand group members - Bug NethServer/dev#5207
+
 * Wed Jan 18 2017 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 1.10.6-1
 - Priority rule on email aliases - NethServer/dev#5201
 - Mail server: enable user shared mailbox by default - NethServer/dev#5192
