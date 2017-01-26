@@ -98,7 +98,7 @@ class Modify extends \Nethgui\Controller\Table\Modify
             $destinations = array();
             foreach($this->parameters['Account'] as $destination) {
                 if(in_array($destination, array_keys($groupList))) {
-                    $destinations = array_merge($destinations, $groupList[$destination]['members']);
+                    $destinations = array_merge($destinations, $groupProvider->getGroupMembers($destination));
                 } else {
                     $destinations[] = $destination;
                 }
