@@ -36,5 +36,5 @@ my $mailHomeDir = '/var/lib/nethserver/vmail/' . $account;
 if ( -d $mailHomeDir ) {
     exec('/bin/rm', '-rf', $mailHomeDir);
 } else {
-    warn ("Home directory for $account account does not exist; skipped");
+    warn ("[NOTICE] Maildir for $account does not exist, skipped.");
 }
