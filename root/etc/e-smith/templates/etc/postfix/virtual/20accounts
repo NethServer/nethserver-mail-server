@@ -16,6 +16,9 @@
         if(($account->prop('MailStatus') || '') eq 'enabled'
            && ($account->prop('MailForwardStatus') || '') eq 'enabled') {
             my $forward = $account->prop('MailForwardAddress') || '';
+            if( ! $forward) {
+                next;
+            }
             if(($account->prop('MailForwardKeepMessageCopy') || '') eq 'yes' ) {
                 $forward .= ', ' . $account->key;
             }
