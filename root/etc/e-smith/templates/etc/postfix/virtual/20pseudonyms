@@ -6,24 +6,40 @@
 
     $OUT = '';
 
-    my @records = esmith::AccountsDB->open_ro()->get_all_by_prop('type' => 'pseudonym');
+    my $accountsDb = esmith::AccountsDB->open_ro();
+    my @records = $accountsDb->get_all_by_prop('type' => 'pseudonym');
     my $account = '';
+    my $hasMailboxForward = sub {
+        my $key = shift;
+        my $record = $accountsDb->get($key);
+        if($record
+            && $record->prop('type') eq 'user'
+            && ($record->prop('MailStatus') || '') eq 'enabled'
+            && ($record->prop('MailForwardStatus') || '') eq 'enabled'
+            && ($record->prop('MailForwardAddress') || '') ne ''
+            ) {
+            return 1;
+        }
+        return 0;
+    };
 
     $OUT .= "\n# fully qualified aliases (address\@domain)\n";
 
     foreach my $record ( grep { $_->key !~ /\@$/} @records ) {
-        $account = address_sanitize($record->prop('Account'));
-        if($account) {
-            $OUT .= sprintf("%-38s %s\n", $record->key, $account);
+        $account = $record->prop('Account');
+        if($account && $record->key ne $account) {
+            $OUT .= sprintf("%-38s %s\n", $record->key, address_sanitize($account));
         }
     }
 
     $OUT .= "\n# generic aliases expansion (address@)\n";
 
     foreach my $record ( grep { $_->key =~ /\@$/} @records ) {
-        $account = address_sanitize($record->prop('Account'));
-        if($account) {
-            $OUT .= sprintf("%-38s %s\n", $record->key . $_->key, $account) foreach (@domains);
+        $account = $record->prop('Account');
+        foreach my $domain (map { $_->key } @domains) {
+            if($account && ! $hasMailboxForward->($record->key . $domain)) {
+                $OUT .= sprintf("%-38s %s\n", $record->key . $domain, address_sanitize($account));
+            }
         }
 
     }
