@@ -22,8 +22,8 @@ Disk space
       indicated (email quota).
 
 Move to "Junk" folder
-    Email messages identified as spam are moved to each user folder
-    *Junkmail* instead of being delivered to the Inbox.
+    Email messages identified as spam are moved to user's *Junk* folder instead
+    of being delivered to the Inbox.
 
 Root can log in as another user
     When this option is enabled, *root* can impersonate *john*
