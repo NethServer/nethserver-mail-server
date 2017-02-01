@@ -56,6 +56,17 @@ class Modify extends \Nethgui\Controller\Table\Modify
         parent::initialize();
     }
 
+    public function validate(\Nethgui\Controller\ValidationReportInterface $report)
+    {
+        parent::validate($report);
+        if($this->getRequest()->isMutation()) {
+            if($this->getPlatform()->getDatabase('accounts')->getType($this->parameters['username']) === 'pseudonym') {
+                $report->addValidationErrorMessage($this, 'username',
+                    'valid_mailbox_pseudonym_conflict');
+            }
+        }
+    }
+
     private function saveProps()
     {
         $props = array();
