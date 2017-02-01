@@ -24,5 +24,14 @@ service sieve-postlogin \{
   \}
 \}
 
+service pop3 \{
+  executable = pop3 pop3-postlogin
+\}
 
+service pop3-postlogin \{
+  executable = script-login /usr/libexec/nethserver/dovecot-postlogin
+  user = $default_internal_user
+  unix_listener pop3-postlogin \{
+  \}
+\}
 
