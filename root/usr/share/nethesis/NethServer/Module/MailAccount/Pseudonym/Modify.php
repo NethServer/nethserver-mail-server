@@ -74,6 +74,15 @@ class Modify extends \Nethgui\Controller\Table\Modify
         }
     }
 
+    public function mailboxExists($pseudonym)
+    {
+        $process = $this->getPlatform()->exec(sprintf('/usr/bin/sudo /usr/libexec/nethserver/list-users %s', escapeshellarg($pseudonym)));
+        if($process->getExitCode() !== 0) {
+            throw new \RuntimeException(sprintf('%s: user account existence check failed', __CLASS__), 1485948162);
+        }
+        return trim($process->getOutput()) !== '{}';
+    }
+
     public function validate(\Nethgui\Controller\ValidationReportInterface $report)
     {
         parent::validate($report);
@@ -85,6 +94,9 @@ class Modify extends \Nethgui\Controller\Table\Modify
             } elseif ($this->getIdentifier() === 'create' && $this->getParent()->getAdapter()->offsetExists($this->parameters['pseudonym'])) {
                 $report->addValidationErrorMessage($this, 'localAddress',
                     'valid_pseudonym_unique');
+            } elseif ($this->mailboxExists($this->parameters['pseudonym'])) {
+                $report->addValidationErrorMessage($this, 'localAddress',
+                    'valid_pseudonym_mailbox_conflict');
             }
         }
     }
