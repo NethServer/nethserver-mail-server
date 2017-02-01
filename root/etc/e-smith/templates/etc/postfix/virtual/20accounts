@@ -1,5 +1,5 @@
 #
-# 40accounts -- ensure local delivery for our accounts
+# 20accounts -- ensure local delivery for our accounts
 #
 {
     use esmith::AccountsDB;
@@ -12,13 +12,13 @@
     }
 
     $OUT = '';
-    foreach my $account ($accountsDb->get_all_by_prop('MailStatus' => 'enabled')) {
-        if($account->prop('type') !~ m/^(user|group)$/) {
-            next;
-        }
-
-        if(($account->prop('MailForwardStatus') || '') eq 'enabled' && getpwnam($account->key)) {
-            my $forward = $account->prop('MailForwardAddress');
+    foreach my $account ($accountsDb->get_all_by_prop('type' => 'user')) {
+        if(($account->prop('MailStatus') || '') eq 'enabled'
+           && ($account->prop('MailForwardStatus') || '') eq 'enabled') {
+            my $forward = $account->prop('MailForwardAddress') || '';
+            if( ! $forward) {
+                next;
+            }
             if(($account->prop('MailForwardKeepMessageCopy') || '') eq 'yes' ) {
                 $forward .= ', ' . $account->key;
             }
