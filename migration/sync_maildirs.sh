@@ -29,6 +29,7 @@ export LANG=C
 export DRYRUN=0
 sourceHost=""
 sourcePort=22
+sourceType="sme8"
 
 function exit_help()
 {
@@ -38,12 +39,13 @@ function exit_help()
         -n          dry run
         -p PORT     ssh port on source host (default 22)
         -s IPADDR   rsync from source host IPADDR
+        -t TYPE     source type: sme8 (default), ns6
 
 " 1>&2
     exit 1;
 }
 
-while getopts "hns:p:" opt; do
+while getopts "hns:p:t:" opt; do
     case $opt in
         h)  # help
             exit_help
@@ -57,14 +59,22 @@ while getopts "hns:p:" opt; do
         s)  # source IPADDR
             sourceHost=${OPTARG}
             ;;
+        t)  # source type
+            sourceType=${OPTARG}
+            ;;
         \?)
             exit_help
             ;;
     esac
 done
 
-if [ -z ${sourceHost} ]; then
+if [ -z "${sourceHost}" ]; then
     echo "Missing -s IPADDR parameter!" 1>&2
+    exit_help
+fi
+
+if [[ "${sourceType}" != "sme8" && "${sourceType}" != "ns6" ]]; then
+    echo "Invalid -t TYPE parameter! Allowed values are: sme8, ns6"
     exit_help
 fi
 
@@ -77,12 +87,21 @@ for destinationMaildir in /var/lib/nethserver/vmail/*/Maildir/; do
     USER=$(basename ${destinationMaildir%%/Maildir/})
     echo "[INFO] `date` -- Synchronizing ${USER} Maildir/"
 
-    sourceDir="/home/e-smith/files/users/${USER%%@$DOMAIN}/Maildir/"
-    if [[ $USER == "admin@$DOMAIN" ]]; then
-        sourceDir="/home/e-smith/Maildir/"
-    elif [[ $USER == "vmail@$DOMAIN" || $USER == "root" ]]; then
-        echo "[INFO] Skip $USER"
+    if [[ $USER == "vmail@$DOMAIN" || $USER == "root" ]]; then
+        echo "[INFO] Skip $USER because it exists only in ns7"
         continue;
+    fi
+
+    if [[ "$sourceType" == "sme8" ]]; then
+        sourceDir="/home/e-smith/files/users/${USER%%@$DOMAIN}/Maildir/"
+        if [[ $USER == "admin@$DOMAIN" ]]; then
+            sourceDir="/home/e-smith/Maildir/"
+        fi
+    elif [[ "$sourceType" == "ns6" ]]; then
+        sourceDir="/var/lib/nethserver/vmail/${USER%%@$DOMAIN}/Maildir/"
+    else
+        echo "[ERROR] invalid source type"
+        exit 1
     fi
 
     # Synchronize maildir:
