@@ -1,6 +1,6 @@
 Summary: Mail server implementation based on postfix and dovecot packages
 Name: nethserver-mail-server
-Version: 1.10.7
+Version: 1.10.8
 Release: 1%{?dist}
 License: GPL
 URL: %{url_prefix}/%{name} 
@@ -64,6 +64,11 @@ usermod -G vmail -a postfix >/dev/null 2>&1
 %attr(0644,root,root) %config %ghost %{_sysconfdir}/systemd/system/dovecot.service.d/limits.conf
 
 %changelog
+* Tue Feb 14 2017 Davide Principi <davide.principi@nethesis.it> - 1.10.8-1
+- Support short login with POP3  - Bug NethServer/dev#5212
+- Mail forward ignored by mail alias - Bug NethServer/dev#5210
+- Accounts DB: user type overrides existing pseudonym record - Bug NethServer/dev#5211
+
 * Thu Jan 26 2017 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 1.10.7-1
 - Email alias does not expand group members - Bug NethServer/dev#5207
 
