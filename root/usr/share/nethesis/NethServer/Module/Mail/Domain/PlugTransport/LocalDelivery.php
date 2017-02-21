@@ -57,7 +57,10 @@ class LocalDelivery extends \Nethgui\Controller\Table\RowPluginAction
                     $report->addValidationErrorMessage($this, 'UnknownRecipientsActionDeliverMailbox', 'valid_catchall_mailbox_primary', array($domainName));
                 }
             } else {
-                $this->getValidator('UnknownRecipientsActionDeliverMailbox')->email();
+                $v = $this->createValidator()->email();
+                if( ! $v->evaluate($this->parameters['UnknownRecipientsActionDeliverMailbox'])) {
+                    $report->addValidationError($this, 'UnknownRecipientsActionDeliverMailbox', $v);
+                }
             }
         }
         parent::validate($report);
