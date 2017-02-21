@@ -1,19 +1,32 @@
 #
-# 20virtual_domains -- Virtual domains {
+# 20virtual_domains -- Virtual domains
+#
+{
     use esmith::DomainsDB;
-    push @virtual_mailbox_domains, map {
-            ($_->prop('TransportType') || '')  eq 'LocalDelivery' ? $_->key : ()
-        } esmith::DomainsDB->open_ro()->get_all_by_prop('type' => 'domain');
+
+    @virtual_alias_domains = ();
+
+    foreach (esmith::DomainsDB->open_ro()->get_all_by_prop('type' => 'domain')) {
+        if(($_->prop('TransportType') || '')  eq 'LocalDelivery' && $_->key ne $domainName) {
+            push @virtual_alias_domains, $_->key;
+        }
+    }
     '';
 }
-#
-virtual_mailbox_domains = { join("\n  ", @virtual_mailbox_domains) }
-virtual_mailbox_maps = {
-    scalar @virtual_mailbox_domains ? 'proxy:unix:passwd.byname' : ''
+
+virtual_mailbox_domains = { $domainName }
+virtual_alias_domains = { join("\n  ", @virtual_alias_domains) }
+virtual_mailbox_maps = proxy:unix:passwd.byname {
+    use esmith::DomainsDB;
+
+    my $domainRecord = esmith::DomainsDB->open_ro()->get($DomainName);
+    if(defined $domainRecord && defined $domainRecord->prop('UnknownRecipientsActionType')
+       && $domainRecord->prop('UnknownRecipientsActionType') eq 'deliver') {
+        return "static:catchall";
+    }
+    return '';
 }
-virtual_alias_maps = {
-    scalar @virtual_mailbox_domains ? 'hash:/etc/postfix/virtual' : ''
-}
+virtual_alias_maps = hash:/etc/postfix/virtual
 
 # Message delivery transport that the local(8)
 # delivery agent should use for mailbox delivery:

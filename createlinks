@@ -123,6 +123,7 @@ foreach (qw(create delete modify)) {
     event_templates('domain-' . $_, qw(
 		    /etc/postfix/recipient_bcc
 		    /etc/postfix/virtual
+		    /etc/postfix/internal_access
     ));
     event_actions('domain-'   . $_, qw(
          nethserver-mail-postmap-update 30

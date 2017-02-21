@@ -5,6 +5,11 @@
     $OUT = '';
     
     foreach (@domains) {
+        if($_->key eq $DomainName) {
+            # skip the primary domain: NEVER put a virtual MAILBOX wild-card in 
+            # the virtual ALIAS file!!
+            next;
+        }
 
         if(defined $_->prop('UnknownRecipientsActionType')
            && $_->prop('UnknownRecipientsActionType') eq 'deliver'
