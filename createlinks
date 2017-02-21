@@ -124,10 +124,14 @@ foreach (qw(create delete modify)) {
 		    /etc/postfix/recipient_bcc
 		    /etc/postfix/virtual
 		    /etc/postfix/internal_access
+		    /etc/dovecot/dovecot.conf
     ));
     event_actions('domain-'   . $_, qw(
          nethserver-mail-postmap-update 30
     ));
+    event_services('domain-' . $_, qw(
+        dovecot reload
+    )); # postfix reload is performed by mail-common
 }
 
 
