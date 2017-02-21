@@ -36,7 +36,7 @@ class LocalDelivery extends \Nethgui\Controller\Table\RowPluginAction
     {
         $this->setSchemaAddition(array(
             array('UnknownRecipientsActionType', $this->createValidator()->memberOf('bounce', 'deliver'), Table::FIELD),
-            array('UnknownRecipientsActionDeliverMailbox', Validate::EMAIL, Table::FIELD),
+            array('UnknownRecipientsActionDeliverMailbox', Validate::ANYTHING, Table::FIELD),
             array('AlwaysBccStatus', Validate::SERVICESTATUS, Table::FIELD),
             array('AlwaysBccAddress', Validate::EMAIL, Table::FIELD),
         ));
@@ -47,4 +47,19 @@ class LocalDelivery extends \Nethgui\Controller\Table\RowPluginAction
         parent::initialize();
     }
 
+    public function validate(\Nethgui\Controller\ValidationReportInterface $report)
+    {
+        if($this->getRequest()->isMutation() && $this->parameters['UnknownRecipientsActionType'] === 'deliver') {
+            $domainName = \Nethgui\array_end(explode('.', \gethostname(), 2));
+            $domainKey = $this->getAdapter()->getKeyValue();
+            if($domainName === $domainKey) {
+                if( ! preg_match("/^[^@]+(@${domainName})?$/", $this->parameters['UnknownRecipientsActionDeliverMailbox']) ) {
+                    $report->addValidationErrorMessage($this, 'UnknownRecipientsActionDeliverMailbox', 'valid_catchall_mailbox_primary', array($domainName));
+                }
+            } else {
+                $this->getValidator('UnknownRecipientsActionDeliverMailbox')->email();
+            }
+        }
+        parent::validate($report);
+    }
 }

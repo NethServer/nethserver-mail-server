@@ -59,6 +59,35 @@ userdb \{
   override_fields = uid={$uid} gid={$gid} home=/var/lib/nethserver/vmail/%u
 \}
 
+# catch-all mailbox
+{
+    #
+    # catch-all for the primary mailbox domain. This cannot be handled by
+    # Postfix and must be implemented by dovecot mailbox store.
+    #
+
+    use esmith::DomainsDB;
+
+    $OUT = '# disabled';
+
+    my $domainRecord = esmith::DomainsDB->open_ro()->get($DomainName);
+    if( ! $domainRecord ) {
+        return $OUT;
+    }
+
+    my $type = $domainRecord->prop('UnknownRecipientsActionType') || '';
+    my $mailbox = $domainRecord->prop('UnknownRecipientsActionDeliverMailbox') || 'root';
+
+    if($type eq 'deliver') {
+       $OUT = qq(userdb {
+    driver = static
+    args = allow_all_users=yes
+    override_fields = uid=$uid gid=$gid home=/var/lib/nethserver/vmail/$mailbox
+    skip = found
+});
+    }
+}
+
 # Location of mailboxes:
 mail_location = maildir:~/Maildir
 
