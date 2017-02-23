@@ -42,6 +42,7 @@ my @saveTemplates = qw(
     /etc/postfix/recipient_bcc
     /etc/dovecot/dovecot.conf
     /etc/dovecot/deny.passwd
+    /etc/dovecot/user-quota
     /etc/pam.d/dovecot-master
     /var/lib/nethserver/sieve-scripts/before.sieve
 );
