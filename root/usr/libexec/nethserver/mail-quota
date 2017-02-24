@@ -53,7 +53,12 @@ foreach (@list) {
     close($fh);
     $results{$user}{'msg'} = $tot_msg;
     $results{$user}{'size'} = int($tot_size / 1024);
-    $results{$user}{'perc'} = int($tot_size / 1024 / $results{$user}{'max'} * 100);
+    if($results{$user}{'max'}) {
+        $results{$user}{'perc'} = int($tot_size / 1024 / $results{$user}{'max'} * 100);
+    } else {
+        $results{$user}{'max'} = undef;
+        $results{$user}{'perc'} = undef;
+    }
 }
 
 my $json = JSON->new;
