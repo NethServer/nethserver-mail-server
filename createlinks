@@ -42,6 +42,7 @@ my @saveTemplates = qw(
     /etc/postfix/recipient_bcc
     /etc/dovecot/dovecot.conf
     /etc/dovecot/deny.passwd
+    /etc/dovecot/quota.passwd
     /etc/pam.d/dovecot-master
     /var/lib/nethserver/sieve-scripts/before.sieve
 );
@@ -112,6 +113,9 @@ foreach (qw(create modify delete)) {
 #
 # user-delete event
 #
+event_templates('user-delete', qw(
+    /etc/dovecot/quota.passwd
+));
 event_actions('user-delete', qw(
     nethserver-mail-account-cleanup 30
 ));
@@ -193,9 +197,10 @@ event_actions('sharedmailbox-delete', qw(
 event_templates('mailbox-save', qw(
       /etc/dovecot/deny.passwd
       /etc/postfix/virtual
-      /etc/dovecot/user-quota
+      /etc/dovecot/quota.passwd
 ));
 
 event_actions('mailbox-save', qw(
+  nethserver-mail-quota-recalc 20
   nethserver-mail-postmap-update 30
 ));

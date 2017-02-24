@@ -86,7 +86,7 @@ class Modify extends \Nethgui\Controller\Table\Modify
         if ($this->getRequest()->isMutation()) {
              $this->saveProps();
              $this->getParent()->getAdapter()->flush();
-             $this->getPlatform()->signalEvent('mailbox-save');
+             $this->getPlatform()->signalEvent('mailbox-save', array($this->parameters['username']));
         }
     }
 
