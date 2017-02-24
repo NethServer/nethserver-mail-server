@@ -204,5 +204,6 @@ event_templates('mailbox-save', qw(
 ));
 
 event_actions('mailbox-save', qw(
+  nethserver-mail-quota-recalc 20
   nethserver-mail-postmap-update 30
 ));
