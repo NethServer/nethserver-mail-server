@@ -20,4 +20,8 @@
 # along with NethServer.  If not, see COPYING.
 #
 
-exec /usr/bin/doveadm quota recalc -A
+if [[ -n "$2" ]]; then
+    exec /usr/bin/doveadm quota recalc -u $2
+else
+    exec /usr/bin/doveadm quota recalc -A
+fi
