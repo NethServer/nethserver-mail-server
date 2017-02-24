@@ -79,8 +79,8 @@ class MailQuota extends \Nethgui\Controller\TableController
             $loader[$user] = array(
                 'user' => $user, 
                 'size' => $this->formatSize($values['size']*1024), 
-                'max_size' => $this->formatSize($values['max']*1024),
-                'percentage' => $values['perc']. '%',
+                'max_size' => $values['max'] === NULL ? '-' : $this->formatSize($values['max']*1024),
+                'percentage' => $values['perc'] === NULL ? '-' : ($values['perc'] . '%'),
                 'msg_number' => $values['msg']
             );
         }
