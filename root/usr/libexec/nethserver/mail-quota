@@ -23,6 +23,7 @@
 use strict;
 use JSON;
 use File::Glob ':bsd_glob';
+use esmith::ConfigDB;
 
 sub exit_error() {
     my $json = JSON->new;
@@ -32,6 +33,14 @@ sub exit_error() {
 }
 
 my %results;
+
+my $configDb = esmith::ConfigDB->open_ro() || exit_error();
+my $quotaIsEnabled = ($configDb->get_prop('dovecot', 'QuotaStatus') || 'disabled') eq 'enabled';
+
+if( ! $quotaIsEnabled) {
+    print '{}';
+    exit(0);
+}
 
 my $maildirs = '/var/lib/nethserver/vmail';
 my @list = bsd_glob($maildirs.'/*/Maildir/maildirsize');
