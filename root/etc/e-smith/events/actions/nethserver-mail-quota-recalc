@@ -22,6 +22,11 @@
 
 set -e
 
+# Exit immediately if quota plugin is not enabled
+if ! doveconf mail_plugins | grep -q -E '\bquota\b'; then
+    exit 0
+fi
+
 # Exit here if username is passed as second argument
 if [[ -n "$2" ]]; then
     exec /usr/bin/doveadm quota recalc -u $2
