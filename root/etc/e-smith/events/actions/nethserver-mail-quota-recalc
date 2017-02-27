@@ -20,8 +20,19 @@
 # along with NethServer.  If not, see COPYING.
 #
 
+set -e
+
+# Exit here if username is passed as second argument
 if [[ -n "$2" ]]; then
     exec /usr/bin/doveadm quota recalc -u $2
-else
-    exec /usr/bin/doveadm quota recalc -A
 fi
+
+# Recalc quota for any existing user
+cd /var/lib/nethserver/vmail
+
+find . -maxdepth 3 -name 'maildirsize' | (
+    IFS=/
+    while read SKIPA USER SKIPB; do
+        doveadm quota recalc -u ${USER} || :
+    done
+)

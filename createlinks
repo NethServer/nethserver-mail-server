@@ -85,8 +85,10 @@ event_services('nethserver-mail-server-update', qw(
 
 event_templates('nethserver-mail-server-save', @saveTemplates);
 
-event_actions('nethserver-mail-server-save',
-	      'nethserver-mail-postmap-update' => '30');
+event_actions('nethserver-mail-server-save', qw(
+  nethserver-mail-postmap-update 30
+  nethserver-mail-quota-recalc 95
+));
 
 event_services('nethserver-mail-server-save',
 	       'dovecot' => 'reload',
@@ -201,6 +203,10 @@ event_templates('mailbox-save', qw(
 ));
 
 event_actions('mailbox-save', qw(
-  nethserver-mail-quota-recalc 20
   nethserver-mail-postmap-update 30
+  nethserver-mail-quota-recalc 95
+));
+
+event_services('mailbox-save', qw(
+  dovecot reload
 ));
