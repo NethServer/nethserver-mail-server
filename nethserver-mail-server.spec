@@ -1,6 +1,6 @@
 Summary: Mail server implementation based on postfix and dovecot packages
 Name: nethserver-mail-server
-Version: 1.10.8
+Version: 1.10.9
 Release: 1%{?dist}
 License: GPL
 URL: %{url_prefix}/%{name} 
@@ -64,6 +64,11 @@ usermod -G vmail -a postfix >/dev/null 2>&1
 %attr(0644,root,root) %config %ghost %{_sysconfdir}/systemd/system/dovecot.service.d/limits.conf
 
 %changelog
+* Wed Mar 01 2017 Davide Principi <davide.principi@nethesis.it> - 1.10.9-1
+- User mail quota ignored during message delivery - Bug NethServer/dev#5216
+- Mail domain option Accept unknown recipients overrides valid addresses - Bug NethServer/dev#5222
+- Allow removal of primary mail domain - NethServer/dev#5227
+
 * Tue Feb 14 2017 Davide Principi <davide.principi@nethesis.it> - 1.10.8-1
 - Support short login with POP3  - Bug NethServer/dev#5212
 - Mail forward ignored by mail alias - Bug NethServer/dev#5210
