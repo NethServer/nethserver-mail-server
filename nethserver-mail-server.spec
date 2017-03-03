@@ -1,6 +1,6 @@
 Summary: Mail server implementation based on postfix and dovecot packages
 Name: nethserver-mail-server
-Version: 1.10.9
+Version: 1.10.10
 Release: 1%{?dist}
 License: GPL
 URL: %{url_prefix}/%{name} 
@@ -64,6 +64,10 @@ usermod -G vmail -a postfix >/dev/null 2>&1
 %attr(0644,root,root) %config %ghost %{_sysconfdir}/systemd/system/dovecot.service.d/limits.conf
 
 %changelog
+* Fri Mar 03 2017 Davide Principi <davide.principi@nethesis.it> - 1.10.10-1
+- Relay rejected for primary mail domain - Bug NethServer/dev#5233
+- Fix service access prop
+
 * Wed Mar 01 2017 Davide Principi <davide.principi@nethesis.it> - 1.10.9-1
 - User mail quota ignored during message delivery - Bug NethServer/dev#5216
 - Mail domain option Accept unknown recipients overrides valid addresses - Bug NethServer/dev#5222
