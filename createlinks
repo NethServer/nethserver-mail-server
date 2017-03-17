@@ -210,3 +210,19 @@ event_actions('mailbox-save', qw(
 event_services('mailbox-save', qw(
   dovecot reload
 ));
+
+#
+# post-restore-data event
+#
+event_actions('post-restore-data', qw(
+  nethserver-mail-upgrade-ns6 80
+));
+
+#
+# post-restore-config event
+#
+event_actions('post-restore-config', qw(
+  nethserver-mail-upgrade-ns6 80
+));
+
+
