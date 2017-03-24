@@ -52,6 +52,9 @@ class Mailbox extends \Nethgui\Controller\AbstractController
         $h = self::getQuotaUiFunction($this->getPlatform()->getDatabase('configuration'));
         $view['QuotaDefaultSizeDatasource'] = \Nethgui\Renderer\AbstractRenderer::hashToDatasource($h);
 
+        // Value correspoding to the "enabled" checkbox state:
+        $view['SpamFolderTarget'] = $view['SpamFolder'] ? $view['SpamFolder'] : 'Junk';
+
         $view['SpamRetentionTimeDatasource'] = \Nethgui\Renderer\AbstractRenderer::hashToDatasource(array(
                 '1d' => $view->translate('${0} day', array(1)),
                 '2d' => $view->translate('${0} days', array(2)),
