@@ -25,7 +25,9 @@ echo $view->fieldset()->setAttribute('template', $T('Disk space'))
 ;
 
 echo $view->fieldset()->setAttribute('template', $T('Spam messages handling'))
-    ->insert($view->checkBox('SpamFolder', 'Junk')->setAttribute('uncheckedValue', ''))
+    ->insert($view->checkBox('SpamFolder', $view['SpamFolderTarget'])
+        ->setAttribute('uncheckedValue', '')
+        ->setAttribute('label', $T('SpamFolder_label', array($view['SpamFolderTarget']))))
     ->insert(
         $view->slider('SpamRetentionTime', $view::LABEL_ABOVE | $view::SLIDER_ENUMERATIVE)
         ->setAttribute('label', $T('Hold for ${0}'))
