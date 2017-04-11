@@ -80,7 +80,8 @@ class Modify extends \Nethgui\Controller\Table\Modify
         if($process->getExitCode() !== 0) {
             throw new \RuntimeException(sprintf('%s: user account existence check failed', __CLASS__), 1485948162);
         }
-        return trim($process->getOutput()) !== '{}';
+        $output = trim($process->getOutput());
+        return $output !== '{}' && $output !== '';
     }
 
     public function validate(\Nethgui\Controller\ValidationReportInterface $report)
