@@ -1,6 +1,6 @@
 Summary: Mail server implementation based on postfix and dovecot packages
 Name: nethserver-mail-server
-Version: 1.10.10
+Version: 1.10.11
 Release: 1%{?dist}
 License: GPL
 URL: %{url_prefix}/%{name} 
@@ -64,6 +64,11 @@ usermod -G vmail -a postfix >/dev/null 2>&1
 %attr(0644,root,root) %config %ghost %{_sysconfdir}/systemd/system/dovecot.service.d/limits.conf
 
 %changelog
+* Tue Apr 11 2017 Davide Principi <davide.principi@nethesis.it> - 1.10.11-1
+- Redirection of postmaster to external e-mail address - NethServer/dev#5266
+- Custom mail quota applied once - Bug NethServer/dev#5265
+- Upgrade from NS 6 via backup and restore - NethServer/dev#5234
+
 * Fri Mar 03 2017 Davide Principi <davide.principi@nethesis.it> - 1.10.10-1
 - Relay rejected for primary mail domain - Bug NethServer/dev#5233
 - Fix service access prop
