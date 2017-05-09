@@ -61,6 +61,7 @@ fi
 
 cp -f $DB ${DB}.bak
 
+shopt -s nullglob
 for ACCOUNT in *@${DOMAIN}; do
     SHORT="${ACCOUNT%%@${DOMAIN}}"
     echo "[NOTICE] Map $SHORT to $ACCOUNT"
@@ -69,6 +70,10 @@ for ACCOUNT in *@${DOMAIN}; do
     echo "s:^user=${SHORT} :user=${ACCOUNT} :g" >> $TMP_REMAP_ACL
     echo "s:Shared/${SHORT}/:Shared/${ACCOUNT}/:g" >> $TMP_REMAP_SHARED
 done
+
+if [[ -z "${SHORT}" ]]; then
+    exit 0
+fi
 
 sed -i -r -f $TMP_REMAP_DB $DB
 
