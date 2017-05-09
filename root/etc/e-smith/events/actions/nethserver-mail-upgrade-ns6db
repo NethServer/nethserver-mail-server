@@ -29,11 +29,33 @@ if ( ! -f '/var/run/.nethserver-upgrade-configdb' && $event ne '--force') {
     exit(0);
 }
 
+my $errors = 0;
 my $adb = esmith::AccountsDB->open();
 my ($systemName, $domainName) = split(/\./, Sys::Hostname::hostname(), 2);
+my $vmailPrefix = '/var/lib/nethserver/vmail';
+
+foreach ($adb->get_all_by_prop('type' => 'group')) {
+    if($_->prop('MailDeliveryType') ne 'shared') {
+        next;
+    }
+
+    # NOTE: here we create the directory. During post-restore-data we initialize
+    # and move messages into it:
+    system("mkdir -m 700 -vp $vmailPrefix/vmail/Maildir/." . $_->key . "/{cur,new}");
+    if( $? != 0 ) {
+        warn("[ERROR] failed to create shared mailbox for " . $_->key . "\n");
+        $errors ++;
+    }
+}
+
+# Fix filesystem ownership
+system("chown -cR vmail:vmail $vmailPrefix/vmail");
+if( $? != 0 ) {
+    $errors ++;
+}
 
 foreach ($adb->get_all_by_prop('type' => 'pseudonym')) {
-     my $account = $_->prop('Account') || next;
+     my $account = $_->prop('Account') || '';
 
      # skip accounts already with domain part
      next if ($account =~ /@/);
@@ -41,12 +63,16 @@ foreach ($adb->get_all_by_prop('type' => 'pseudonym')) {
      # Expand the Account prop relation:
      my $accountRecord = $adb->get($account);
      if( ! $accountRecord) {
-         warn("[WARNING] could not find account $account for pseudonym $_->key\n");
+         warn("[WARNING] could not find account \"$account\" for pseudonym " . $_->key . "\n");
          next;
      } elsif($accountRecord->prop('type') eq 'user') {
          $account = $account."@".$domainName;
      } elsif($accountRecord->prop('type') eq 'group') {
-         $account = join(',', map { $_ . '@' . $domainName } split(/,/, $accountRecord->prop('Members')));
+         if($accountRecord->prop('MailDeliveryType') eq 'copy') {
+             $account = join(',', map { $_ . '@' . $domainName } split(/,/, $accountRecord->prop('Members')));
+         } elsif($accountRecord->prop('MailDeliveryType') eq 'shared') {
+             $acccount = 'vmail+' . $accountRecord->key;
+         }
      } else {
          warn("[WARNING] could not find a valid account type for pseudonym $_->key\n");
          next;
@@ -54,3 +80,5 @@ foreach ($adb->get_all_by_prop('type' => 'pseudonym')) {
 
      $_->set_prop('Account', $account);
 }
+
+exit($errors > 0 ? 1 : 0);

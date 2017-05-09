@@ -68,7 +68,11 @@ for ACCOUNT in *@${DOMAIN}; do
     echo "s:(user/|group/|anyone/)${SHORT}/:\1${ACCOUNT}/:g" >> $TMP_REMAP_DB
     echo "s:/${SHORT}\$:/${ACCOUNT}:g" >> $TMP_REMAP_DB
     echo "s:^user=${SHORT} :user=${ACCOUNT} :g" >> $TMP_REMAP_ACL
-    echo "s:Shared/${SHORT}/:Shared/${ACCOUNT}/:g" >> $TMP_REMAP_SHARED
+    if [[ -d "/var/lib/nethserver/vmail/vmail/Maildir/.$SHORT" ]]; then
+        echo "s:^Shared/${SHORT}/INBOX:Public/${SHORT}:g" >> $TMP_REMAP_SHARED
+    else
+        echo "s:^Shared/${SHORT}/:Shared/${ACCOUNT}/:g" >> $TMP_REMAP_SHARED
+    fi
 done
 
 if [[ -z "${SHORT}" ]]; then
