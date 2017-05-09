@@ -19,24 +19,11 @@
 # along with NethServer.  If not, see COPYING.
 #
 
-use esmith::AccountsDB;
-use esmith::ConfigDB;
+use Sys::Hostname;
 use File::Glob ':bsd_glob';
 use File::Basename;
 
-my $adb = esmith::AccountsDB->open();
-my $cdb = esmith::ConfigDB->open_ro();
-
-my $domain = $cdb->get('DomainName')->prop('type');
-
-foreach ($adb->get_all_by_prop('type' => 'pseudonym')) {
-     my $account = $_->prop('Account') || next;
-
-     # skip accounts already with domain part
-     next if ($account =~ /@/);
-
-     $_->set_prop('Account', $account."@".$domain);
-}
+my ($systemName, $domainName) = split(/\./, Sys::Hostname::hostname(), 2);
 
 foreach (bsd_glob('/var/lib/nethserver/vmail/*')) {
     if ( -d "$_/Maildir") {
@@ -48,6 +35,13 @@ foreach (bsd_glob('/var/lib/nethserver/vmail/*')) {
         # skip mail dirs already with domain part
         next if ($name =~ /@/);
 
-        rename($_, $_."@".$domain);
+        my $target = $_."@".$domainName;
+
+        if( -d $target) {
+            warn "[WARNING] an existing $target was found. Rename to $target.restore\n";
+            rename($target, $target . '.restore');
+        }
+
+        rename($_, $target);
     }
 }

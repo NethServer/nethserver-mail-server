@@ -215,14 +215,15 @@ event_services('mailbox-save', qw(
 # post-restore-data event
 #
 event_actions('post-restore-data', qw(
-  nethserver-mail-upgrade-ns6 80
+    nethserver-mail-upgrade-ns6mbox 80
+    nethserver-mail-upgrade-ns6acls 81
 ));
 
 #
 # post-restore-config event
 #
 event_actions('post-restore-config', qw(
-  nethserver-mail-upgrade-ns6 80
+    nethserver-mail-upgrade-ns6db 60
 ));
 
 

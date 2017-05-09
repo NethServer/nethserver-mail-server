@@ -31,8 +31,8 @@
 #  3. DB, for shared-mailboxes.db file
 #
 
-# exit on errors
-set -e
+event=$1
+shift
 
 TMP_REMAP_ACL=$(mktemp /tmp/fixshares-acl.XXXXXXXX)
 TMP_REMAP_SHARED=$(mktemp /tmp/fixshares-shared.XXXXXXXX)
@@ -40,7 +40,7 @@ TMP_REMAP_DB=$(mktemp /tmp/fixshares-db.XXXXXXXX)
 
 cleanup ()
 {
-    rm -f $TMP_REMAP_ACL $TMP_REMAP_SHARED $TMP_REMAP_DB
+    rm -f $TMP_REMAP_ACL $TMP_REMAP_SHARED $TMP_REMAP_DB $DB.bak
 }
 
 trap cleanup EXIT HUP TERM
@@ -48,7 +48,7 @@ trap cleanup EXIT HUP TERM
 cd /var/lib/nethserver/vmail
 
 DB="shared-mailboxes.db"
-DOMAIN=$(hostname -d)
+DOMAIN=$(hostname | cut -d . -f 2-)
 
 if [[ ! -f $DB ]]; then
     echo "[ERROR] Missing $DB file"
@@ -57,7 +57,7 @@ fi
 
 cp -f $DB ${DB}.bak
 
-for ACCOUNT in *${DOMAIN}; do
+for ACCOUNT in *@${DOMAIN}; do
     SHORT="${ACCOUNT%%@${DOMAIN}}"
     echo "[NOTICE] Map $SHORT to $ACCOUNT"
     echo "s:(user/|group/|anyone/)${SHORT}/:\1${ACCOUNT}/:g" >> $TMP_REMAP_DB
