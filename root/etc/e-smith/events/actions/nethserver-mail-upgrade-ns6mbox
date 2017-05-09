@@ -23,6 +23,12 @@ use Sys::Hostname;
 use File::Glob ':bsd_glob';
 use File::Basename;
 
+my $event = shift || '';
+
+if ( ! -f '/var/run/.nethserver-upgrade-configdb' && $event ne '--force') {
+    exit(0);
+}
+
 my ($systemName, $domainName) = split(/\./, Sys::Hostname::hostname(), 2);
 
 foreach (bsd_glob('/var/lib/nethserver/vmail/*')) {
@@ -38,7 +44,7 @@ foreach (bsd_glob('/var/lib/nethserver/vmail/*')) {
         my $target = $_."@".$domainName;
 
         if( -d $target) {
-            warn "[WARNING] an existing $target was found. Rename to $target.restore\n";
+            warn "[WARNING] an existing ${target} was found. Rename to ${target}.restore\n";
             rename($target, $target . '.restore');
         }
 

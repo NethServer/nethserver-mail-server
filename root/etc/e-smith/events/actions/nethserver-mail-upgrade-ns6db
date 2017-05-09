@@ -23,6 +23,12 @@ use Sys::Hostname;
 use esmith::AccountsDB;
 use esmith::ConfigDB;
 
+my $event = shift || '';
+
+if ( ! -f '/var/run/.nethserver-upgrade-configdb' && $event ne '--force') {
+    exit(0);
+}
+
 my $adb = esmith::AccountsDB->open();
 my ($systemName, $domainName) = split(/\./, Sys::Hostname::hostname(), 2);
 

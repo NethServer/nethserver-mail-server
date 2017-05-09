@@ -34,6 +34,10 @@
 event=$1
 shift
 
+if [[ ! -f /var/run/.nethserver-upgrade-configdb && "${event}" != "--force" ]]; then
+    exit 0
+fi
+
 TMP_REMAP_ACL=$(mktemp /tmp/fixshares-acl.XXXXXXXX)
 TMP_REMAP_SHARED=$(mktemp /tmp/fixshares-shared.XXXXXXXX)
 TMP_REMAP_DB=$(mktemp /tmp/fixshares-db.XXXXXXXX)
