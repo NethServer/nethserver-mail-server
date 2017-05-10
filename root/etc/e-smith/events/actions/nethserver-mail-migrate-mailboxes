@@ -62,8 +62,7 @@ foreach my $userName (map { $_->key } $srcAccountsDb->users()) {
            next;
        }
 
-       #$srcDirPrefix = $pwuser->dir . '/';
-       $srcDirPrefix = $migrationRootDir . '/home/e-smith/files/users/' . $userName . '/';
+       $srcDirPrefix = $pwuser->dir . '/';
     }
 
     foreach my $tgtDir (qw(Maildir sieve)) {
@@ -128,6 +127,11 @@ foreach my $userName (map { $_->key } $srcAccountsDb->users()) {
 
 } # end foreach userName
 
+# Fix IMAP acls by appending the @domain suffix to user and group names:
+system('/etc/e-smith/events/actions/nethserver-mail-upgrade-ns6acls', $event);
+if( $? != 0 ) {
+    $errors ++;
+}
 
 if($errors > 0) {
     warn "[WARNING] $errors error(s) occurred in $0 action\n";

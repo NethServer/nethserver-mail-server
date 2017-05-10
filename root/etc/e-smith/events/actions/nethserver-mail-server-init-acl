@@ -25,9 +25,13 @@ use strict;
 my $event = shift;
 my $errors = 0;
 
-if( ! -d '/var/lib/nethserver/vmail/vmail') {
-    warn "[NOTICE] Initialize vmail Public IMAP namespace\n";
+if( ! -f '/var/lib/nethserver/vmail/vmail/Maildir/dovecot-acl' || $event eq '--force') {
+    warn("[NOTICE] Initialize ACLs of Public (vmail) IMAP namespace\n");
     system('doveadm acl set -u vmail INBOX authenticated lookup');
+    if($? != 0) {
+        $errors++;
+    }
+    system('doveadm acl set -u vmail INBOX user=root admin create delete expunge insert lookup post read write write-deleted write-seen');
     if($? != 0) {
         $errors++;
     }
