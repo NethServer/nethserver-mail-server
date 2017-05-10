@@ -62,8 +62,7 @@ foreach my $userName (map { $_->key } $srcAccountsDb->users()) {
            next;
        }
 
-       #$srcDirPrefix = $pwuser->dir . '/';
-       $srcDirPrefix = $migrationRootDir . '/home/e-smith/files/users/' . $userName . '/';
+       $srcDirPrefix = $pwuser->dir . '/';
     }
 
     foreach my $tgtDir (qw(Maildir sieve)) {
