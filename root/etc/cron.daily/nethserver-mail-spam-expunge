@@ -31,6 +31,12 @@ SpamFolder=`$db configuration getprop dovecot SpamFolder`
 for dir in `/usr/bin/find $mail_dirs -maxdepth 1 -type d`; do
     USER=`basename $dir`
 
+    # Skip non-Dovecot users
+    $doveadm user ${USER} &>/dev/null
+    if [ $? -gt 0 ]; then
+        continue
+    fi
+
     # Cleanup prop values:
     unset MailSpamRetentionStatus MailSpamRetentionTime MailStatus
 
