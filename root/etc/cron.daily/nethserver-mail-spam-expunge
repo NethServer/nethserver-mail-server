@@ -59,11 +59,11 @@ for dir in `/usr/bin/find $mail_dirs -maxdepth 1 -type d`; do
 	    $doveadm expunge -u ${USER} \
 		SENTBEFORE "${TIME}" \
 		MAILBOX INBOX \
-		HEADER X-Spam-Flag YES
+		HEADER X-Spam-Flag YES &> /dev/null
 	else
 	    $doveadm expunge -u ${USER} \
 		SENTBEFORE "${TIME}" \
-		MAILBOX "${SpamFolder}"
+		MAILBOX "${SpamFolder}" &> /dev/null
 	fi
     fi
     
