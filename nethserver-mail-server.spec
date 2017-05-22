@@ -1,6 +1,6 @@
 Summary: Mail server implementation based on postfix and dovecot packages
 Name: nethserver-mail-server
-Version: 1.10.12
+Version: 1.10.13
 Release: 1%{?dist}
 License: GPL
 URL: %{url_prefix}/%{name} 
@@ -64,6 +64,9 @@ usermod -G vmail -a postfix >/dev/null 2>&1
 %attr(0644,root,root) %config %ghost %{_sysconfdir}/systemd/system/dovecot.service.d/limits.conf
 
 %changelog
+* Mon May 22 2017 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 1.10.13-1
+- Spam expunge: avoid "Fatal: User doesn't exist " error - Bug NethServer/dev#5287
+
 * Wed May 10 2017 Davide Principi <davide.principi@nethesis.it> - 1.10.12-1
 - Upgrade from NS 6 via backup and restore - NethServer/dev#5234
 
