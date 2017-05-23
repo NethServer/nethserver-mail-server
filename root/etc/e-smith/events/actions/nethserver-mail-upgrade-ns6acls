@@ -55,8 +55,8 @@ DB="shared-mailboxes.db"
 DOMAIN=$(hostname | cut -d . -f 2-)
 
 if [[ ! -f $DB ]]; then
-    echo "[ERROR] Missing $DB file"
-    exit 1
+    echo "[WARNING] Missing $DB file"
+    exit 0
 fi
 
 cp -f $DB ${DB}.bak
@@ -89,3 +89,5 @@ fi
 
 find . -name dovecot-acl -print0 | xargs -0 -- sed -i -r -f $TMP_REMAP_ACL
 find . -name subscriptions -print0 | xargs -0 -- sed -i -r -f $TMP_REMAP_SHARED
+
+exit 0
