@@ -31,6 +31,15 @@ SpamFolder=`$db configuration getprop dovecot SpamFolder`
 for dir in `/usr/bin/find $mail_dirs -maxdepth 1 -type d`; do
     USER=`basename $dir`
 
+    if [[ "${USER}" == vmail ]]; then
+        $doveadm mailbox list -u vmail \* | grep -q "${SpamFolder}"
+        if [[ $? == 0 ]]; then
+            echo "[WARNING] Removing ${SpamFolder} from vmail public mailbox"
+            $doveadm mailbox delete -u vmail "${SpamFolder}"
+        fi
+        continue
+    fi
+
     # Skip non-Dovecot users
     $doveadm user ${USER} &>/dev/null
     if [ $? -gt 0 ]; then
