@@ -49,7 +49,7 @@ foreach ($adb->get_all_by_prop('type' => 'group')) {
 }
 
 # Fix filesystem ownership
-system("chown -cR vmail:vmail $vmailPrefix/vmail");
+system("chown -cR vmail:vmail $vmailPrefix");
 if( $? != 0 ) {
     $errors ++;
 }
