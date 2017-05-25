@@ -75,8 +75,7 @@ class Pseudonym extends \Nethgui\Controller\TableController
         $destinations = explode(',', $values['Account']);
 
         if(count($destinations) > 4) {
-            array_splice($destinations, 0, 4);
-            $destinations[] = '...';
+            $destinations = array_merge(array_slice($destinations, 0 , 2), array('...'), array_slice($destinations, -2));
         }
 
         return implode(', ', $destinations);
