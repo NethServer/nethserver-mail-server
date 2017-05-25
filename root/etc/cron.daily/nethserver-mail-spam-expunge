@@ -20,7 +20,6 @@
 # along with NethServer.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-mail_dirs=/var/lib/nethserver/vmail/
 doveadm=/usr/bin/doveadm
 db=/sbin/e-smith/db
 
@@ -28,14 +27,13 @@ db=/sbin/e-smith/db
 DefaultRetentionTime=`$db configuration getprop dovecot SpamRetentionTime`
 SpamFolder=`$db configuration getprop dovecot SpamFolder`
 
-for dir in `/usr/bin/find $mail_dirs -maxdepth 1 -type d`; do
-    USER=`basename $dir`
+for MDIR in /var/lib/nethserver/vmail/*/Maildir; do
+    USER=$(basename ${MDIR%%Maildir})
 
     if [[ "${USER}" == vmail ]]; then
-        $doveadm mailbox list -u vmail \* | grep -q "${SpamFolder}"
-        if [[ $? == 0 ]]; then
+        if [[ -n "${SpamFolder}" && -d "$MDIR/.${SpamFolder}" ]]; then
             echo "[WARNING] Removing ${SpamFolder} from vmail public mailbox"
-            $doveadm mailbox delete -u vmail "${SpamFolder}"
+            rm -rf "$MDIR/.${SpamFolder}"
         fi
         continue
     fi
