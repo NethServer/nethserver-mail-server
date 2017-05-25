@@ -128,7 +128,7 @@ class Modify extends \Nethgui\Controller\Table\Modify
     public function getExtAddresses()
     {
         $addresses = array();
-        foreach (preg_split("/[,;]\s+/", $this->parameters['ExtAddresses']) as $line) {
+        foreach (preg_split("/[,;\s]+/", $this->parameters['ExtAddresses']) as $line) {
             $address = trim($line);
             if($address) {
                 $addresses[] = $address;
