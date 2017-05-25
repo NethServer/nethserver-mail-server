@@ -165,14 +165,6 @@ class Modify extends \Nethgui\Controller\Table\Modify
             $hash['vmail+' . $mbx['name']] = $mbx['name'];
         }
 
-        $defaultDomain = \Nethgui\array_end(explode('.', \gethostname(), 2));
-        foreach ($this->getParent()->getAdapter() as $key => $prop) {
-            if(substr($key, -1) === '@') {
-                $key .= $defaultDomain;
-            }
-            $hash[$key] = $key;
-        }
-
         return \Nethgui\Widget\XhtmlWidget::hashToDatasource($hash, TRUE);
     }
 
