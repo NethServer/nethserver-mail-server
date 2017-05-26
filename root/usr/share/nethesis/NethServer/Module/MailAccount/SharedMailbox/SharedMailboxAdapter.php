@@ -46,6 +46,9 @@ class SharedMailboxAdapter extends \Nethgui\Adapter\LazyLoaderAdapter
         }
         foreach(array_filter($proc->getOutputArray()) as $mb) {
             $key = substr($mb, 7); // trim Public/ prefix
+            if(strpos($key, '/') !== FALSE) {
+                continue;
+            }
             $mailboxes[$key] = array('name' => $key);
         }
         ksort($mailboxes);
