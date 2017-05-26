@@ -108,9 +108,13 @@ class Modify extends \Nethgui\Controller\Table\Modify
             // Expand the member list of each group
             $groupProvider = new \NethServer\Tool\GroupProvider($this->getPlatform());
             $groupList = $groupProvider->getGroups();
+            $pseudonyms = $this->getParent()->getAdapter();
             $destinations = array();
             foreach($this->parameters['Account'] as $destination) {
-                if(in_array($destination, array_keys($groupList))) {
+                $isGroup = in_array($destination, array_keys($groupList));
+                $isPseudonym = isset($pseudonyms[$destination])
+                    || isset($pseudonyms[substr($destination, 0, 1 + strpos($destination, '@'))]);
+                if( !$isPseudonym && $isGroup) {
                     $destinations = array_merge($destinations, $groupProvider->getGroupMembers($destination));
                 } else {
                     $destinations[] = $destination;
@@ -124,7 +128,7 @@ class Modify extends \Nethgui\Controller\Table\Modify
     public function getExtAddresses()
     {
         $addresses = array();
-        foreach (preg_split("/[,;]\s+/", $this->parameters['ExtAddresses']) as $line) {
+        foreach (preg_split("/[,;\s]+/", $this->parameters['ExtAddresses']) as $line) {
             $address = trim($line);
             if($address) {
                 $addresses[] = $address;
