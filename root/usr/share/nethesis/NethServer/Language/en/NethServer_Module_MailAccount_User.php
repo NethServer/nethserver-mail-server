@@ -18,3 +18,4 @@ $L['CreateMailAddresses_label'] = 'Create default email addresses';
 $L['MailAddressList_label'] = 'Mail addresses';
 $L['Key_label'] = 'User';
 $L['valid_mailbox_pseudonym_conflict'] = 'A mail alias with the same name already exists. Remove it first.';
+$L['EditProfile_label'] = 'Edit profile';

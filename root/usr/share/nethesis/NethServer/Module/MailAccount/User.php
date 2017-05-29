@@ -61,6 +61,19 @@ class User extends \Nethgui\Controller\TableController
         return strval($key);
     }
 
+    public function prepareViewForColumnActions(\Nethgui\Controller\Table\Read $action, \Nethgui\View\ViewInterface $view, $key, $values, &$rowMetadata)
+    {
+        if ($key != 'root') {
+            return $action->prepareViewForColumnActions($view, $key, $values, $rowMetadata);
+        }
+        $cellView = $view->spawnView($this->getParent());
+        $self = $this;
+        $cellView->setTemplate(function(\Nethgui\Renderer\Xhtml $view) use ($self, $view) {
+            return sprintf('<button class="Button" onclick="window.location=%s">%s</button>', htmlspecialchars(json_encode($view->getModuleUrl('/UserProfile'))), $view->translate('EditProfile_label'));
+        });
+        return $cellView;
+    }
+
    public function prepareViewForColumnMailForwardAddress(\Nethgui\Controller\Table\Read $action, \Nethgui\View\ViewInterface $view, $key, $values, &$rowMetadata)
     {
         if ($values['MailForwardStatus'] == 'enabled' ) {
