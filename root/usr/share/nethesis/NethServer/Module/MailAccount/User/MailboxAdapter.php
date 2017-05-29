@@ -74,6 +74,18 @@ class MailboxAdapter extends \Nethgui\Adapter\LazyLoaderAdapter
                 $loader[$user][$prop] = $this->getValue($user, $prop);
             }
         }
+
+        // Add root mailbox configuration:
+        $loader['root'] = $this->defaults;
+        $loader['root']['username'] = 'root';
+        $confDb = $this->platform->getDatabase('configuration');
+        $rootEmailAddress = $confDb->getProp('root', 'EmailAddress');
+        if($rootEmailAddress) {
+            $loader['root']['MailForwardStatus'] = 'enabled';
+            $loader['root']['MailForwardAddress'] = $rootEmailAddress;
+        }
+        $loader['root']['MailForwardKeepMessageCopy'] = $confDb->getProp('root', 'KeepMessageCopy');
+
         return $loader;
     }
 
