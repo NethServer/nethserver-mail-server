@@ -21,7 +21,9 @@ echo $view->header('pseudonym')->setAttribute('template', $T($headerText));
 echo $keyWidgets;
 echo $view->textInput('Description');
 echo $view->fieldset()->setAttribute('template', $T('Destinations_label'))
-        ->insert($view->objectPicker('Account')->setAttribute('objects', 'AccountDatasource'))
+        ->insert($view->objectPicker('Account')
+            ->setAttribute('objects', 'AccountDatasource')
+            ->setAttribute('objectLabel', 1))
 ;
 echo $view->textArea('ExtAddresses', $view::LABEL_ABOVE)->setAttribute('dimensions', '5x30');
 echo $view->checkbox('Access', 'private')->setAttribute('uncheckedValue', 'public');

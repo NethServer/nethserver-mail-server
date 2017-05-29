@@ -100,6 +100,12 @@ class Modify extends \Nethgui\Controller\Table\Modify
                     'valid_pseudonym_mailbox_conflict');
             }
         }
+        if($this->getRequest()->isMutation()) {
+            if(count($this->parameters['Account']) === 0) {
+                $report->addValidationErrorMessage($this, 'Account',
+                    'valid_pseudonym_empty_destination');
+            }
+        }
     }
 
     public function process()
@@ -137,7 +143,7 @@ class Modify extends \Nethgui\Controller\Table\Modify
         return $addresses;
     }
 
-    public function getAccountDatasource()
+    public function getAccountDatasource(\Nethgui\View\ViewInterface $view)
     {
         $userProvider = new \NethServer\Tool\UserProvider($this->getPlatform());
         $groupProvider = new \NethServer\Tool\GroupProvider($this->getPlatform());
@@ -164,7 +170,7 @@ class Modify extends \Nethgui\Controller\Table\Modify
         }
 
         foreach ($mbxProvider->getSharedMailboxList() as $mbx) {
-            $hash['vmail+' . $mbx['name']] = $mbx['name'];
+            $hash['vmail+' . $mbx['name']] = $view->translate('SharedMailbox_selector_label', array($mbx['name']));
         }
 
         return \Nethgui\Widget\XhtmlWidget::hashToDatasource($hash, TRUE);
@@ -181,7 +187,7 @@ class Modify extends \Nethgui\Controller\Table\Modify
         $view->setTemplate($templates[$this->getIdentifier()]);
 
         if ( ! $this->getRequest()->isMutation() && $this->getRequest()->isValidated()) {
-            $view['AccountDatasource'] = $this->getAccountDatasource();
+            $view['AccountDatasource'] = $this->getAccountDatasource($view);
             if ($this->getIdentifier() === 'create') {
                 $view['domainAddressDatasource'] = $this->readDomainAddressDatasource($view);
             }
