@@ -12,7 +12,7 @@ $quotaPanel = $view->fieldsetSwitch('MailQuotaType', 'custom', $view::FIELDSETSW
 
 $forwardPanel = $view->fieldsetSwitch('MailForwardStatus', 'enabled', $view::FIELDSETSWITCH_CHECKBOX | $view::FIELDSETSWITCH_EXPANDABLE)
     ->setAttribute('uncheckedValue', 'disabled')
-    ->insert($view->textInput('MailForwardAddress'))
+    ->insert($view->textArea('MailForwardAddress', $view::LABEL_ABOVE)->setAttribute('dimensions', '5x30'))
     ->insert($view->checkbox('MailForwardKeepMessageCopy', 'yes')->setAttribute('uncheckedValue', 'no'))
 ;
 

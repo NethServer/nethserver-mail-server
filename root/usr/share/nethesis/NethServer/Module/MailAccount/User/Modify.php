@@ -43,7 +43,7 @@ class Modify extends \Nethgui\Controller\Table\Modify
             array('MailQuotaType', $this->createValidator()->memberOf('custom', 'default'), Table::FIELD),
             array('MailQuotaCustom', $this->createValidator()->orValidator($quotaValidator1, $quotaValidator2), Table::FIELD),
             array('MailForwardStatus', Validate::SERVICESTATUS, Table::FIELD),
-            array('MailForwardAddress', Validate::EMAIL, Table::FIELD),
+            array('MailForwardAddress', Validate::NOTEMPTY, Table::FIELD),
             array('MailForwardKeepMessageCopy', Validate::YES_NO, Table::FIELD),
             array('MailSpamRetentionStatus', Validate::SERVICESTATUS, Table::FIELD),
             array('MailSpamRetentionTime', '/^(\d+[smhdw]|infinite)$/', Table::FIELD),
@@ -56,6 +56,14 @@ class Modify extends \Nethgui\Controller\Table\Modify
         parent::initialize();
     }
 
+    public function bind(\Nethgui\Controller\RequestInterface $request)
+    {
+        parent::bind($request);
+        if($request->isMutation() && $request->hasParameter('MailForwardAddress')) {
+            $this->parameters['MailForwardAddress'] = implode(",", self::splitLines($request->getParameter('MailForwardAddress')));
+        }
+    }
+
     public function validate(\Nethgui\Controller\ValidationReportInterface $report)
     {
         parent::validate($report);
@@ -63,6 +71,16 @@ class Modify extends \Nethgui\Controller\Table\Modify
             if($this->getPlatform()->getDatabase('accounts')->getType($this->parameters['username']) === 'pseudonym') {
                 $report->addValidationErrorMessage($this, 'username',
                     'valid_mailbox_pseudonym_conflict');
+            }
+            $forwards = $this->parameters['MailForwardAddress'];
+            if($forwards) {
+                $emailValidator = $this->createValidator(Validate::EMAIL);
+                foreach(explode(',', $forwards) as $email) {
+                    if( !$emailValidator->evaluate($email)) {
+                        $report->addValidationErrorMessage($this, 'MailForwardAddress',
+                            'valid_mailforward_address', array($email));
+                    }
+                }
             }
         }
     }
@@ -108,6 +126,14 @@ class Modify extends \Nethgui\Controller\Table\Modify
                 '180d' => $view->translate('${0} days', array(180)),
                 'infinite' => $view->translate('ever'),
             ));
+        if(isset($this->parameters['MailForwardAddress'])) {
+            $view['MailForwardAddress'] = implode("\r\n", explode(',', $this->parameters['MailForwardAddress']));
+        }
+    }
+
+    public static function splitLines($text)
+    {
+        return array_filter(preg_split("/[,;\s]+/", $text));
     }
 
 }
