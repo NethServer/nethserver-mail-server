@@ -31,6 +31,7 @@ class MailboxAdapter extends \Nethgui\Adapter\LazyLoaderAdapter
     
     private $defaults = array (
         'MailStatus' => 'enabled',
+        'MailAccess' => 'public',
         'MailQuotaType' => 'default',
         'MailQuotaCustom' => '1',
         'MailForwardStatus'=> 'disabled',
@@ -55,6 +56,7 @@ class MailboxAdapter extends \Nethgui\Adapter\LazyLoaderAdapter
         $this->platform = $platform;
         $this->provider = new \NethServer\Tool\UserProvider($this->platform);
         $this->users = $this->provider->getUsers();
+        $this->defaults['MailQuotaCustom'] = $platform->getDatabase('configuration')->getProp('dovecot', 'QuotaDefaultSize');
         parent::__construct(array($this, 'readMailboxes'));
     }
 

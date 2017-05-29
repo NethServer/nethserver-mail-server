@@ -35,11 +35,10 @@ class Modify extends \Nethgui\Controller\Table\Modify
         $quotaValidator1 = $this->createValidator()->greatThan(0)->lessThan(501);
         $quotaValidator2 = $this->createValidator()->equalTo('unlimited');
 
-        $this->declareParameter('QuotaStatus', FALSE, array('configuration', 'dovecot', 'QuotaStatus'));
-
         $parameterSchema = array(
             array('username', Validate::ANYTHING, Table::KEY),
             array('MailStatus', Validate::SERVICESTATUS, Table::FIELD),
+            array('MailAccess', $this->createValidator()->memberOf('public', 'private'), Table::FIELD),
             array('MailQuotaType', $this->createValidator()->memberOf('custom', 'default'), Table::FIELD),
             array('MailQuotaCustom', $this->createValidator()->orValidator($quotaValidator1, $quotaValidator2), Table::FIELD),
             array('MailForwardStatus', Validate::SERVICESTATUS, Table::FIELD),
@@ -49,9 +48,6 @@ class Modify extends \Nethgui\Controller\Table\Modify
             array('MailSpamRetentionTime', '/^(\d+[smhdw]|infinite)$/', Table::FIELD),
         );
         $this->setSchema($parameterSchema);
-
-        $this->setDefaultValue('MailStatus', 'enabled');
-        $this->setDefaultValue('MailSpamRetentionTime', '15d');
 
         parent::initialize();
     }

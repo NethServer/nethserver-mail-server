@@ -20,3 +20,4 @@ $L['Key_label'] = 'User';
 $L['valid_mailbox_pseudonym_conflict'] = 'A mail alias with the same name already exists. Remove it first.';
 $L['valid_mailforward_address'] = '"${0}" is not a valid email address';
 $L['EditProfile_label'] = 'Edit profile';
+$L['MailAccess_label'] = 'Local network only';

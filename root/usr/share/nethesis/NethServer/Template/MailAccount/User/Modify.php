@@ -26,6 +26,7 @@ $spamRetentionPanel = $view->fieldsetSwitch('MailSpamRetentionStatus', 'enabled'
 
 echo $view->panel()
     ->insert($view->checkBox('MailStatus', 'enabled')->setAttribute('uncheckedValue', 'disabled'))
+    ->insert($view->checkBox('MailAccess', 'private')->setAttribute('uncheckedValue', 'public'))
     ->insert($forwardPanel)
     ->insert($quotaPanel)
     ->insert($spamRetentionPanel)

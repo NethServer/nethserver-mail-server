@@ -13,6 +13,10 @@ Edit
 Access to email services
     Enable or disable SMTP, IMAP and POP3 access for the user.
 
+Local network only
+    Enabling this option will block the reception of messages
+    from external senders.
+
 Forward messages
     Forward received emails to an alternative address.
 
