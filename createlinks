@@ -200,6 +200,7 @@ event_templates('mailbox-save', qw(
       /etc/dovecot/deny.passwd
       /etc/postfix/virtual
       /etc/dovecot/quota.passwd
+      /etc/postfix/internal_access
 ));
 
 event_actions('mailbox-save', qw(

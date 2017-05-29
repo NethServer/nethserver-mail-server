@@ -40,6 +40,7 @@ class Modify extends \Nethgui\Controller\Table\Modify
         $parameterSchema = array(
             array('username', Validate::ANYTHING, Table::KEY),
             array('MailStatus', Validate::SERVICESTATUS, Table::FIELD),
+            array('MailAccess', $this->createValidator()->memberOf('public', 'private'), Table::FIELD),
             array('MailQuotaType', $this->createValidator()->memberOf('custom', 'default'), Table::FIELD),
             array('MailQuotaCustom', $this->createValidator()->orValidator($quotaValidator1, $quotaValidator2), Table::FIELD),
             array('MailForwardStatus', Validate::SERVICESTATUS, Table::FIELD),

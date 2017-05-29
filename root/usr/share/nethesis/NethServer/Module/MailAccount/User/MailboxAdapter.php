@@ -31,6 +31,7 @@ class MailboxAdapter extends \Nethgui\Adapter\LazyLoaderAdapter
     
     private $defaults = array (
         'MailStatus' => 'enabled',
+        'MailAccess' => 'public',
         'MailQuotaType' => 'default',
         'MailQuotaCustom' => '1',
         'MailForwardStatus'=> 'disabled',
