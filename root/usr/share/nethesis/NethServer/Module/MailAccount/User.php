@@ -77,7 +77,7 @@ class User extends \Nethgui\Controller\TableController
    public function prepareViewForColumnMailForwardAddress(\Nethgui\Controller\Table\Read $action, \Nethgui\View\ViewInterface $view, $key, $values, &$rowMetadata)
     {
         if ($values['MailForwardStatus'] == 'enabled' ) {
-            return $values['MailForwardAddress'];
+            return str_replace(',', ', ', $values['MailForwardAddress']);
         }
         return '-';
     }
