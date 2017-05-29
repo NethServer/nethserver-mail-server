@@ -100,6 +100,12 @@ class Modify extends \Nethgui\Controller\Table\Modify
                     'valid_pseudonym_mailbox_conflict');
             }
         }
+        if($this->getRequest()->isMutation()) {
+            if(count($this->parameters['Account']) === 0) {
+                $report->addValidationErrorMessage($this, 'Account',
+                    'valid_pseudonym_empty_destination');
+            }
+        }
     }
 
     public function process()
