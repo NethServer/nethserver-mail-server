@@ -78,6 +78,13 @@ class Pseudonym extends \Nethgui\Controller\TableController
             $destinations = array_merge(array_slice($destinations, 0 , 2), array('...'), array_slice($destinations, -2));
         }
 
+        $destinations = array_map(function($destination) use ($view) {
+            if(substr($destination, 0, 6) === 'vmail+') {
+                return $view->translate('SharedMailbox_selector_label', array(substr($destination, 6)));
+            }
+            return $destination;
+        }, $destinations);
+
         return implode(', ', $destinations);
     }
 
