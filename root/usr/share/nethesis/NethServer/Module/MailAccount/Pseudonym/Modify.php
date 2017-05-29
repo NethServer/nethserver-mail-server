@@ -145,7 +145,9 @@ class Modify extends \Nethgui\Controller\Table\Modify
 
         $users = $userProvider->getUsers();
 
-        $hash = array();
+        $hash = array(
+            'root' => 'root'
+        );
 
         if ($this->parameters['Account'] instanceof \Traversable) {
             foreach ($this->parameters['Account'] as $a) {

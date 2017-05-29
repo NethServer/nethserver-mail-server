@@ -16,7 +16,7 @@
 
         if( ! $accountsDb->get_prop($address, 'Account')
             || $accountsDb->get_prop($address, 'type') eq 'pseudonym-deleted') {
-            $OUT .= sprintf("%-38s %s\n", $address, 'postmaster');
+            $OUT .= sprintf("%-38s %s\n", $address, 'root');
         } else {
             $OUT .= "## $address is defined below\n";
         }
