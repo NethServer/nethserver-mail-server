@@ -1,6 +1,6 @@
 Summary: Mail server implementation based on postfix and dovecot packages
 Name: nethserver-mail-server
-Version: 1.10.14
+Version: 1.10.15
 Release: 1%{?dist}
 License: GPL
 URL: %{url_prefix}/%{name} 
@@ -64,6 +64,15 @@ usermod -G vmail -a postfix >/dev/null 2>&1
 %attr(0644,root,root) %config %ghost %{_sysconfdir}/systemd/system/dovecot.service.d/limits.conf
 
 %changelog
+* Tue May 30 2017 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 1.10.15-1
+- List builtin entries in User mailboxes and Mail aliases pages - NethServer/dev#5296
+- Do not list shared mailbox subfolders - Bug NethServer/dev#5298
+- Remove "vmail+" prefix from Mail aliases page - NethServer/dev#5300
+- Bogus Junk folder appears in shared mailboxes - Bug NethServer/dev#5294
+- Add "Local network only" option to User mailboxes - NethServer/dev#5295
+- Multiple forward addresses in mailboxes - NethServer/dev#5292
+- Set a group name as mail alias destination - NethServer/dev#5293
+
 * Thu May 25 2017 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 1.10.14-1
 - ns6upgrade: suppress cosmetic errors
 
