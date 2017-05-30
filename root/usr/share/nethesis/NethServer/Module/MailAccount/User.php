@@ -40,6 +40,7 @@ class User extends \Nethgui\Controller\TableController
             'MailQuotaCustom',
             'MailSpamRetentionTime',
             'MailForwardAddress',
+            'MailAccess',
             'Actions'
         );
 
@@ -59,6 +60,14 @@ class User extends \Nethgui\Controller\TableController
             $rowMetadata['rowCssClass'] = trim($rowMetadata['rowCssClass'] . ' user-locked');
         }
         return strval($key);
+    }
+
+    public function prepareViewForColumnMailAccess(\Nethgui\Controller\Table\Read $action, \Nethgui\View\ViewInterface $view, $key, $values, &$rowMetadata)
+    {
+        if ($values['MailAccess'] == 'private' ) {
+            return $view->translate('Yes');
+        }
+        return $view->translate('No');
     }
 
     public function prepareViewForColumnActions(\Nethgui\Controller\Table\Read $action, \Nethgui\View\ViewInterface $view, $key, $values, &$rowMetadata)
