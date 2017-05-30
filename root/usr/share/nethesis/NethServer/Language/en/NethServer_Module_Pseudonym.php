@@ -20,3 +20,5 @@ $L['Destinations_label'] = 'Destinations';
 $L['valid_pseudonym_mailbox_conflict'] = 'An user account with the same name already exists';
 $L['valid_pseudonym_empty_destination'] = 'One element must be set at least';
 $L['SharedMailbox_selector_label'] = '${0} (shared mailbox)';
+$L['Yes'] = 'Yes';
+$L['No'] = 'No';

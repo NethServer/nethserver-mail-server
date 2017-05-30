@@ -42,7 +42,7 @@ class Pseudonym extends \Nethgui\Controller\TableController
         $columns = array(
             'Key',
             'Account',
-            'Flag',
+            'Access',
             'Actions'
         );
 
@@ -57,17 +57,12 @@ class Pseudonym extends \Nethgui\Controller\TableController
         parent::initialize();
     }
 
-    public function prepareViewForColumnFlag(\Nethgui\Controller\Table\Read $action, \Nethgui\View\ViewInterface $view, $key, $values, &$rowMetadata)
+    public function prepareViewForColumnAccess(\Nethgui\Controller\Table\Read $action, \Nethgui\View\ViewInterface $view, $key, $values, &$rowMetadata)
     {
-        $flag = '';
-        if ($values['Access'] === 'private') {
-            $rowMetadata['rowCssClass'] = trim($rowMetadata['rowCssClass'] . '');
-            $flag .= 'P';
-        } else {
-            $flag .= '-';
+        if ($values['Access'] == 'private' ) {
+            return $view->translate('Yes');
         }
-
-        return $flag;
+        return $view->translate('No');
     }
 
     public function prepareViewForColumnAccount(\Nethgui\Controller\Table\Read $action, \Nethgui\View\ViewInterface $view, $key, $values, &$rowMetadata)
