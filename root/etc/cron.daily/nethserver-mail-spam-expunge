@@ -32,7 +32,6 @@ for MDIR in /var/lib/nethserver/vmail/*/Maildir; do
 
     if [[ "${USER}" == vmail ]]; then
         if [[ -n "${SpamFolder}" && -d "$MDIR/.${SpamFolder}" ]]; then
-            echo "[WARNING] Removing ${SpamFolder} from vmail public mailbox"
             rm -rf "$MDIR/.${SpamFolder}"
         fi
         continue
