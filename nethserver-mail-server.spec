@@ -1,6 +1,6 @@
 Summary: Mail server implementation based on postfix and dovecot packages
 Name: nethserver-mail-server
-Version: 1.10.15
+Version: 1.10.16
 Release: 1%{?dist}
 License: GPL
 URL: %{url_prefix}/%{name} 
@@ -64,6 +64,9 @@ usermod -G vmail -a postfix >/dev/null 2>&1
 %attr(0644,root,root) %config %ghost %{_sysconfdir}/systemd/system/dovecot.service.d/limits.conf
 
 %changelog
+* Wed Jun 28 2017 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 1.10.16-1
+- spam-expunge: avoid cron output for vmail public mailbox
+
 * Tue May 30 2017 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 1.10.15-1
 - List builtin entries in User mailboxes and Mail aliases pages - NethServer/dev#5296
 - Do not list shared mailbox subfolders - Bug NethServer/dev#5298
