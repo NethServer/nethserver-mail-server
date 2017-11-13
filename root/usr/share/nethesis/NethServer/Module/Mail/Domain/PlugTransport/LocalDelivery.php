@@ -56,7 +56,7 @@ class LocalDelivery extends \Nethgui\Controller\Table\RowPluginAction
                 if( ! preg_match("/^[^@]+(@${domainName})?$/", $this->parameters['UnknownRecipientsActionDeliverMailbox']) ) {
                     $report->addValidationErrorMessage($this, 'UnknownRecipientsActionDeliverMailbox', 'valid_catchall_mailbox_primary', array($domainName));
                 }
-            } else {
+            } elseif( $this->parameters['UnknownRecipientsActionDeliverMailbox'] !== 'root' && substr($this->parameters['UnknownRecipientsActionDeliverMailbox'], 0, 6) !== 'vmail+' ) {
                 $v = $this->createValidator()->email();
                 if( ! $v->evaluate($this->parameters['UnknownRecipientsActionDeliverMailbox'])) {
                     $report->addValidationError($this, 'UnknownRecipientsActionDeliverMailbox', $v);
@@ -64,5 +64,43 @@ class LocalDelivery extends \Nethgui\Controller\Table\RowPluginAction
             }
         }
         parent::validate($report);
+    }
+
+    public function prepareView(\Nethgui\View\ViewInterface $view)
+    {
+        parent::prepareView($view);
+        $mailboxesDatasource = array();
+        foreach($this->getLocalMailboxes() as $mbx) {
+            if(substr($mbx, 0, 6) === 'vmail+') {
+                $mailboxesDatasource[] = array($mbx, $view->translate('SharedMailbox_selector_label', array(substr($mbx, 6))));
+            } else {
+                $mailboxesDatasource[] = array($mbx, $mbx);
+            }
+        }
+        $view['UnknownRecipientsActionDeliverMailboxDatasource'] = $mailboxesDatasource;
+    }
+
+    private function getLocalMailboxes()
+    {
+        $userProvider = new \NethServer\Tool\UserProvider($this->getPlatform());
+        $mbxProvider = new \NethServer\Module\MailAccount\SharedMailbox\SharedMailboxAdapter($this->getPlatform());
+        $mailboxes = array('root');
+
+        $users = $userProvider->getUsers();
+        ksort($users);
+
+        foreach ($users as $key => $prop) {
+            $mailboxes[] = $key;
+        }
+
+        foreach ($mbxProvider->getSharedMailboxList() as $mbx) {
+            $mailboxes[] = 'vmail+' . $mbx['name'];
+        }
+
+        if(isset($this->parameters['UnknownRecipientsActionDeliverMailbox']) && $this->parameters['UnknownRecipientsActionDeliverMailbox'] && ! in_array($this->parameters['UnknownRecipientsActionDeliverMailbox'], $mailboxes))  {
+            array_unshift($mailboxes, $this->parameters['UnknownRecipientsActionDeliverMailbox']);
+        }
+
+        return $mailboxes;
     }
 }

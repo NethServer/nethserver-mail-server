@@ -7,7 +7,5 @@ echo $view->fieldsetSwitch('AlwaysBccStatus', 'enabled', $view::FIELDSETSWITCH_C
 
 echo $view->fieldsetSwitch('UnknownRecipientsActionType', 'deliver', $view::FIELDSETSWITCH_CHECKBOX | $view::FIELDSETSWITCH_EXPANDABLE)
     ->setAttribute('uncheckedValue', 'bounce')
-    ->insert($view->textInput('UnknownRecipientsActionDeliverMailbox'))
+    ->insert($view->selector('UnknownRecipientsActionDeliverMailbox', $view::SELECTOR_DROPDOWN))
 ;
-
-
