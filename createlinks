@@ -225,6 +225,12 @@ event_actions('post-restore-data', qw(
 #
 event_actions('post-restore-config', qw(
     nethserver-mail-upgrade-ns6db 60
+    nethserver-mail-shrmbx-cfgrestore 60
 ));
 
-
+#
+# pre-backup-config event
+#
+event_actions('pre-backup-config', qw(
+    nethserver-mail-shrmbx-cfgbackup 40
+));
