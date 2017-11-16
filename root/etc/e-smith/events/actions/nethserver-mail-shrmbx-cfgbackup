@@ -25,4 +25,7 @@ rm -f $arc
 
 cd /var/lib/nethserver/vmail/vmail
 
-find . -type f -name dovecot-acl | tar -c -T - -f $arc
+(
+    find . \( -type d \( -name cur -o -name new -o -name tmp \) \) \
+           -o \( -type f \( -name dovecot-acl -o -name maildirfolder \) \)
+) | tar --no-recursion -c -T - -f $arc
