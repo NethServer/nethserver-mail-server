@@ -26,4 +26,4 @@ if [[ ! -f $arc ]]; then
     exit 0
 fi
 
-tar -C /var/lib/nethserver/vmail/vmail -x -f $arc
+tar -C /var/lib/nethserver/vmail -x -f $arc

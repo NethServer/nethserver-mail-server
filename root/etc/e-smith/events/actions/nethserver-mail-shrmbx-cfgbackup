@@ -23,9 +23,12 @@ arc=/var/lib/nethserver/backup/nethserver-mail-shrmbx.tar
 
 rm -f $arc
 
-cd /var/lib/nethserver/vmail/vmail
+cd /var/lib/nethserver/vmail
 
 (
-    find . \( -type d \( -name cur -o -name new -o -name tmp \) \) \
-           -o \( -type f \( -name dovecot-acl -o -name maildirfolder \) \)
+    echo shared-mailboxes.db
+    echo vmail
+    echo vmail/Maildir
+    find vmail -type d \( -name cur -o -name new -o -name tmp -o -name '.*' \) -print \
+        -o -type f \( -name dovecot-acl -o -name maildirfolder \) -print
 ) | tar --no-recursion -c -T - -f $arc
