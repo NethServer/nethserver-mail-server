@@ -45,6 +45,7 @@ my @saveTemplates = qw(
     /etc/dovecot/quota.passwd
     /etc/pam.d/dovecot-master
     /var/lib/nethserver/sieve-scripts/before.sieve
+    /etc/dovecot/ipaccess.conf
 );
 
 # UPDATE templates
