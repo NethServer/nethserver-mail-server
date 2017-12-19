@@ -62,6 +62,7 @@ usermod -G vmail -a postfix >/dev/null 2>&1
 %dir %attr(0775,root,root) %{_sysconfdir}/dovecot/sievc/Maildir
 %config %attr (0440,root,root) %{_sysconfdir}/sudoers.d/20_nethserver_mail_server
 %attr(0644,root,root) %config %ghost %{_sysconfdir}/systemd/system/dovecot.service.d/limits.conf
+%attr(0644,root,root) %config %ghost %{_sysconfdir}/dovecot/ipaccess.conf
 
 %changelog
 * Fri Nov 24 2017 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 1.10.18-1
@@ -285,4 +286,3 @@ usermod -G vmail -a postfix >/dev/null 2>&1
 - Migrate admin's standard mailbox to vmail storage. Refs #1622
 - Grant IMAP access to system users in /etc/dovecot/system-users passwd database. Refs #1622
 - Dovecot certificates under nethserver-base certificate management. Refs #1634
-

@@ -45,6 +45,7 @@ my @saveTemplates = qw(
     /etc/dovecot/quota.passwd
     /etc/pam.d/dovecot-master
     /var/lib/nethserver/sieve-scripts/before.sieve
+    /etc/dovecot/ipaccess.conf
 );
 
 # UPDATE templates
@@ -233,4 +234,11 @@ event_actions('post-restore-config', qw(
 #
 event_actions('pre-backup-config', qw(
     nethserver-mail-shrmbx-cfgbackup 40
+));
+
+#
+# trusted-networks-modify event
+#
+event_templates('trusted-networks-modify', qw(
+    /etc/dovecot/ipaccess.conf
 ));

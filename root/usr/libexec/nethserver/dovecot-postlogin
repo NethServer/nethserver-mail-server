@@ -22,6 +22,7 @@
 
 use strict;
 use Sys::Hostname;
+use NetAddr::IP qw(:lower);
 
 my $user = $ENV{USER};
 if($user !~ /\@/ && $user ne 'root' && $user ne 'vmail') {
@@ -43,7 +44,35 @@ $ENV{MASTER_USER}=$ENV{USER};
 $ENV{USERDB_KEYS} .= 'acl_groups master_user ';
 
 #
+# ipaccess.conf -- restrict access by IP policy (#5395)
+#
+if($ENV{IP} && -r '/etc/dovecot/ipaccess.conf') {
+    my $allow_access = 1; # Default is temporary ALLOW
+    my $client_ip = NetAddr::IP->new($ENV{IP});
+    open(my $iph, '<', '/etc/dovecot/ipaccess.conf');
+    while(<$iph>) {
+        chomp;
+        m/^(?:\s+)?(.+?)(?:\s*=\s*)(.+?)(?:\s*)?$/;
+        if($1 =~ m/^#/) {
+            next; # Skip comment lines
+        } elsif(grep { $_ eq $1 } @groups) {
+            $allow_access = 0; # Matching a restricted group line implies temporary DENY
+            if(grep { $_ && $client_ip->within(NetAddr::IP->new($_)) } split(/,\s*/, $2)) {
+                $allow_access = 1; # The first matching subnet implies a final ALLOW decision
+                last;
+            }
+        }
+    }
+    close($iph);
+    if(!$allow_access) {
+        print "* NO [ALERT] Access not allowed from your IP\r\n";
+        exit(0);
+    }
+}
+
+
+
+#
 # The ENVironment is ready, we are done.
 #
 exec(@ARGV) or die "Unable to exec @ARGV: $!";
-
