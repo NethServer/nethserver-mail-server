@@ -7,7 +7,7 @@
         $OUT = <<EOF
 # -- enabled (move marked SPAM messages into junkmail folder)
 require ["fileinto", "mailbox"];
-if header :contains "X-Spam-Flag" "YES" {
+if header :contains "X-Spam" "YES" {
     fileinto :create "$dovecot{SpamFolder}";
     stop;
 }

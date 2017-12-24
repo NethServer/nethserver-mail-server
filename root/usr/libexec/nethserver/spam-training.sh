@@ -34,6 +34,7 @@ exec 1>&-
 PROG=`basename $0`
 USER=$1
 ACTION=$2
+PWD=`cat /var/lib/nethserver/secrets/rspamd`
 
 function log {
     local level=$1
@@ -41,8 +42,8 @@ function log {
     [ -x /usr/bin/logger ] && /usr/bin/logger -i -t "${PROG}/${USER}" -p "mail.${level}" $*;    
 }
 
-if ! [ -x /usr/bin/sa-learn ] || ! getent passwd amavis &>/dev/null; then
-    # Nothing to do if spamassassin is not installed
+if ! [ -x /usr/bin/rspamc ] || ! getent passwd _rspamd &>/dev/null; then
+    # Nothing to do if rspamd is not installed
     exit 0
 fi
 
@@ -53,13 +54,13 @@ if [ $? -eq 0 ] && ! echo $sa_learn_group | \
     /bin/cut -d : -f 4 | \
     /bin/grep -q "\<${USER}\>"; then
     log debug "Not a member of 'spamtrainers' group. Nothing to do."
-    exit 0;
+    exit 0;rspamc
 fi
 
-if ! [ $ACTION == 'ham' ] && ! [ $ACTION == 'spam' ] ; then
+if ! [ $ACTION == 'learn_ham' ] && ! [ $ACTION == 'learn_spam' ] ; then
     log err "Action '${ACTION}' is not recognized" 
     exit 3
 fi
 
-/usr/sbin/sendmail -F 'spam-training.sh script' -r root@`hostname` ${USER}+${ACTION}@spamtrain.nh && log info "Message enqueued as ${ACTION}"
+/usr/bin/rspamc -h localhost:11334 -P $PWD $ACTION  && log info "Message enqueued as ${ACTION}"
 
