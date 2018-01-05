@@ -54,7 +54,7 @@ if [ $? -eq 0 ] && ! echo $sa_learn_group | \
     /bin/cut -d : -f 4 | \
     /bin/grep -q "\<${USER}\>"; then
     log debug "Not a member of 'spamtrainers' group. Nothing to do."
-    exit 0;rspamc
+    exit 0;
 fi
 
 if ! [ $ACTION == 'learn_ham' ] && ! [ $ACTION == 'learn_spam' ] ; then
