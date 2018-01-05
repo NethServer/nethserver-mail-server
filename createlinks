@@ -52,7 +52,6 @@ event_templates('nethserver-mail-server-update',
 		@saveTemplates, 
 		@certificates, qw(
 		/etc/postfix/master.cf
-		/etc/amavisd/amavisd.conf
 		/etc/dovecot/master-users
                 /etc/hosts
                 /etc/dnsmasq.conf
@@ -72,7 +71,6 @@ event_actions('nethserver-mail-server-update', qw(
 ));
 
 event_services('nethserver-mail-server-update', qw(
-	       amavisd restart
 	       dovecot restart
 	       rsyslog restart
 	       postfix restart
