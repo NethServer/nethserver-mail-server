@@ -26,6 +26,7 @@ db=/sbin/e-smith/db
 # The default retention time period length:
 DefaultRetentionTime=`$db configuration getprop dovecot SpamRetentionTime`
 SpamFolder=`$db configuration getprop dovecot SpamFolder`
+SpamPrefix=`$db configuration getprop rspamd SpamSubjectPrefixString`
 
 for MDIR in /var/lib/nethserver/vmail/*/Maildir; do
     USER=$(basename ${MDIR%%Maildir})
@@ -65,8 +66,14 @@ for MDIR in /var/lib/nethserver/vmail/*/Maildir; do
 	    $doveadm expunge -u ${USER} \
 		SENTBEFORE "${TIME}" \
 		MAILBOX INBOX \
-		HEADER X-Spam-Flag YES &> /dev/null
-	else
+		HEADER X-Spam YES &> /dev/null
+
+        $doveadm expunge -u ${USER} \
+        SENTBEFORE "${TIME}" \
+        MAILBOX INBOX \
+        SUBJECT $SpamPrefix &> /dev/null
+
+    else
 	    $doveadm expunge -u ${USER} \
 		SENTBEFORE "${TIME}" \
 		MAILBOX "${SpamFolder}" &> /dev/null
