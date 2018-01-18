@@ -1,5 +1,5 @@
 #
-# 41postlogin-ipaccess
+# 40postlogin-ipaccess
 #
 
 service imap-postlogin \{
