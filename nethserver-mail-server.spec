@@ -31,12 +31,22 @@ perl createlinks
 rm -rf %{buildroot}
 (cd root; find . -depth -print | cpio -dump %{buildroot})
 %{genfilelist} %{buildroot} | \
-  sed '\:^/etc/suoders.d/: d' > %{name}-%{version}-filelist
+  sed '\:^/etc/suoders.d/: d' > %{name}-%{version}-filelist.global
 
 mkdir -p %{buildroot}/%{_nsstatedir}/vmail
 mkdir -p %{buildroot}/%{_nsstatedir}/sieve-scripts
 mkdir -p %{buildroot}/%{_sysconfdir}/dovecot/sieve-scripts
 mkdir -p %{buildroot}/%{_sysconfdir}/dovecot/sievc/Maildir
+
+# List of files for the "ipaccess" subpackage
+cat - > %{name}-%{version}-filelist-ipaccess <<'EOF' 
+/etc/e-smith/db/configuration/defaults/dovecot/RestrictedAccessGroup
+/etc/e-smith/templates/etc/dovecot/dovecot.conf/40postlogin-ipaccess
+/usr/libexec/nethserver/dovecot-postlogin-ipaccess
+EOF
+
+# Generate the main packge filelist by filtering out subpackage files:
+grep -v -x -F -f %{name}-%{version}-filelist-ipaccess %{name}-%{version}-filelist.global > %{name}-%{version}-filelist
 
 %pre
 # ensure vmail user exists:
@@ -63,6 +73,15 @@ usermod -G vmail -a postfix >/dev/null 2>&1
 %config %attr (0440,root,root) %{_sysconfdir}/sudoers.d/20_nethserver_mail_server
 %attr(0644,root,root) %config %ghost %{_sysconfdir}/systemd/system/dovecot.service.d/limits.conf
 %attr(0644,root,root) %config %ghost %{_sysconfdir}/dovecot/ipaccess.conf
+
+%package ipaccess
+Summary: IMAP IP access policy for a specific group of users
+
+%files ipaccess -f %{name}-%{version}-filelist-ipaccess
+
+%description ipaccess
+Mail server extension that implements IP access policy for IMAP service based
+on group membership.
 
 %changelog
 * Fri Nov 24 2017 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 1.10.18-1
