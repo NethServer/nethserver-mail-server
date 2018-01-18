@@ -36,6 +36,7 @@ my @certificates = (qw(
 # expanded templates on SAVE event
 my @saveTemplates = qw(
     /etc/postfix/main.cf
+    /etc/postfix/transport
     /etc/postfix/virtual
     /etc/postfix/internal_access
     /etc/postfix/recipient_bcc
