@@ -296,7 +296,7 @@ on group membership.
 - Support domainless pseudonyms. #1665
 - Create default primary mail domain record. #1530 
 - /etc/sysconfig/dovecot template: fixed wrong bash syntax to close stderr descriptor. Fixes #1656 
-- *.spec: use %{url_prefix} macro in URL tag; set minimum version requirements. #1654 #1653
+- *.spec: use %%{url_prefix} macro in URL tag; set minimum version requirements. #1654 #1653
 
 
 * Thu Jan 31 2013 Davide Principi <davide.principi@nethesis.it> - 1.1.0-1.ns6
