@@ -73,7 +73,10 @@ Properties:
 * ``SpamRetentionTime Nd`` Expunge messages in SpamFolder if older than the given time span. "d" is for days.
 * ``TlsSecurity {optional,required}`` 
   controls dovecot ``disable_plaintext_auth`` parameter: if set to ``required`` clear-text authentication methods are disabled, while ``optional`` enables them.
-* ``RestrictedAccessGroup`` The value is a long group name, like ``domain admins@mydomain.tld``. Members of the given group can login to dovecot services only from trusted networks.
+* ``RestrictedAccessGroup`` The value is a long group name, like ``domain
+  admins@mydomain.tld``. Members of the given group can login to dovecot
+  services only from trusted networks. Install the
+  ``nethserver-mail-server-ipaccess`` package to enable this feature.
 
 
 Domains database
