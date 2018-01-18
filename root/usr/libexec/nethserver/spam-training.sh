@@ -34,7 +34,6 @@ exec 1>&-
 PROG=`basename $0`
 USER=$1
 ACTION=$2
-PWD=`cat /var/lib/nethserver/secrets/rspamd`
 
 function log {
     local level=$1
@@ -62,5 +61,5 @@ if ! [ $ACTION == 'learn_ham' ] && ! [ $ACTION == 'learn_spam' ] ; then
     exit 3
 fi
 
-/usr/bin/rspamc -h localhost:11334 -P $PWD $ACTION  && log info "Message enqueued as ${ACTION}"
+/usr/bin/rspamc -h localhost:11334 -P $(< /var/lib/nethserver/secrets/rspamd) $ACTION  && log info "Message enqueued as ${ACTION}"
 
