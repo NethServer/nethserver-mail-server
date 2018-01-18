@@ -41,7 +41,14 @@ mkdir -p %{buildroot}/%{_sysconfdir}/dovecot/sievc/Maildir
 # List of files for the "ipaccess" subpackage
 cat - > %{name}-%{version}-filelist-ipaccess <<'EOF' 
 /etc/e-smith/db/configuration/defaults/dovecot/RestrictedAccessGroup
+/etc/e-smith/templates/etc/dovecot/ipaccess.conf/20restricted_access_group
 /etc/e-smith/templates/etc/dovecot/dovecot.conf/40postlogin-ipaccess
+/etc/e-smith/events/nethserver-mail-server-save/templates2expand/etc/dovecot/ipaccess.conf
+/etc/e-smith/events/nethserver-mail-server-update/templates2expand/etc/dovecot/ipaccess.conf
+/etc/e-smith/events/trusted-networks-modify/templates2expand/etc/dovecot/ipaccess.conf
+/etc/e-smith/events/nethserver-mail-server-ipaccess-update/services2adjust/dovecot
+/etc/e-smith/events/nethserver-mail-server-ipaccess-update/templates2expand/etc/dovecot/dovecot.conf
+/etc/e-smith/events/nethserver-mail-server-ipaccess-update/templates2expand/etc/dovecot/ipaccess.conf
 /usr/libexec/nethserver/dovecot-postlogin-ipaccess
 EOF
 
@@ -72,12 +79,14 @@ usermod -G vmail -a postfix >/dev/null 2>&1
 %dir %attr(0775,root,root) %{_sysconfdir}/dovecot/sievc/Maildir
 %config %attr (0440,root,root) %{_sysconfdir}/sudoers.d/20_nethserver_mail_server
 %attr(0644,root,root) %config %ghost %{_sysconfdir}/systemd/system/dovecot.service.d/limits.conf
-%attr(0644,root,root) %config %ghost %{_sysconfdir}/dovecot/ipaccess.conf
 
 %package ipaccess
 Summary: IMAP IP access policy for a specific group of users
 
 %files ipaccess -f %{name}-%{version}-filelist-ipaccess
+%dir %{_nseventsdir}/%{name}-ipaccess-update
+%doc COPYING
+%attr(0644,root,root) %config %ghost %{_sysconfdir}/dovecot/ipaccess.conf
 
 %description ipaccess
 Mail server extension that implements IP access policy for IMAP service based
