@@ -1,6 +1,6 @@
 Summary: Mail server implementation based on postfix and dovecot packages
 Name: nethserver-mail-server
-Version: 1.10.18
+Version: 1.11.0
 Release: 1%{?dist}
 License: GPL
 URL: %{url_prefix}/%{name} 
@@ -93,6 +93,9 @@ Mail server extension that implements IP access policy for IMAP service based
 on group membership.
 
 %changelog
+* Tue Jan 23 2018 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 1.11.0-1
+- IP-based IMAP access restriction - NethServer/dev#5395
+
 * Fri Nov 24 2017 Giacomo Sanchietti <giacomo.sanchietti@nethesis.it> - 1.10.18-1
 - Shared mailboxes not restored from configuration backup - Bug NethServer/dev#5381
 - Bad mail delivery to non-existing mailbox with catchall address - Bug NethServer/dev#5379
