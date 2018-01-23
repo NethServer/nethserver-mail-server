@@ -238,3 +238,26 @@ The *cidr list* is a comma-separated list of IP and network addresses in CIDR
 format, like ``127.0.0.1, 192.168.1.0/24, 10.1.1.2``. The binary conversion is
 implemented by the ``NetAddr::IP`` Perl module. See ``perldoc NetAddr::IP`` for
 details.
+
+IP-based IMAP access restriction
+--------------------------------
+
+This feature allows to restrict IMAP access for a specific group.
+Members of the given group have IMAP access restricted to trusted networks.
+
+1. Install ``nethserver-mail-server-ipaccess`` package ::
+
+     yum install nethserver-mail-server-ipaccess
+
+2. Set the limited group, remember to use the full group name: ``<group>@<domain>`` ::
+
+     config setprop dovecot RestrictedAccessGroup <group>@<domain>
+
+   Example for group ``collaborators@nethserver.org``: ::
+
+     config setprop dovecot RestrictedAccessGroup collaborators@nethserver.org
+
+3. Apply the configuration ::
+
+     signal-event nethserver-mail-server-save
+
