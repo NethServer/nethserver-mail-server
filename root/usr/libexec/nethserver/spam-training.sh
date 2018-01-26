@@ -61,5 +61,5 @@ if ! [ $ACTION == 'learn_ham' ] && ! [ $ACTION == 'learn_spam' ] ; then
     exit 3
 fi
 
-/usr/bin/rspamc -h localhost:11334 -P $(< /var/lib/nethserver/secrets/rspamd) $ACTION  && log info "Message enqueued as ${ACTION}"
+/usr/sbin/sendmail -F 'spam-training.sh script' -r root@`hostname` ${USER}+${ACTION}@spamtrain.nh && log info "Message enqueued as ${ACTION}"
 
