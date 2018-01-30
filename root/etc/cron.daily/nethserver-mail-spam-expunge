@@ -65,7 +65,7 @@ for MDIR in /var/lib/nethserver/vmail/*/Maildir; do
 	    $doveadm expunge -u ${USER} \
 		SENTBEFORE "${TIME}" \
 		MAILBOX INBOX \
-		HEADER X-Spam YES &> /dev/null
+		HEADER X-Spam-Flag YES &> /dev/null
     else
 	    $doveadm expunge -u ${USER} \
 		SENTBEFORE "${TIME}" \
