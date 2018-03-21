@@ -254,3 +254,15 @@ event_templates('nethserver-mail-server-ipaccess-update', qw(
 event_services('nethserver-mail-server-ipaccess-update', qw(
     dovecot restart
 ));
+
+#
+# tls-policy-save event
+#
+
+event_templates('tls-policy-save', qw(
+    /etc/dovecot/dovecot.conf
+));
+
+event_services('tls-policy-save', qw(
+    dovecot reload
+));
