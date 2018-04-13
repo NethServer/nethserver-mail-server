@@ -36,7 +36,7 @@ rm -rf %{buildroot}
 mkdir -p %{buildroot}/%{_nsstatedir}/vmail
 mkdir -p %{buildroot}/%{_nsstatedir}/sieve-scripts
 mkdir -p %{buildroot}/%{_sysconfdir}/dovecot/sieve-scripts
-mkdir -p %{buildroot}/%{_sysconfdir}/dovecot/sievc/Maildir
+mkdir -p %{buildroot}/%{_sysconfdir}/dovecot/sievec/Maildir
 
 # List of files for the "ipaccess" subpackage
 cat - > %{name}-%{version}-filelist-ipaccess <<'EOF' 
@@ -76,7 +76,7 @@ usermod -G vmail -a postfix >/dev/null 2>&1
 %dir %attr(0700,vmail,vmail) %{_nsstatedir}/vmail
 %dir %attr(0770,root,vmail) %{_nsstatedir}/sieve-scripts
 %dir %attr(0775,root,root) %{_sysconfdir}/dovecot/sieve-scripts
-%dir %attr(0775,root,root) %{_sysconfdir}/dovecot/sievc/Maildir
+%dir %attr(0775,root,root) %{_sysconfdir}/dovecot/sievec/Maildir
 %config %attr (0440,root,root) %{_sysconfdir}/sudoers.d/20_nethserver_mail_server
 %attr(0644,root,root) %config %ghost %{_sysconfdir}/systemd/system/dovecot.service.d/limits.conf
 
