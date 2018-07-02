@@ -1,6 +1,6 @@
 Summary: Mail server implementation based on postfix and dovecot packages
 Name: nethserver-mail-server
-Version: 1.12.2
+Version: 1.12.3
 Release: 1%{?dist}
 License: GPL
 URL: %{url_prefix}/%{name} 
@@ -89,6 +89,9 @@ Mail server extension that implements IP access policy for IMAP service based
 on group membership.
 
 %changelog
+* Mon Jul 02 2018 Davide Principi <davide.principi@nethesis.it> - 1.12.3-1
+- Fix of keytab backup configuration expansion - NethServer/dev#5536
+
 * Tue Jun 26 2018 Davide Principi <davide.principi@nethesis.it> - 1.12.2-1
 - Allow Elliptic Curve Criptography (ECC) certificate - NethServer/dev#5509
 
